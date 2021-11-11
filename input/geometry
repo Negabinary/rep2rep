@@ -1,0 +1,23 @@
+typeSystem geometry =
+    types _:distance, _:angle,
+    _:point, _:rect, _:direction, _:area,
+    origin, up, perpendicular, one, value
+    
+    order origin < point,
+          up < direction,
+          perpendicular < angle,
+          one < distance,
+          distance < value,
+          angle < value,
+          area < value
+
+conSpec geometryG:geometry = 
+    move : [point, direction, distance] -> point,
+    intersect : [point, direction, point, direction] -> point,
+    rectangle : [point, point, distance] -> point,
+    rectjoin : [rect, rect] -> rect,
+    measure : [point, point] -> distance,
+    measure_angle : [point, point, point] -> angle,
+    measure_area : [rect] -> area,
+    direction : [point, point] -> direction
+    

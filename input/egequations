@@ -1,0 +1,32 @@
+import correspondences/eqGeom
+
+construction additionCommutes:equationG = 
+    t:AplusBeqBplusA:equality
+        <- equality[
+            t1:AplusB:expr
+                <- infixOp[
+                    t11:A:var,
+                    t12:B:var,
+                ],
+            t2:equals,
+            t3:BplusA:expr
+                <- infixOp[
+                    t21:B:var,
+                    t22:A:var
+                ]
+        ]
+
+construction unity:equationG =
+    t:oneeqone:equality
+        <- equality[
+            t1:one,
+            t2:equals,
+            t3:one
+        ]
+
+transfer
+    sourceConstruction unity
+    targetTypeSystem geometry
+    goal ([t:oneeqone:equality],[t':value]) :: repeq
+    output test
+    limit 10

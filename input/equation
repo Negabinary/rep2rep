@@ -1,0 +1,21 @@
+typeSystem equation =
+    types _:expr, _:equality, 
+            _:var, one, open, close,
+            plus, minus, times, divide, binOp,
+            sin, cos, tan, fun, equals
+    
+    order one < expr,
+          plus < binOp,
+          minus < binOp,
+          times < binOp,
+          divide < binOp,
+          sin < fun,
+          cos < fun,
+          tan < fun
+
+conSpec equationG:equation = 
+    infixOp : [expr, binOp, expr] -> expr,
+    equality : [expr, equals, expr] -> equality,
+    app : [fun, expr] -> expr,
+    brackets : [open, expr, close] -> expr
+    

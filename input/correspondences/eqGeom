@@ -1,0 +1,18 @@
+import equation
+import geometry
+
+correspondence bothSides:(equationG,geometryG) =
+    source t:equality <- equality[t1:expr,t2:equals,t3:expr]
+    target t':value
+    tokenRels ([t1:expr],[t':value]) :: represents,
+              ([t3:expr],[t':value]) :: represents
+    constructRel ([t:equality],[t':value]) :: repeq
+    strength 1.0
+
+
+correspondence one:(equationG,geometryG) = 
+    source t:one
+    target t':one
+    tokenRels
+    constructRel ([t:one],[t':one]) :: represents
+    strength 1.0
