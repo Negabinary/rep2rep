@@ -11,7 +11,6 @@ sig
                             -> Type.typeSystem
                             -> Construction.construction
                             -> Relation.relationship
-                            -> int
                             -> State.T Seq.seq
 
 end;
@@ -30,8 +29,7 @@ struct
               end
         in f 0
         end
-      (*val tokensInConstruction = List.filter (fn x => not (CSpace.sameTokens t x)) (Construction.tokensOfConstruction ct)*)
-      val tokensInConstruction = (Construction.tokensOfConstruction ct)
+      val tokensInConstruction = (Construction.fullTokenSequence ct)
       val tokensInComposition = Composition.tokensOfComposition D
       val names = map CSpace.nameOfToken (tokensInComposition @ tokensInConstruction)
       fun mkRenameFunction _ [] = (fn _ => NONE)
@@ -78,7 +76,9 @@ struct
               | _ => raise CorrespondenceNotApplicable)
       fun partialFunComp f g x = (case g x of NONE => f x | SOME y => f y)
       fun srFun x = (Option.valOf o sourceRenamingFunction) x
+          handle Option => (Logging.write "\nERROR: source renaming function\n"; raise Option)
       fun trFun x = (Option.valOf o (partialFunComp targetRenamingFunction partialMorphism)) x
+          handle Option => (Logging.write "\nERROR: target renaming function\n"; raise Option)
       fun updateR (sfs,tfs,R) = (map srFun sfs, map trFun tfs, R)
       (*****)
       fun funUnion (f::L) x =
@@ -198,7 +198,7 @@ struct
 
   exception BadGoal
   (* every element of goals should be of the form ([vi1,...,vin],[vj1,...,vjm],R)*)
-  fun structureTransfer KB sourceT targetT ct goal limit =
+  fun structureTransfer KB sourceT targetT ct goal =
     let
       val t = (case Relation.tupleOfRelationship goal of
                   (_,[x],_) => x
@@ -249,10 +249,13 @@ struct
             else Int.compare (gsl,gsl')*)
         end
       fun eq (st,st') = List.isPermutationOf (uncurry Relation.stronglyMatchingRelationships) (State.goalsOf st) (State.goalsOf st')
+      fun ign (st,L) = List.length (#goals st) > 50 orelse length L > 9999 orelse List.exists (fn x => eq (x,st)) L
     in
-      (*Search.sortNoRepetition unfoldState heuristic4 eq limit initialState*)
       (*Search.depthFirst unfoldState limit initialState*)
-      Search.graphDepthFirstSorting unfoldState heuristic4 eq limit initialState
+      (*Search.graphDepthFirst unfoldState eq limit initialState*)
+      (*Search.breadthFirstSortAndIgnore unfoldState heuristic4 ign initialState*)
+      Search.depthFirstSortAndIgnore unfoldState heuristic4 ign initialState
+      (*Search.bestFirstSortAndIgnore unfoldState heuristic4 ign initialState*)
     end
 
 

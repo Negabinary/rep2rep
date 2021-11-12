@@ -72,13 +72,13 @@ struct
   type documentContent = {typeSystems : Type.typeSystem list,
                           conSpecs : CSpace.conSpec list,
                           knowledge : Knowledge.base,
-                          constructions : {name : string, conSpec : string, construction : Construction.construction} FiniteSet.set,
+                          constructions : {name : string, conSpec : string, construction : Construction.construction} list,
                           transferRequests : (string list) list,
                           strengths : string -> real option}
   val emptyDocContent = {typeSystems = [],
                          conSpecs = [],
                          knowledge = Knowledge.empty,
-                         constructions = FiniteSet.empty,
+                         constructions = [],
                          transferRequests = [],
                          strengths = (fn _ => NONE)}
 
@@ -146,7 +146,7 @@ struct
       val KB = knowledgeOf DC
       val _ = print ("\nApplying structure transfer...");
       val startTime = Time.now();
-      val results = Transfer.structureTransfer KB (sourceTypeSystem) targetTypeSystem construction goal 1000;
+      val results = Transfer.structureTransfer KB sourceTypeSystem targetTypeSystem construction goal;
       val endTime = Time.now();
       val runtime = Time.toMilliseconds endTime - Time.toMilliseconds startTime;
       val _ = print ("done\n" ^ "  runtime: "^ LargeInt.toString runtime ^ " ms \n");
@@ -174,6 +174,9 @@ struct
         end
       fun mkLatexConstructionsAndGoals (comp,tproof,goal,goals) =
         let val latexConstructions = mkLatexConstructions comp
+            val _ = if Composition.wellFormedComposition targetTypeSystem comp
+                    then ()
+                    else print ("\nWARNING! some decomposition is not well formed!")
             val latexLeft = Latex.environment "minipage" "[t]{0.45\\linewidth}" (Latex.printWithHSpace 0.2 latexConstructions)
             val latexGoals = mkLatexGoals (goal,goals,tproof)
             val latexRight = Latex.environment "minipage" "[t]{0.35\\linewidth}" (latexGoals)
@@ -224,12 +227,12 @@ struct
       fun getTyps _ [] = []
         | getTyps subType ((x,c)::L) =
             if x = SOME typesKW
-            then map (parseTyp subType) (String.tokens (fn x => x = #"\n" orelse x = #",") (String.concat c))
+            then map (parseTyp subType) (String.tokens (fn x => x = #",") (String.concat c))
             else getTyps subType L
       fun getOrder [] = []
         | getOrder ((x,c)::L) =
             if x = SOME subTypeKW
-            then map inequality (String.tokens (fn x => x = #"\n" orelse x = #",") (String.concat c))
+            then map inequality (String.tokens (fn x => x = #",") (String.concat c))
             else getOrder L
       val ordList = getOrder blocks
       fun getTypsInOrdList ((x,y)::L) = FiniteSet.insert (Type.typeOfString x) (FiniteSet.insert (Type.typeOfString y) (getTypsInOrdList L))
@@ -268,7 +271,7 @@ struct
   let val (name,x,typeSystemN) = String.breakOn ":" r
       (*val _ = if x = ":" then () else raise ParseError "no type system specified for conSpec"*)
       val chars = List.concat (map String.explode tss)
-      val crs = map parseConstructor (Parser.splitLevelWithSeparatorApply' (fn x => x) (fn x => x = #"\n" orelse x = #",") chars)
+      val crs = map parseConstructor (Parser.splitLevelWithSeparatorApply' (fn x => x) (fn x => x = #",") chars)
       val _ = Logging.write ("\nAdding constructors for constructor specification " ^ name ^ " of type system " ^ typeSystemN ^ "...\n")
       val _ = map ((fn x => Logging.write ("  " ^ x ^ "\n")) o CSpace.stringOfConstructor) crs
       val _ = Logging.write "...done\n"
@@ -296,7 +299,7 @@ struct
           (ts,"",_) =>
             let val tok = Parser.token ts
             in if List.exists (CSpace.sameTokens tok) tacc
-               then Construction.Loop tok
+               then Construction.Reference tok
                else Construction.Source tok
             end
         | (tcps,_,ss) =>
@@ -307,7 +310,7 @@ struct
                         else raise ParseError ("invalid input sequence to constructor: " ^ ss)
             in Construction.TCPair (tcp, Parser.splitLevelApply ((c (tok::tacc)) o String.removeParentheses) xs)
             end
-    in c [] (String.stripSpaces s)
+    in Construction.fixReferences (c [] (String.stripSpaces s))
     end;
 
   fun addCorrespondence (nn,cs) dc =
@@ -316,34 +319,50 @@ struct
       val (sourceCSpecN,y,targetCSpecN) = String.breakOn "," (String.removeParentheses cspecNs)
       val _ = if y = "," then () else raise ParseError ("construction " ^ nn ^ " needs source and target cspecs")
       val sourceCSpec = findConSpecWithName dc sourceCSpecN
+      val sourceTySys = findTypeSystemWithName dc (#typeSystem sourceCSpec)
       val targetCSpec = findConSpecWithName dc targetCSpecN
-      fun getPattern k [] = raise ParseError ("no " ^ k ^ " in correspondence " ^ String.concat cs)
+      val targetTySys = findTypeSystemWithName dc (#typeSystem targetCSpec)
+      val _ = Logging.write ("\nAdding correspondence " ^ name ^ "...")
+      fun getPattern k [] = (Logging.write ("  ERROR: " ^ k ^ " pattern not specified");
+                              raise ParseError ("no " ^ k ^ " in correspondence " ^ String.concat cs))
         | getPattern k ((x,ps) :: L) =
             if x = SOME k
             then parseConstruction (String.concat ps) (if k = sourceKW then sourceCSpec else targetCSpec)
             else getPattern k L
-      fun getTokenRels [] = raise ParseError ("no token rels in correspondence " ^ String.concat cs)
+      fun getTokenRels [] = (Logging.write ("  ERROR: token relation not specified");
+                              raise ParseError ("no token rels in correspondence " ^ String.concat cs))
         | getTokenRels ((x,trss) :: L) =
             if x = SOME tokenRelsKW
             then Parser.relaxedList Parser.relationship (String.concat trss)
             else getTokenRels L
-      fun getConstructRel [] = raise ParseError ("no construct rel in correspondence " ^ String.concat cs)
+      fun getConstructRel [] = (Logging.write ("  ERROR: construct relation not specified");
+                                raise ParseError ("no construct rel in correspondence " ^ String.concat cs))
         | getConstructRel ((x,crs) :: L) =
             if x = SOME constructRelKW
             then Parser.relationship (String.concat crs)
             else getConstructRel L
-      fun getStrength [] = raise ParseError ("no construct rel in correspondence " ^ String.concat cs)
+      fun getStrength [] = (Logging.write ("  ERROR: strength not specified");
+                            raise ParseError ("no strength in correspondence " ^ String.concat cs))
         | getStrength ((x,ss) :: L) =
             if x = SOME strengthKW
             then Real.fromString (String.concat ss)
             else getStrength L
       val blocks = contentForKeywords corrKeywords cs
+      val sPatt = getPattern sourceKW blocks
+      val tPatt = getPattern targetKW blocks
+      val _ = if Construction.wellFormed sourceTySys sPatt
+              then Logging.write "\n  source pattern is well formed"
+              else Logging.write "\n  WARNING: source pattern is not well formed"
+      val _ = if Construction.wellFormed targetTySys tPatt
+              then Logging.write "\n  target pattern is well formed\n"
+              else Logging.write "\n  WARNING: target pattern is not well formed\n"
       val corr = {name = name,
-                  sourcePattern = getPattern sourceKW blocks,
-                  targetPattern = getPattern targetKW blocks,
+                  sourcePattern = sPatt,
+                  targetPattern = tPatt,
                   tokenRels = getTokenRels blocks,
                   constructRel = getConstructRel blocks}
       fun strengthsUpd c = if c = name then getStrength blocks else (#strengths dc) c
+      val _ = Logging.write ("done\n")
   in {typeSystems = #typeSystems dc,
       conSpecs = #conSpecs dc,
       knowledge = Knowledge.addCorrespondence (#knowledge dc) corr,
@@ -358,13 +377,18 @@ struct
       val cspec = findConSpecWithName dc cspecN
       val ct = parseConstruction cts cspec
       val T = findTypeSystemWithName dc (#typeSystem cspec)
-      (*val _ = if Construction.wellFormed T ct then print ("construction " ^ name ^ " is well formed")
-                else print ("WARNING: construction "^name^" is not well formed")*)
+      val _ = print ("\nChecking well-formedness of construction " ^ name ^ "...");
+      val startTime = Time.now();
+      val _ = if Construction.wellFormed  T ct then Logging.write ("\n  "^ name ^ " is well formed\n")
+                else print ("\n  WARNING: "^ name ^" is not well formed\n")
+      val endTime = Time.now();
+      val runtime = Time.toMilliseconds endTime - Time.toMilliseconds startTime;
+      val _ = print ("  well-formedness check runtime: "^ LargeInt.toString runtime ^ " ms \n...done\n  ");
       val ctRecord = {name = name, conSpec = cspecN, construction = ct}
   in {typeSystems = #typeSystems dc,
       conSpecs = #conSpecs dc,
       knowledge = #knowledge dc,
-      constructions = FiniteSet.insert ctRecord (#constructions dc),
+      constructions = ctRecord :: (#constructions dc),
       transferRequests = #transferRequests dc,
       strengths = #strengths dc}
   end
@@ -374,7 +398,7 @@ struct
       {typeSystems = ts @ ts',
        conSpecs = sp @ sp',
        knowledge = Knowledge.join kb kb',
-       constructions = FiniteSet.union cs cs',
+       constructions = cs @ cs',
        transferRequests = tr @ tr',
        strengths = (fn c => case st c of SOME f => SOME f | NONE => st' c)})
   | joinDocumentContents [] = emptyDocContent
@@ -412,7 +436,7 @@ struct
           end handle Bind => raise ParseError "expected name = content, found multiple words before ="
 
       val nonImported = List.filter (fn (x,_) => x <> SOME importKW) blocks
-      val allContent = distribute nonImported
+      val allContent = distribute (rev nonImported)
       val _ = map (parseTransferRequests allContent) (#transferRequests allContent)
   in allContent
   end

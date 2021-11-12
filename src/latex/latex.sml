@@ -17,7 +17,13 @@ end;
 structure Latex : LATEX =
 struct
 
-  fun mathsf s = "\\mathsf{" ^ s ^ "}"
+  fun latexifyUnderscore s =
+  let fun lus [] = []
+        | lus (c::C) = if c = #"_" then #"\\" :: #"_" :: lus C else c :: lus C
+  in String.implode (lus (String.explode s))
+  end
+
+  fun mathsf s = "\\mathsf{" ^ latexifyUnderscore s ^ "}"
   fun typ ty = mathsf (Type.nameOfType ty)
   fun token t =
     let val tok = CSpace.nameOfToken t
@@ -78,8 +84,9 @@ struct
     in "\\node[constructor = " ^ String.addBraces nc ^ "] " ^ nodeNameOfConstructor c t ^ " at " ^ coordinates coor ^ " " ^ String.addBraces nodeString ^ ";"
     end
 
+
   fun tokenNode isSource coor t =
-    let val typn = "$\\mathsf{"^Type.nameOfType (CSpace.typeOfToken t)^"}$"
+    let val typn = "$\\mathsf{"^latexifyUnderscore(Type.nameOfType (CSpace.typeOfToken t))^"}$"
         val tokn = "$"^CSpace.nameOfToken t^"$"
         val att = if isSource then "termS" else "term"
     in "\\node["^att^" = " ^ String.addBraces typn ^ "] " ^ nodeNameOfToken t ^ " at " ^ coordinates coor ^ " " ^ String.addBraces tokn ^ ";"
@@ -106,14 +113,14 @@ struct
         (*in Real.max(0.75,0.1*real (Int.max(sizeOfToken,sizeOfType)))*)
         in Real.max(0.7,0.11* (Real.max(sizeOfToken, sizeOfType)))
         end
-    | quickWidthEstimate (Construction.Loop _) = 0.0
+    | quickWidthEstimate (Construction.Reference _) = 0.0
     | quickWidthEstimate (Construction.TCPair (_,cs)) = List.sumMap quickWidthEstimate cs
 
   fun construction' coor parentName i (Construction.Source t) =
         (case parentName of
           NONE => lines [tokenNode true coor t]
         | SOME pn => lines [tokenNode true coor t, arrowLabelled (nodeNameOfToken t) pn i])
-    | construction' _ parentName i (Construction.Loop t) =
+    | construction' _ parentName i (Construction.Reference t) =
         (case parentName of
           NONE => "% BAD CONSTRUCTION"
         | SOME pn => if i = 1
