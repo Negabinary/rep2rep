@@ -1,18 +1,24 @@
 import equation
 import geometry
 
-correspondence bothSides:(equationG,geometryG) =
+correspondence distanceBothSides:(equationG,geometryG) =
     source t:equality <- equality[t1:expr,t2:equals,t3:expr]
-    target t':value
-    tokenRels ([t1:expr],[t':value]) :: represents,
-              ([t3:expr],[t':value]) :: represents
+    target t':distance <- measure[p1:point, p2:point]
+    tokenRels ([t1:expr],[p2:point]) :: distanceRep,
+              ([t3:expr],[p2:point]) :: distanceRep
     constructRel ([t:equality],[t':value]) :: repeq
     strength 1.0
 
-
-correspondence one:(equationG,geometryG) = 
+correspondence distanceOne:(equationG,geometryG) = 
     source t:one
-    target t':one
+    target d:distance <- measure[p1:point, p1:point]
     tokenRels
-    constructRel ([t:one],[t':one]) :: represents
+    constructRel ([t:one],[p1:point]) :: distanceRep
     strength 1.0
+
+comment plusDistance:(equationG,geometryG) = 
+    source t:expr <- infixOp[t1:expr, t2:plus, t2:expr]
+    target t':distance <- measure[p1:point, p3:point <- move[p2:point <- move[p1:point, d1:direction, d2:distance], d1:direction, d3:distance]]
+    tokenRels ([t1:expr],[d3:value]) :: represents,
+              ([t2:expr],[d2:value]) :: represents
+    constructRel ([t:expr],[t':value]) :: represents

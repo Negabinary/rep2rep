@@ -1,0 +1,12 @@
+typeSystem geometry =
+    types _:distance, _:point, _:direction, origin, up, one, value
+    
+    order origin < point,
+          up < direction,
+          one < distance,
+          distance < value
+
+conSpec geometryG:geometry = 
+    move : [point, direciton, distance] -> point
+    join : [point, point] -> line
+    concat : [line, line] -> line

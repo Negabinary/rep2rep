@@ -1,5 +1,5 @@
 typeSystem geometry =
-    types _:distance, _:angle,
+    types _:distance, _:angle, _:line,
     _:point, _:rect, _:direction, _:area,
     origin, up, perpendicular, one, value
     

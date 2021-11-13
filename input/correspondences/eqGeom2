@@ -1,0 +1,17 @@
+import equation
+import geometry2
+
+corresponence distanceBothSides:(equationG,geometryG) = 
+    source t:equality <- equality[t1:expr,t2:equals,t3:expr]
+    target t':line
+    tokenRels ([t1:expr],[t':line]) :: length,
+              ([t3:expr],[t':line]) :: length
+    constructRel ([t:equality],[t':value]) :: repeq
+    strength 1.0
+
+correspondence distanceOne:(equationG,geometryG) = 
+    source t:one
+    target l:line <- join[p1:point, p2:point <- move[p1:point, d1:direction, one]]
+    tokenRels
+    constructRel ([t:one],[l:line]) :: length
+    strength 1.0

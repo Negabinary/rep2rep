@@ -1,4 +1,4 @@
-import correspondences/eqGeom
+import correspondences/eqGeom2
 
 construction additionCommutes:equationG = 
     t:AplusBeqBplusA:equality
@@ -6,13 +6,15 @@ construction additionCommutes:equationG =
             t1:AplusB:expr
                 <- infixOp[
                     t11:A:var,
-                    t12:B:var,
+                    t12:plus,
+                    t13:B:var
                 ],
             t2:equals,
             t3:BplusA:expr
                 <- infixOp[
                     t21:B:var,
-                    t22:A:var
+                    t22:plus,
+                    t23:A:var
                 ]
         ]
 
@@ -28,5 +30,5 @@ transfer
     sourceConstruction unity
     targetTypeSystem geometry
     goal ([t:oneeqone:equality],[t':value]) :: repeq
-    output test
+    output test2
     limit 10
