@@ -4,8 +4,8 @@ import geometry
 correspondence distanceBothSides:(equationG,geometryG) =
     source t:equality <- equality[t1:expr,t2:equals,t3:expr]
     target t':distance <- measure[p1:point, p2:point]
-    tokenRels ([t1:expr],[p2:point]) :: distanceRep,
-              ([t3:expr],[p2:point]) :: distanceRep
+    tokenRels ([t1:expr],[p1:point, p2:point]) :: distanceRep,
+              ([t3:expr],[p1:point, p2:point]) :: distanceRep
     constructRel ([t:equality],[t':value]) :: repeq
     strength 1.0
 
@@ -13,7 +13,7 @@ correspondence distanceOne:(equationG,geometryG) =
     source t:one
     target d:distance <- measure[p1:point, p1:point]
     tokenRels
-    constructRel ([t:one],[p1:point]) :: distanceRep
+    constructRel ([t:one],[p1:point, p2:point]) :: distanceRep
     strength 1.0
 
 comment plusDistance:(equationG,geometryG) = 

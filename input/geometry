@@ -14,7 +14,7 @@ typeSystem geometry =
 conSpec geometryG:geometry = 
     move : [point, direction, distance] -> point,
     intersect : [point, direction, point, direction] -> point,
-    rectangle : [point, point, distance] -> point,
+    rectangle : [point, point, distance] -> rect,
     rectjoin : [rect, rect] -> rect,
     measure : [point, point] -> distance,
     measure_angle : [point, point, point] -> angle,

@@ -1,5 +1,5 @@
 typeSystem geometry =
-    types _:distance, _:point, _:direction, origin, up, one, value
+    types _:distance, _:point, _:direction, origin, up, one, value, line
     
     order origin < point,
           up < direction,
@@ -7,6 +7,6 @@ typeSystem geometry =
           distance < value
 
 conSpec geometryG:geometry = 
-    move : [point, direciton, distance] -> point
-    join : [point, point] -> line
+    move : [point, direciton, distance] -> point,
+    join : [point, point] -> line,
     concat : [line, line] -> line

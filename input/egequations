@@ -27,8 +27,8 @@ construction unity:equationG =
         ]
 
 transfer
-    sourceConstruction unity
+    sourceConstruction additionCommutes
     targetTypeSystem geometry
-    goal ([t:oneeqone:equality],[t':value]) :: repeq
+    goal ([t:AplusBeqBplusA:equality],[t':line]) :: repeq
     output test2
     limit 10
