@@ -1,3 +1,6 @@
+val REP2REP_VERSION = "gcc99671";
+val BASE = "./src/";
+use "src/util/rep2replib.sml";
 import "util.logging";
 import "latex.latex";
 import "oruga.document";
@@ -36,10 +39,6 @@ fun parseArgs () =
 fun main () =
   let val today = Date.fmt "%Y-%m-%d" (Date.fromTimeLocal (Time.now()));
       val version = "rep2rep-" ^ REP2REP_VERSION;
-  (*)    val _ = Logging.write ("BEGIN algorithm-trace-"
-                               ^ today
-                               ^ " with "
-                               ^ version ^ "\n");*)
       val documentName = parseArgs ();
       val _ = Document.read documentName
   in ()

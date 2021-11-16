@@ -15,22 +15,7 @@ rep2rep: dist/rep2rep
 
 dist/rep2rep: $(REP2REP_TMP)
 	mkdir -p dist
-	$(MLC) $(FLAGS) -o $@ $<
-
-.PHONY:$(REP2REP_TMP)
-$(REP2REP_TMP): base.sml src/main.sml
-	echo "use \""$<"\";" >> $@;
-	for f in $(filter-out base.sml,$^); do \
-		tmp=$$(dirname $$f)/$$(basename $$f .sml); \
-		tmp=$$(sed "s/^src\///" <<< $$tmp); \
-		tmp=$$(sed "s/\//\./g" <<< $$tmp); \
-		echo "import \"$$tmp\";" >> $@ ; \
-	done
-
-base.sml:
-	echo 'val REP2REP_VERSION="'$(REP2REP_VERSION)'";' >> base.sml
-	echo 'val BASE="./src/";' >> base.sml
-	echo 'use "src/util/rep2replib.sml";' >> base.sml
+	$(MLC) $(FLAGS) -o $@ src/main.sml
 
 test: tests/test
 	$<
@@ -53,5 +38,5 @@ clean:
 	rm -rf base.sml
 
 .PHONY:repl
-repl: base.sml
+repl: src/main.sml
 	$(REPL) --use $<
