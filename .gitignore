@@ -1,7 +1,6 @@
 
 base.sml
 dist/rep2rep
-output/latex/test.aux
-output/latex/test.log
-output/latex/test.pdf
-output/latex/test.tex
+output/latex/*
+!output/latex/commands.sty
+dist/rep2rep
