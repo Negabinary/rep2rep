@@ -1,8 +1,0 @@
-{
-    "argv": ["python", "-m",
-             "server", "-f",
-             "{connection_file}"],
-    "display_name": "Oruga",
-    "name": "Oruga",
-    "language": "oruga"
-   }
