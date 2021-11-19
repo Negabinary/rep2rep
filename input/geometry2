@@ -1,12 +1,15 @@
 typeSystem geometry =
-    types _:distance, _:point, _:direction, origin, up, one, value, line
+    types _:line, _:point, _:rect, value
     
-    order origin < point,
-          up < direction,
-          one < distance,
-          distance < value
+    order line < value, rect < value
 
 conSpec geometryG:geometry = 
-    move : [point, direciton, distance] -> point,
+    concat : [line, line] -> line,
     join : [point, point] -> line,
-    concat : [line, line] -> line
+    end : [line] -> point,
+    start : [line] -> point,
+    intersect : [line, line] -> point,
+    left : [line] -> line,
+    right : [line] -> line,
+    mkrect : [line, line] -> rect,
+    joinrect : [rect, rect] -> rect

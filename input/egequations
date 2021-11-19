@@ -5,16 +5,25 @@ construction additionCommutes:equationG =
         <- equality[
             t1:AplusB:expr
                 <- infixOp[
-                    t11:A:var,
-                    t12:plus,
-                    t13:B:var
+                    t11:expr <-
+                        infixOp[
+                            t131:B:var, t132:plus, t133:C:var
+                        ],
+                    t12:divide,
+                    t13:A:var
                 ],
             t2:equals,
             t3:BplusA:expr
                 <- infixOp[
-                    t21:B:var,
-                    t22:plus,
-                    t23:A:var
+                    t31:expr <-
+                        infixOp[
+                            t311:B:var, t312:divide, t313:A:var
+                        ],
+                    t32:plus,
+                    t33:expr <-
+                        infixOp[
+                            t331:C:var, t332:divide, t333:A:var
+                        ]
                 ]
         ]
 
@@ -29,6 +38,6 @@ construction unity:equationG =
 transfer
     sourceConstruction additionCommutes
     targetTypeSystem geometry
-    goal ([t:AplusBeqBplusA:equality],[t':line]) :: repeq
+    goal ([t:AplusBeqBplusA:equality],[t':value]) :: repeq
     output test2
-    limit 10
+    limit 100

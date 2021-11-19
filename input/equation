@@ -5,6 +5,7 @@ typeSystem equation =
             sin, cos, tan, fun, equals
     
     order one < expr,
+          var < expr,
           plus < binOp,
           minus < binOp,
           times < binOp,
