@@ -1,5 +1,6 @@
 import "oruga.parser";
 import "latex.latex";
+import "oruga.grammar";
 
 signature DOCUMENT =
 sig
@@ -10,6 +11,7 @@ sig
   val typeSystemsOf : documentContent -> Type.typeSystem list
   val conSpecsOf : documentContent -> CSpace.conSpec list
   val constructionsOf : documentContent -> {name : string, conSpec : string, construction : Construction.construction} FiniteSet.set
+  val grammarsOf : documentContent -> Grammar.grammar list
   val transferRequestsOf : documentContent ->  (string list) list
   val findTypeSystemWithName : documentContent -> string -> Type.typeSystem
   val findConSpecWithName : documentContent -> string -> CSpace.conSpec
@@ -30,7 +32,9 @@ struct
   val constructionKW = "construction"
   val transferKW = "transfer"
   val commentKW = "comment"
-  val bigKeywords = [importKW,typeSystemKW,conSpecKW,correspondenceKW,constructionKW,transferKW,commentKW]
+  val grammarKW = "grammar"
+  val inputKW = "input"
+  val bigKeywords = [importKW,typeSystemKW,conSpecKW,correspondenceKW,constructionKW,transferKW,commentKW, grammarKW, inputKW]
 
   val typesKW = "types"
   val subTypeKW = "order"
@@ -74,13 +78,15 @@ struct
                           knowledge : Knowledge.base,
                           constructions : {name : string, conSpec : string, construction : Construction.construction} list,
                           transferRequests : (string list) list,
-                          strengths : string -> real option}
+                          strengths : string -> real option,
+                          grammars : Grammar.grammar list}
   val emptyDocContent = {typeSystems = [],
                          conSpecs = [],
                          knowledge = Knowledge.empty,
                          constructions = [],
                          transferRequests = [],
-                         strengths = (fn _ => NONE)}
+                         strengths = (fn _ => NONE),
+                         grammars = []}
 
   val typeSystemsOf = #typeSystems
   val conSpecsOf = #conSpecs
@@ -88,6 +94,7 @@ struct
   val constructionsOf = #constructions
   val transferRequestsOf = #transferRequests
   val strengthsOf = #strengths
+  val grammarsOf = #grammars
 
   fun findTypeSystemWithName DC n =
     valOf (List.find (fn x => #name x = n) (typeSystemsOf DC))
@@ -104,6 +111,10 @@ struct
   fun findCorrespondenceWithName DC n =
     valOf (Knowledge.findCorrespondenceWithName (knowledgeOf DC) n)
     handle Option => raise ParseError ("no correspondence with name " ^ n)
+  
+  fun findGrammarWithName DC n =
+    valOf (List.find (fn x => #name x = n) (grammarsOf DC))
+    handle Option => raise ParseError ("no grammar with name " ^ n)
 
   fun parseTransferRequests DC ws =
   let fun stringifyC ((x,c)::L) = "("^(valOf x)^","^ (String.stringOfList (fn x => x) c)^") : "^(stringifyC L)
@@ -254,7 +265,8 @@ struct
       knowledge = #knowledge dc,
       constructions = #constructions dc,
       transferRequests = #transferRequests dc,
-      strengths = #strengths dc}
+      strengths = #strengths dc,
+      grammars = #grammars dc}
   end
 
   fun parseConstructor s =
@@ -281,7 +293,8 @@ struct
       knowledge = #knowledge dc,
       constructions = #constructions dc,
       transferRequests = #transferRequests dc,
-      strengths = #strengths dc}
+      strengths = #strengths dc,
+      grammars = #grammars dc}
   end
 
   fun findConstructorInConSpec s cspec =
@@ -368,7 +381,8 @@ struct
       knowledge = Knowledge.addCorrespondence (#knowledge dc) corr,
       constructions = #constructions dc,
       transferRequests = #transferRequests dc,
-      strengths = strengthsUpd}
+      strengths = strengthsUpd,
+      grammars = #grammars dc}
   end
 
   fun addConstruction (nn, cts) dc =
@@ -390,16 +404,103 @@ struct
       knowledge = #knowledge dc,
       constructions = ctRecord :: (#constructions dc),
       transferRequests = #transferRequests dc,
-      strengths = #strengths dc}
+      strengths = #strengths dc,
+      grammars = #grammars dc}
   end
 
-  fun joinDocumentContents ({typeSystems = ts, conSpecs = sp, knowledge = kb, constructions = cs, transferRequests = tr, strengths = st} :: L) =
-  (case joinDocumentContents L of {typeSystems = ts', conSpecs = sp', knowledge = kb', constructions = cs', transferRequests = tr', strengths = st'} =>
+  fun addInput (nn, tokens) dc = 
+  let val (conName, x, gmrName) = String.breakOn ":" nn;
+      val gmr = findGrammarWithName dc gmrName;
+      val str = String.implode (List.concat (map String.explode tokens));
+      val constructions = Grammar.parse gmr "equality" tokens;
+      val _ = if x = ":" then () else raise ParseError ("No parse found for " ^ conName)
+      val _ = print ("\nFound " ^ Int.toString (List.length (constructions)) ^ " possible parses for " ^ conName);
+      val _ = map (fn x => (print "\n"; PolyML.print (Construction.toString x))) constructions;
+  in
+    {typeSystems = #typeSystems dc,
+      conSpecs = #conSpecs dc,
+      knowledge = #knowledge dc,
+      constructions = {name = conName, conSpec = #name (#conSpec gmr), construction = List.hd constructions} :: (#constructions dc),
+      transferRequests = #transferRequests dc,
+      strengths = #strengths dc,
+      grammars = #grammars dc}
+  end
+
+  fun addGrammar (nn, tokens) dc = 
+  let val (grammarName, x, cspecN) = String.breakOn ":" nn;
+      val _ = if x = ":" then () else raise ParseError ("grammar " ^ nn ^ " needs a cspec");
+      val cspec = findConSpecWithName dc cspecN;
+      val chars = List.concat (map String.explode tokens);
+      fun find_type (tstr:string) : Type.typ = Type.typeOfString tstr;
+      fun parseReduction reductionString =
+          let val (_, x, reductionString) = String.breakOn "[" reductionString;
+              val _ = if x = "[" then () else raise ParseError ("grammar " ^ nn ^ " expected a [ somewhere");
+              val (parseTokens, x, reductionString) = String.breakOn "]" reductionString;
+              val _ = if x = "]" then () else raise ParseError ("grammar " ^ nn ^ " expected a ] somewhere");
+              val (_, x, reductionString) = String.breakOn "->" reductionString;
+              val _ = if x = "->" then () else raise ParseError ("grammar " ^ nn ^ " expected a -> somewhere");
+              fun parseParseToken parseTokenString =
+                  let val (name, x, nont) = String.breakOn ":" parseTokenString;
+                  in
+                    if x <> "" then Grammar.NonTerminal(name, nont) else Grammar.Terminal(parseTokenString)
+                  end
+              val from = Parser.splitLevelWithSeparatorApply' parseParseToken (fn x => x = #",") (String.explode parseTokens);
+              val to =  
+                case String.breakOn "[" reductionString of
+                    (x, "", _) => (
+                        case String.breakOn ":" x of
+                            (tn, "", _) => Grammar.BaseRep(find_type tn)
+                          | (tn, _, tt) => raise ParseError ("OOPS, I need to ask about this one") (*TODO: Ask about this one*)
+                    )
+                  | (constructorName, _, x) => (
+                        case String.breakOn "]" x of
+                            (_, "", _) => raise ParseError ("grammar " ^ nn ^ " expected a ] somewhere")
+                          | (construtionTokens, _, _) => 
+                              let val toConstructorOption = CSpace.findConstructorWithName constructorName cspec;
+                                  val toConstructor = case toConstructorOption of SOME(x) => x | NONE => raise ParseError ("Unknown constructor " ^ constructorName);
+                                  fun parseParsedToken parseTokenString =
+                                      let val (name, x, nont) = String.breakOn ":" parseTokenString;
+                                      in
+                                        if x <> "" then Grammar.DNonTerminal(name, nont) else Grammar.DTerminal(parseTokenString)
+                                      end
+                                  val toTokens = Parser.splitLevelWithSeparatorApply' parseParsedToken (fn x => x = #",") (String.explode construtionTokens);
+                              in
+                                  Grammar.ConRep(toConstructor, toTokens)
+                              end
+                    );
+          in
+              {from=from, to=to}
+          end
+      fun parseReductionSet str = 
+          let val (nonterminal, x, str) = String.breakOn ":" str;
+              val _ = if x = ":" then () else raise ParseError ("grammar " ^ nn ^ " expected a : somewhere");
+              val reductions = Parser.splitLevelWithSeparatorApply' parseReduction (fn x => x = #"|") (String.explode str);
+          in 
+              (nonterminal, reductions)
+          end
+      val reductions = Parser.splitLevelWithSeparatorApply' parseReductionSet (fn x => x = #",") chars;
+      val newGrammar = {
+        name = grammarName,
+        conSpec = cspec,
+        reductions = reductions
+      };
+  in {typeSystems = #typeSystems dc,
+      conSpecs = #conSpecs dc,
+      knowledge = #knowledge dc,
+      constructions = #constructions dc,
+      transferRequests = #transferRequests dc,
+      strengths = #strengths dc,
+      grammars = newGrammar :: (#grammars dc)}
+  end
+
+  fun joinDocumentContents ({typeSystems = ts, conSpecs = sp, knowledge = kb, constructions = cs, transferRequests = tr, strengths = st, grammars = gms} :: L) =
+  (case joinDocumentContents L of {typeSystems = ts', conSpecs = sp', knowledge = kb', constructions = cs', transferRequests = tr', strengths = st', grammars = gms'} =>
       {typeSystems = ts @ ts',
        conSpecs = sp @ sp',
        knowledge = Knowledge.join kb kb',
        constructions = cs @ cs',
        transferRequests = tr @ tr',
+       grammars = gms @ gms',
        strengths = (fn c => case st c of SOME f => SOME f | NONE => st' c)})
   | joinDocumentContents [] = emptyDocContent
 
@@ -409,7 +510,8 @@ struct
       knowledge = #knowledge dc,
       constructions = #constructions dc,
       transferRequests = ws :: #transferRequests dc,
-      strengths = #strengths dc}
+      strengths = #strengths dc,
+      grammars = #grammars dc}
 
   fun read filename =
   let val file = TextIO.openIn ("input/"^filename)
@@ -432,7 +534,10 @@ struct
              if x = SOME correspondenceKW then addCorrespondence (hd n,ws) dc else
              if x = SOME constructionKW then addConstruction (hd n,String.concat ws) dc else
              if x = SOME transferKW then addTransferRequests c dc else
-             if x = SOME commentKW then dc else raise ParseError "error: this shouldn't have happened"
+             if x = SOME commentKW then dc else
+             if x = SOME grammarKW then addGrammar (hd n, ws) dc else
+             if x = SOME inputKW then addInput (hd n, ws) dc else
+             raise ParseError "error: this shouldn't have happened"
           end handle Bind => raise ParseError "expected name = content, found multiple words before ="
 
       val nonImported = List.filter (fn (x,_) => x <> SOME importKW) blocks

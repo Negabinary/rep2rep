@@ -41,84 +41,87 @@ struct
   fun breakOnClosingDelimiter (lD,rD) s =
     let
       fun bcb _ [] = raise ParseError s
-        | bcb (p,s,c) (x::xs) =
-            let val p' = if x = #"(" then p+1 else (if x = #")" then p-1 else p)
-                val s' = if x = #"[" then s+1 else (if x = #"]" then s-1 else s)
-                val c' = if x = #"{" then c+1 else (if x = #"}" then c-1 else c)
-            in if (p',s',c') = (0,0,0)
+        | bcb (p,s,c,q) (x::xs) =
+            let val p' = if x = #"(" andalso q then p+1 else (if x = #")" andalso q then p-1 else p)
+                val s' = if x = #"[" andalso q then s+1 else (if x = #"]" andalso q then s-1 else s)
+                val c' = if x = #"{" andalso q then c+1 else (if x = #"}" andalso q then c-1 else c)
+                val q' = if x = #"\"" then not q else q
+            in if (p',s',c',q') = (0,0,0,true)
                then ([],xs)
-               else (case bcb (p',s',c') xs of (l1,l2) => (x::l1,l2))
+               else (case bcb (p',s',c',q') xs of (l1,l2) => (x::l1,l2))
             end
-      val triple = if rD = #")" then (1,0,0)
-                    else if rD = #"]" then (0,1,0)
-                    else if rD = #"}" then (0,0,1)
+      val triple = if rD = #")" then (1,0,0,true)
+                    else if rD = #"]" then (0,1,0,true)
+                    else if rD = #"}" then (0,0,1,true)
+                    else if rD = #"\"" then (0,0,0,false)
                     else raise CodeError
     in bcb triple (String.explode s)
     end;
-(*)
-  fun breakOnClosingDelimiter (lD,rD) s =
-    let
-      fun bcb _ [] = raise ParseError
-        | bcb n (x::xs) =
-            let val m = if x = lD then n+1 else (if x = rD then n-1 else n)
-            in if m = ~1 then ([],xs) else (case bcb m xs of (l1,l2) => (x::l1,l2))
-            end
-    in bcb 0 (String.explode s)
-    end;*)
 
   fun splitLevel L =
     let
       fun sl _ [] = [[]]
-        | sl (p,s,c) (x::xs) =
-            let val p' = if x = #"(" then p+1 else (if x = #")" then p-1 else p)
-                val s' = if x = #"[" then s+1 else (if x = #"]" then s-1 else s)
-                val c' = if x = #"{" then c+1 else (if x = #"}" then c-1 else c)
-                val slr = sl (p',s',c') xs
+        | sl (p,s,c,q) (x::xs) =
+            let val p' = if x = #"(" andalso q then p+1 else (if x = #")" andalso q then p-1 else p)
+                val s' = if x = #"[" andalso q then s+1 else (if x = #"]" andalso q then s-1 else s)
+                val c' = if x = #"{" andalso q then c+1 else (if x = #"}" andalso q then c-1 else c)
+                val q' = if x = #"\"" then not q else q
+                val slr = sl (p',s',c',q') xs
             in
-              if (p',s',c') = (0,0,0) then if x = #"," then []::slr
-                                            else (case slr of (L::LL) =>
-                                                    (x::L) :: LL
-                                                  | _ => raise CodeError)
-              else (case slr of (L::LL) => (x::L) :: LL | _ => raise CodeError)
+              if (p',s',c',q') = (0,0,0,true) then
+                  if x = #"," then 
+                      []::slr
+                  else (
+                    case slr of 
+                        (L::LL) => (x::L) :: LL 
+                      | _ => raise CodeError
+                  )
+              else (
+                  case slr of 
+                      (L::LL) => (x::L) :: LL 
+                    | _ => raise CodeError
+              )
             end
-    in List.map String.implode (sl (0,0,0) L)
+    in List.map String.implode (sl (0,0,0,true) L)
     end;
 
 
   fun splitLevelWithSeparatorApply' f sep L =
     let
       fun sl _ [] = [[]]
-        | sl (p,s,c) (x::xs) =
-            let val p' = if x = #"(" then p+1 else (if x = #")" then p-1 else p)
-                val s' = if x = #"[" then s+1 else (if x = #"]" then s-1 else s)
-                val c' = if x = #"{" then c+1 else (if x = #"}" then c-1 else c)
-                val slr = sl (p',s',c') xs
+        | sl (p,s,c,q) (x::xs) =
+            let val p' = if x = #"(" andalso q then p+1 else (if x = #")" andalso q then p-1 else p)
+                val s' = if x = #"[" andalso q then s+1 else (if x = #"]" andalso q then s-1 else s)
+                val c' = if x = #"{" andalso q then c+1 else (if x = #"}" andalso q then c-1 else c)
+                val q' = if x = #"\"" then not q else q
+                val slr = sl (p',s',c',q') xs
             in
-              if (p',s',c') = (0,0,0) then if sep x then []::slr
+              if (p',s',c',q') = (0,0,0,true) then if sep x then []::slr
                                             else (case slr of
                                                     (L::LL) => (x::L) :: LL
                                                   | _ => raise CodeError)
               else (case slr of (L::LL) => (x::L) :: LL | _ => raise CodeError)
             end
-    in List.map (f o String.implode) (sl (0,0,0) L)
+    in List.map (f o String.implode) (sl (0,0,0,true) L)
     end;
 
   fun splitLevelWithSeparatorApply f sep L =
     let
       fun sl _ [] = [[]]
-        | sl (p,s,c) (x::xs) =
-            let val p' = if x = #"(" then p+1 else (if x = #")" then p-1 else p)
-                val s' = if x = #"[" then s+1 else (if x = #"]" then s-1 else s)
-                val c' = if x = #"{" then c+1 else (if x = #"}" then c-1 else c)
-                val slr = sl (p',s',c') xs
+        | sl (p,s,c,q) (x::xs) =
+            let val p' = if x = #"(" andalso q then p+1 else (if x = #")" andalso q then p-1 else p)
+                val s' = if x = #"[" andalso q then s+1 else (if x = #"]" andalso q then s-1 else s)
+                val c' = if x = #"{" andalso q then c+1 else (if x = #"}" andalso q then c-1 else c)
+                val q' = if x = #"\"" then not q else q
+                val slr = sl (p',s',c',q') xs
             in
-              if (p',s',c') = (0,0,0) then if x = sep then []::slr
+              if (p',s',c',q') = (0,0,0,true) then if x = sep then []::slr
                                             else (case slr of
                                                     (L::LL) => (x::L) :: LL
                                                   | _ => raise CodeError)
               else (case slr of (L::LL) => (x::L) :: LL | _ => raise CodeError)
             end
-    in List.map (f o String.implode) (sl (0,0,0) L)
+    in List.map (f o String.implode) (sl (0,0,0,true) L)
     end;
 
   fun splitLevelApply f L = splitLevelWithSeparatorApply f #"," L;
