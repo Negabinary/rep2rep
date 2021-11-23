@@ -64,7 +64,7 @@ struct
                                     List.map 
                                         (fn option => 
                                             Construction.TCPair ({
-                                                token = CSpace.makeToken (unique_name ()) (#2(CSpace.csig toConstructor)), 
+                                                token = CSpace.makeToken (unique_name ()) ((unique_name ()) ^ ":" ^ #2(CSpace.csig toConstructor)), 
                                                 constructor = toConstructor
                                             }, option)
                                         ) 
