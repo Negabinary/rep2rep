@@ -1,7 +1,7 @@
 typeSystem geometry =
-    types _:line, _:point, _:rect, value
+    types _:line, _:point, _:rect, value, _:angle
     
-    order line < value, rect < value
+    order line < value, rect < value, angle < value
 
 conSpec geometryG:geometry = 
     concat : [line, line] -> line,
@@ -9,7 +9,8 @@ conSpec geometryG:geometry =
     end : [line] -> point,
     start : [line] -> point,
     intersect : [line, line] -> point,
-    left : [line] -> line,
-    right : [line] -> line,
     mkrect : [line, line] -> rect,
-    joinrect : [rect, rect] -> rect
+    divrect : [rect, line] -> line,
+    joinrect : [rect, rect] -> rect,
+    moveline : [line, line] -> line,
+    rotline : [line, angle] -> line

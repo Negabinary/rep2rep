@@ -14,7 +14,7 @@ typeSystem equation =
           cos < fun,
           tan < fun,
           A < var, 
-          B < var, 
+          B < var,
           C < var
 
 conSpec equationG:equation = 

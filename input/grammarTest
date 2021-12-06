@@ -15,11 +15,22 @@ grammar equationM:equationG =
          | [B] -> B
          | [C] -> C
 
-input opoeo:equationM = 1 = 1
+comment opoeo:equationM = open A + B close = 1
+
+input opoeo:equationM = open A * B close = 1
+
+
+comment opoeo:equationG =
+     t11:equality <- equality [t8:expr <- brackets[t2:open, t6:test:expr <- infixOp[t3:A, t4:plus, t5:B], t7:close], t9:equals, t10:one]
+
+comment additionDistributes:equationM = open A + B close * C = A * C + B * C
+
+input additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
+
 
 transfer
-    sourceConstruction opoeo
+    sourceConstruction additionDistributes
     targetTypeSystem geometry
-    goal ([t4:equality],[t':value]) :: repeq
+    goal ([t42:t43:equality],[t':value]) :: repeq
     output test2
     limit 100
