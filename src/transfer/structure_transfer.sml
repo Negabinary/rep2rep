@@ -1,6 +1,7 @@
 import "transfer.search";
 import "transfer.state";
 import "util.logging";
+import "util.random";
 
 signature TRANSFER =
 sig
@@ -231,7 +232,7 @@ struct
             val gs' = State.goalsOf st'
             val D = State.patternCompOf st
             val D' = State.patternCompOf st'
-        in Int.compare ((length gs),(length gs'))
+        in Int.compare (length gs,length gs')
         end
       fun opposite LESS = GREATER | opposite EQUAL = EQUAL | opposite GREATER = LESS
       fun heuristic4 (st,st') =
@@ -245,18 +246,41 @@ struct
         in if gsn = 0 andalso gsn' = 0 then opposite P
            else if gsn > 0 andalso gsn' > 0 andalso P <> EQUAL then P
            else Int.compare (gsn,gsn')
-        (*in if ((gsn = 0 andalso gsn' = 0) orelse (gsn > 0 andalso gsn' > 0)) andalso P <> EQUAL
-            then P
-            else Int.compare (gsl,gsl')*)
         end
+      fun heuristic5 _ =
+        let val x1 = MLtonRandom.rand ()
+            val X2 = map MLtonRandom.rand [(),(),(),(),(),(),(),(),(),()]
+            fun le x = List.all (fn y => x < y) X2
+        in if le x1 then LESS else GREATER
+        end
+
+      fun heuristic6 (st,st') =
+        let val gsn = length (State.goalsOf st)
+            val gsn' = length (State.goalsOf st')
+        in if (gsn = 0 andalso gsn' = 0) orelse (gsn > 0 andalso gsn' > 0) then heuristic5 (st,st')
+           else Int.compare (gsn,gsn')
+        end
+      val limit = 9999
+
       fun eq (st,st') = List.isPermutationOf (uncurry Relation.stronglyMatchingRelationships) (State.goalsOf st) (State.goalsOf st')
-      fun ign (st,L) = List.length (#goals st) > 50 orelse length L > 9999 orelse List.exists (fn x => eq (x,st)) L
+      fun ign (st,L) = List.length (State.goalsOf st) > 30 orelse length L > limit orelse List.exists (fn x => eq (x,st)) L
+      fun ign' (st,L) =
+            List.length (State.goalsOf st) > 10
+            orelse length L > limit
+            orelse Composition.size (State.patternCompOf st) > 3
+            orelse not (Composition.unistructurable targetT (State.patternCompOf st))
+            orelse List.exists Relation.relationshipIsFalse (State.goalsOf st)
+            (*orelse List.exists (fn x => eq (x,st)) L*)
+      fun forget st = List.length (State.goalsOf st) < 0
     in
       (*Search.depthFirst unfoldState limit initialState*)
       (*Search.graphDepthFirst unfoldState eq limit initialState*)
-      (*Search.breadthFirstSortAndIgnore unfoldState heuristic4 ign initialState*)
-      Search.depthFirstSortAndIgnore unfoldState heuristic4 ign initialState
-      (*Search.bestFirstSortAndIgnore unfoldState heuristic4 ign initialState*)
+      (*Search.breadthFirstSortAndIgnore unfoldState heuristic6 ign' initialState*)
+      (*Search.breadthFirstSortIgnoreForget unfoldState heuristic6 ign' forget initialState*)
+      (*Search.depthFirstSortAndIgnore unfoldState heuristic4 ign' initialState*)
+      (*Search.depthFirstSortIgnoreForget unfoldState heuristic6 ign' forget initialState*)
+      (*Search.bestFirstSortAndIgnore unfoldState heuristic6 ign' initialState*)
+      Search.bestFirstSortIgnoreForget unfoldState heuristic4 ign forget initialState
     end
 
 
