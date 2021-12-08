@@ -13,4 +13,6 @@ conSpec geometryG:geometry =
     divrect : [rect, line] -> line,
     joinrect : [rect, rect] -> rect,
     moveline : [line, line] -> line,
-    rotline : [line, angle] -> line
+    rotline : [line, angle] -> line,
+    anglebetween : [line, line] -> angle,
+    joinangle : [angle, angle] -> angle

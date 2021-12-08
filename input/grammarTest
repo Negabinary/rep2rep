@@ -14,6 +14,7 @@ grammar equationM:equationG =
          | [A] -> A
          | [B] -> B
          | [C] -> C
+         | [90] -> ninety
 
 comment opoeo:equationM = open A + B close = 1
 
@@ -25,12 +26,16 @@ comment opoeo:equationG =
 
 comment additionDistributes:equationM = open A + B close * C = A * C + B * C
 
-input additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
+comment additionDistributes:equationM = open A + B close + C = A + open B + C close
+
+input additionDistributes:equationM = sin A = cos open 90 - A close
+
+comment additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
 
 
 transfer
     sourceConstruction additionDistributes
     targetTypeSystem geometry
-    goal ([t42:t43:equality],[t':value]) :: repeq
+    goal ([t35:t36:equality],[t':value]) :: repeq
     output test2
     limit 100

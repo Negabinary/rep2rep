@@ -17,6 +17,14 @@ correspondence areaBothSides:(equationG,geometryG) =
     constructRel ([t:equality],[r:rect]) :: repeq
     strength 1.0
 
+correspondence angleBothSides:(equationG,geometryG) = 
+    source t:equality <- equality[t1:expr,t2:equals,t3:expr]
+    target a:angle
+    tokenRels ([t1:expr],[a:angle]) :: angle,
+              ([t3:expr],[a:angle]) :: angle
+    constructRel ([t:equality],[a:angle]) :: repeq
+    strength 1.0
+
 correspondence distanceBrackets:(equationG,geometryG) = 
     source t:expr <- brackets[t1:open, t2:expr, t3:close]
     target l:line
@@ -26,9 +34,16 @@ correspondence distanceBrackets:(equationG,geometryG) =
 
 correspondence areaBrackets:(equationG,geometryG) =
     source t:expr <- brackets[t1:open, tt:expr, t3:close]
-    target a:area
-    tokenRels ([tt:expr],[a:area]) :: area
-    constructRel ([t:expr],[a:area]) :: area
+    target a:rect
+    tokenRels ([tt:expr],[a:rect]) :: area
+    constructRel ([t:expr],[a:rect]) :: area
+    strength 1.0
+
+correspondence angleBrackets:(equationG,geometryG) =
+    source t:expr <- brackets[t1:open, tt:expr, t3:close]
+    target a:angle
+    tokenRels ([tt:expr],[a:angle]) :: angle
+    constructRel ([t:expr],[a:angle]) :: angle
     strength 1.0
 
 correspondence distanceAddition:(equationG,geometryG) = 
@@ -166,6 +181,31 @@ correspondence areaDivision:(equationG,geometryG) =
               ([t3:expr],[l2:line]) :: length,
               ([],[l2:line,r1:line]) :: sideOf
     constructRel ([t:expr],[l:line]) :: length
+    strength 1.0
+
+correspondence angleAddition:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, tp:plus, t2:expr]
+    target a:angle <- joinangle[a1:angle, a2:angle]
+    tokenRels ([t1:expr],[a1:angle]) :: angle,
+              ([t2:expr],[a2:angle]) :: angle,
+              ([],[a1:angle, a2:angle]) :: consecutive
+    constructRel ([t:expr],[a:angle]) :: angle
+    strength 1.0
+
+correspondence angleSubtraction:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, tp:minus, t2:expr]
+    target a:angle <- joinangle[a1:angle, a2:angle]
+    tokenRels ([t1:expr],[a1:angle]) :: angle,
+              ([t2:expr],[a2:angle]) :: angle,
+              ([],[a1:angle, a2:angle]) :: sameEnd
+    constructRel ([t:expr],[a:angle]) :: angle
+    strength 1.0
+
+correspondence ninetyangle:(equationG,geometryG) =
+    source t:ninety
+    target a:angle
+    tokenRels ([],[a:angle]) :: perpendicular
+    constructRel ([t:ninety],[a:angle]) :: angle
     strength 1.0
 
 correspondence tangentLine:(equationG,geometryG) =

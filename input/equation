@@ -2,7 +2,7 @@ typeSystem equation =
     types _:expr, _:equality, 
             var, one, open, close,
             plus, minus, times, divide, binOp,
-            sin, cos, tan, fun, equals, A, B, C
+            sin, cos, tan, fun, equals, A, B, C, ninety
     
     order one < expr,
           var < expr,
@@ -15,7 +15,8 @@ typeSystem equation =
           tan < fun,
           A < var, 
           B < var,
-          C < var
+          C < var,
+          ninety < expr
 
 conSpec equationG:equation = 
     infixOp : [expr, binOp, expr] -> expr,

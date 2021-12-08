@@ -156,7 +156,7 @@ struct
 
   fun mkDocument content =
     let val opening = "\\documentclass[10pt]{article}\n "^
-                      "\\usepackage[margin=2cm,a1paper]{geometry}\n "^
+                      "\\usepackage[margin=2cm,a2paper]{geometry}\n "^
                       "\\input{commands.sty}\n"^
                       "\\tikzset{align at top/.style={baseline=(current bounding box.north)}}\n\n"^
                       "\\begin{document}"
