@@ -1,6 +1,7 @@
 import "oruga.parser";
 import "latex.latex";
 import "oruga.grammar";
+import "postprocessing";
 
 signature DOCUMENT =
 sig
@@ -54,7 +55,8 @@ struct
   val outputKW = "output"
   val limitKW = "limit"
   val ISKW = "IS"
-  val transferKeywords = [targetTypeSystemKW,sourceConstructionKW,goalKW,outputKW,limitKW,ISKW]
+  val postprocessKW = "postprocess"
+  val transferKeywords = [targetTypeSystemKW,sourceConstructionKW,goalKW,outputKW,limitKW,ISKW,postprocessKW]
 
 
   fun breakOn s [] = ([],"",[])
@@ -145,6 +147,11 @@ struct
             if x = SOME limitKW
             then valOf (Int.fromString (String.concat c)) handle Option => raise ParseError "limit needs an integer!"
             else getLimit L
+      fun getPostprocessing [] = "false"
+        | getPostprocessing ((x,c)::L) =
+            if x = SOME postprocessKW
+            then "true"
+            else getPostprocessing L
       val targetTypeSystem = getTargetTySys C
       val constructionRecord = getConstruction C
       val construction = #construction constructionRecord
@@ -158,6 +165,8 @@ struct
       val _ = print ("\nApplying structure transfer...");
       val startTime = Time.now();
       val results = Transfer.structureTransfer KB sourceTypeSystem targetTypeSystem construction goal;
+      val results = if getPostprocessing C = "false" then results else (PolyML.print "testtttttttttttttttttttttttttt"; Postprocessing.postprocess results);
+      val _ = PolyML.print (getPostprocessing C)
       val endTime = Time.now();
       val runtime = Time.toMilliseconds endTime - Time.toMilliseconds startTime;
       val _ = print ("done\n" ^ "  runtime: "^ LargeInt.toString runtime ^ " ms \n");

@@ -1,4 +1,4 @@
-import correspondences/eqGeom2
+import correspondences/eqGeom3
 
 grammar equationM:equationG =
     equality : [v1:expr, =, v2:expr] -> equality[v1:expr, equals, v2:expr],
@@ -24,11 +24,13 @@ input opoeo:equationM = open A * B close = 1
 comment opoeo:equationG =
      t11:equality <- equality [t8:expr <- brackets[t2:open, t6:test:expr <- infixOp[t3:A, t4:plus, t5:B], t7:close], t9:equals, t10:one]
 
-comment additionDistributes:equationM = open A + B close * C = A * C + B * C
+input additionDistributes:equationM = open A + B close * C = A * C + B * C
+comment 46:47
 
 comment additionDistributes:equationM = open A + B close + C = A + open B + C close
+comment 48:49
 
-input additionDistributes:equationM = sin A = cos open 90 - A close
+comment additionDistributes:equationM = sin A = cos open 90 - A close
 
 comment additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
 
@@ -36,6 +38,7 @@ comment additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
 transfer
     sourceConstruction additionDistributes
     targetTypeSystem geometry
-    goal ([t35:t36:equality],[t':value]) :: repeq
+    goal ([t46:t47:equality],[t':value]) :: repeq
     output test2
-    limit 100
+    limit 1
+    postprocess geometryPP

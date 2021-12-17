@@ -1,0 +1,28 @@
+typeSystem geometry =
+    types _:line, _:rect, value, _:angle
+    
+    order line < value, rect < value, angle < value
+
+conSpec geometryG:geometry = 
+    resolveLine : [line, line] -> line,
+    resolveArea : [rect, rect] -> rect,
+    resolveAngle : [angle, angle] -> angle,
+
+    concat : [line, line] -> line,
+    similarTriangle : [line, line, line] -> line,
+
+    mkrect : [line, line] -> rect,
+    divrect : [rect, line] -> line,
+    joinrect : [rect, rect] -> rect,
+    subrect : [rect, rect] -> rect
+
+comment,
+    sin : [line, angle] -> line,
+    cos : [line, angle] -> line
+
+    anglebetween : [line, line] -> angle,
+    joinangle : [angle, angle] -> angle,
+    subangle : [angle, angle] -> angle,
+
+    rotate : [line, angle] -> line,
+    nextRect : [rect] -> rect

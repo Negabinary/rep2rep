@@ -1,0 +1,148 @@
+import equation
+import geometry3
+
+correspondence distanceBothSides:(equationG,geometryG) = 
+    source t:equality <- equality[t1:expr,t2:equals,t3:expr]
+    target l:line <- resolveLine[l1:line, l2:line]
+    tokenRels ([t1:expr],[l1:line]) :: length,
+              ([t3:expr],[l2:line]) :: length
+    constructRel ([t:equality],[l:line]) :: repeq
+    strength 1.0
+
+correspondence areaBothSides:(equationG,geometryG) = 
+    source t:equality <- equality[t1:expr,t2:equals,t3:expr]
+    target r:rect <- resolveArea[r1:rect, r2:rect]
+    tokenRels ([t1:expr],[r1:rect]) :: area,
+              ([t3:expr],[r2:rect]) :: area
+    constructRel ([t:equality],[r:rect]) :: repeq
+    strength 1.0
+
+correspondence angleBothSides:(equationG,geometryG) = 
+    source t:equality <- equality[t1:expr,t2:equals,t3:expr]
+    target a:angle <- resolveAngle[a1:angle, a2:angle]
+    tokenRels ([t1:expr],[a1:angle]) :: angle,
+              ([t3:expr],[a2:angle]) :: angle
+    constructRel ([t:equality],[a:angle]) :: repeq
+    strength 1.0
+
+correspondence distanceBrackets:(equationG,geometryG) = 
+    source t:expr <- brackets[t1:open, t2:expr, t3:close]
+    target l:line
+    tokenRels   ([t2:expr],[l:line]) :: length
+    constructRel ([t:expr],[l:line]) :: length
+    strength 1.0
+
+correspondence areaBrackets:(equationG,geometryG) =
+    source t:expr <- brackets[t1:open, tt:expr, t3:close]
+    target a:rect
+    tokenRels ([tt:expr],[a:rect]) :: area
+    constructRel ([t:expr],[a:rect]) :: area
+    strength 1.0
+
+correspondence angleBrackets:(equationG,geometryG) =
+    source t:expr <- brackets[t1:open, tt:expr, t3:close]
+    target a:angle
+    tokenRels ([tt:expr],[a:angle]) :: angle
+    constructRel ([t:expr],[a:angle]) :: angle
+    strength 1.0
+
+correspondence distanceAddition:(equationG,geometryG) = 
+    source t:expr <- infixOp[t1:expr, t3:plus, t2:expr]
+    target l:line <- concat[l1:line, l2:line]
+    tokenRels ([t1:expr],[l1:line]) :: length,
+              ([t2:expr],[l2:line]) :: length
+    constructRel ([t:expr],[l:line]) :: length
+    strength 1.0
+
+correspondence distanceSubtraction:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, t3:minus, t2:expr]
+    target l:line <- concat[l1:line, l2:line]
+    tokenRels ([t1:expr],[l1:line]) :: length,
+              ([t2:expr],[l2:line]) :: length
+    constructRel ([t:expr],[l:line]) :: length
+    strength 1.0
+
+correspondence distanceMultiplication:(equationG,geometryG) =
+    source t:expr <- infixOp[tA:expr, t3:times, tB:expr]
+    target l:line <- similarTriangle[lA:line, lU:line, lB:line]
+    tokenRels ([tA:expr],[lA:line]) :: length,
+              ([tB:expr],[lB:line]) :: length,
+              ([],[lU:line]) :: unitlength
+    constructRel ([t:expr],[l:line]) :: length
+    strength 0.5
+
+correspondence distanceDivision:(equationG,geometryG) =
+    source t:expr <- infixOp[tA:expr, t3:divide, tB:expr]
+    target l:line <- similarTriangle[lA:line, lB:line, lU:line]
+    tokenRels ([tA:expr],[lA:line]) :: length,
+              ([tB:expr],[lB:line]) :: length,
+              ([],[lU:line]) :: unitlength
+    constructRel ([t:expr],[l:line]) :: length
+    strength 0.5
+
+correspondence areaAddition:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, t2:plus, t3:expr]
+    target r:rect <- joinrect[
+        r1:rect,
+        r2:rect
+    ]
+    tokenRels ([t1:expr],[r1:rect]) :: area,
+              ([t3:expr],[r2:rect]) :: area
+    constructRel ([t:expr],[r:rect]) :: area
+    strength 1.0
+
+correspondence areaSubtraction:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, t2:minus, t3:expr]
+    target r:rect <- subrect[
+        r1:rect,
+        r2:rect
+    ]
+    tokenRels ([t1:expr],[r1:rect]) :: area,
+              ([t3:expr],[r2:rect]) :: area
+    constructRel ([t:expr],[r:rect]) :: area
+    strength 1.0
+
+correspondence areaMultiplcation:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, t2:times, t3:expr]
+    target r:rect <- mkrect[
+        l1:line,
+        l2:line
+    ]
+    tokenRels ([t1:expr],[l1:line]) :: length,
+              ([t3:expr],[l2:line]) :: length
+    constructRel ([t:expr],[r:rect]) :: area
+    strength 1.0
+
+correspondence areaDivision:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, t2:divide, t3:expr]
+    target l:line <- divrect[
+        r1:rect,
+        l2:line
+    ]
+    tokenRels ([t1:expr],[r1:rect]) :: area,
+              ([t3:expr],[l2:line]) :: length
+    constructRel ([t:expr],[l:line]) :: length
+    strength 1.0
+
+correspondence angleAddition:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, tp:plus, t2:expr]
+    target a:angle <- joinangle[a1:angle, a2:angle]
+    tokenRels ([t1:expr],[a1:angle]) :: angle,
+              ([t2:expr],[a2:angle]) :: angle
+    constructRel ([t:expr],[a:angle]) :: angle
+    strength 1.0
+
+correspondence angleSubtraction:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr, tp:minus, t2:expr]
+    target a:angle <- subangle[a1:angle, a2:angle]
+    tokenRels ([t1:expr],[a1:angle]) :: angle,
+              ([t2:expr],[a2:angle]) :: angle
+    constructRel ([t:expr],[a:angle]) :: angle
+    strength 1.0
+
+correspondence ninetyangle:(equationG,geometryG) =
+    source t:ninety
+    target a:angle
+    tokenRels ([],[a:angle]) :: perpendicular
+    constructRel ([t:ninety],[a:angle]) :: angle
+    strength 1.0

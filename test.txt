@@ -1,0 +1,166 @@
+
+Adding constructors for constructor specification equationG of type system equation...
+  infixOp : [expr, binOp, expr] -> expr
+  equality : [expr, equals, expr] -> equality
+  app : [fun, expr] -> expr
+  brackets : [open, expr, close] -> expr
+...done
+
+Adding constructors for constructor specification geometryG of type system geometry...
+  resolveLine : [line, line] -> line
+  resolveArea : [area, area] -> area
+  resolveAngle : [angle, angle] -> angle
+  concat : [line, line] -> line
+  similarTriangle : [line, line, line] -> line
+  mkrect : [line, line] -> rect
+  divrect : [rect, line] -> line
+  joinrect : [rect, rect] -> rect
+  subrect : [rect, rect] -> rectcomment
+  anglebetween : [line, line] -> angle
+  joinangle : [angle, angle] -> angle
+  subangle : [angle, angle] -> angle
+...done
+
+Adding correspondence distanceBothSides...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence areaBothSides...
+  source pattern is well formed
+  WARNING: target pattern is not well formed
+done
+
+Adding correspondence angleBothSides...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence distanceBrackets...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence areaBrackets...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence angleBrackets...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence distanceAddition...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence distanceSubtraction...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence distanceMultiplication...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence distanceDivision...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence areaAddition...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence areaSubtraction...
+  source pattern is well formed
+  WARNING: target pattern is not well formed
+done
+
+Adding correspondence areaMultiplcation...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence areaDivision...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence angleAddition...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence angleSubtraction...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence ninetyangle...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Found 1 possible parses for opoeo
+"t13:t14:equality <- equality : [expr, equals, expr] -> equality <-[t9:t10:expr <- brackets : [open, expr, close] -> expr <-[t2:open, t6:t7:expr <- infixOp : [expr, binOp, expr] -> expr <-[t3:A, t4:times, t5:B], t8:close], t11:equals, t12:one]"
+
+Found 1 possible parses for additionDistributes
+"t48:t49:equality <- equality : [expr, equals, expr] -> equality <-[t29:t30:expr <- infixOp : [expr, binOp, expr] -> expr <-[t23:t24:expr <- brackets : [open, expr, close] -> expr <-[t16:open, t20:t21:expr <- infixOp : [expr, binOp, expr] -> expr <-[t17:A, t18:plus, t19:B], t22:close], t25:plus, t28:C], t31:equals, t46:t47:expr <- infixOp : [expr, binOp, expr] -> expr <-[t32:A, t35:plus, t44:t45:expr <- brackets : [open, expr, close] -> expr <-[t37:open, t41:t42:expr <- infixOp : [expr, binOp, expr] -> expr <-[t38:B, t39:plus, t40:C], t43:close]]]"
+
+Applying structure transfer..."testtttttttttttttttttttttttttt"
+"true"
+done
+  runtime: 383 ms 
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}
+{constructions = [...], ...}

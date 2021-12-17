@@ -166,8 +166,7 @@ correspondence areaMultiplcation:(equationG,geometryG) =
     ]
     tokenRels ([t1:expr],[l1:line]) :: length,
               ([t3:expr],[l2:line]) :: length,
-              ([],[l1:line,l2:line]) :: perpendicular,
-              ([],[l1:line,l2:line]) :: consecutive
+              ([],[l1:line,l2:line]) :: perpendicular
     constructRel ([t:expr],[r:rect]) :: area
     strength 1.0
 
