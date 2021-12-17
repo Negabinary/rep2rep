@@ -124,7 +124,7 @@ correspondence areaDivision:(equationG,geometryG) =
     constructRel ([t:expr],[l:line]) :: length
     strength 1.0
 
-correspondence angleAddition:(equationG,geometryG) =
+comment TODO:READD angleAddition:(equationG,geometryG) =
     source t:expr <- infixOp[t1:expr, tp:plus, t2:expr]
     target a:angle <- joinangle[a1:angle, a2:angle]
     tokenRels ([t1:expr],[a1:angle]) :: angle,
@@ -132,7 +132,7 @@ correspondence angleAddition:(equationG,geometryG) =
     constructRel ([t:expr],[a:angle]) :: angle
     strength 1.0
 
-correspondence angleSubtraction:(equationG,geometryG) =
+comment TODO:READD angleSubtraction:(equationG,geometryG) =
     source t:expr <- infixOp[t1:expr, tp:minus, t2:expr]
     target a:angle <- subangle[a1:angle, a2:angle]
     tokenRels ([t1:expr],[a1:angle]) :: angle,
@@ -140,7 +140,7 @@ correspondence angleSubtraction:(equationG,geometryG) =
     constructRel ([t:expr],[a:angle]) :: angle
     strength 1.0
 
-correspondence ninetyangle:(equationG,geometryG) =
+comment TODO:READD ninetyangle:(equationG,geometryG) =
     source t:ninety
     target a:angle
     tokenRels ([],[a:angle]) :: perpendicular

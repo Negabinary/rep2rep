@@ -316,28 +316,108 @@ struct
     val (sp, sd, ss) = (same_point, same_direction, same_distance);
     *)
 
-    fun use_positive_constraint (PC(p1, p2)) = if p1 = p2 then false else
-        (case !p1 of
-            NONE => (p1 := (SOME o PCopy) p2; false)
-          | SOME(PCopy(p3)) => use_positive_constraint(PC(p3,p2))
-          | SOME(Move(b1,d1,s1)) => (case !p2 of
-                NONE => (p2 := (SOME o PCopy) p1; false)
-              | SOME (PCopy(p3)) => use_positive_constraint (PC(p1,p3))
-              | SOME (Move(b2,d2,s1)) => true))
-      | use_positive_constraint (DC(d1, d2)) = if d1 = d2 then false else
-        (case !d1 of
-            NONE => (d1 := (SOME o DCopy) d2; false)
-          | SOME (x) => (case !d2 of
-                NONE => (d2 := (SOME o DCopy) d1; false)
-              | SOME (y) => true))
-      | use_positive_constraint (SC(s1, s2)) = if s1 = s2 then false else
-        (case !s1 of
-            NONE => (s1 := (SOME o SCopy) s2; false)
-          | SOME(x) => (case !s2 of
-                NONE => (s2 := (SOME o SCopy) s1; false)
-              | SOME(y) => true));
+    datatype pos_neg_constraint = Y of constraint | N of constraint | X of constraint;
+    (*Y = Yes, N = No, X = Extra condition that can't be proven*)
 
 
+    fun use_positive_constraint (PC(p1, p2)) = if p1 = p2 then [[]] else (case (!p1, !p2) of
+            (SOME(PCopy(x)), _) =>
+                use_positive_constraint (PC(x, p2))
+          | (_, SOME(PCopy(x))) =>
+                use_positive_constraint (PC(p1, x))
+          | (NONE, _) =>
+                (p1 := (SOME o PCopy) p2; [[]])  (*TODO: Contains Check*)
+          | (_, NONE) =>
+                (p2 := (SOME o PCopy) p1; [[]])  (*TODO: Contains Check*)
+          | (SOME(Move(b1,d1,s1)), SOME(Move(b2,d2,s2))) =>
+                [
+                    [Y(PC(b1,b2)), Y(DC(d1,d2)), Y(SC(s1,s2))],
+                    [N(PC(b1,b2)), N(DC(d1,d2)), X(PC(p1, p2))],
+                    [N(PC(b1,b2)), N(SC(s1,s2)), X(PC(p1, p2))]
+                ])
+      | use_positive_constraint (DC(d1, d2)) = if d1 = d2 then [[]] else (case (!d1, !d2) of
+            (SOME(DCopy(x)), _) =>
+                use_positive_constraint (DC(x, d2))
+          | (_, SOME(DCopy(x))) =>
+                use_positive_constraint (DC(d1, x))
+          | (NONE, _) =>
+                (d1 := (SOME o DCopy) d2; [[]])  (*TODO: Contains Check*)
+          | (_, NONE) => 
+                (d2 := (SOME o DCopy) d1; [[]])  (*TODO: Contains Check*)
+          | (SOME(Direction(p1,p2)), _) =>
+                (case !p2 of
+                    SOME(Move(p1,y,z)) => use_positive_constraint(DC(y,d2))
+                  | _ => [[X(DC(d1,d2))]])
+          | (_, SOME(Direction(p1,p2))) =>
+                (case !p2 of
+                    SOME(Move(p1,y,z)) => use_positive_constraint(DC(d1,y))
+                  | _ => [[X(DC(d1,d2))]])
+          | (SOME(RDir(b1,v1)),SOME(RDir(b2,v2))) =>
+                if v1 = v2 then
+                    use_positive_constraint (DC(b1, b2))
+                else
+                    [[N(DC(b1, b2)), X(DC(d1, d2))]]
+          | (SOME(Right(b1)),SOME(Right(b2))) =>
+                use_positive_constraint (DC(b1, b2))
+          | _ =>
+                [[X(DC(d1,d2))]])
+      | use_positive_constraint (SC(s1,s2)) = if s1 = s2 then [[]] else (case (!s1, !s2) of
+            (SOME(SCopy(x)), _) =>
+                use_positive_constraint (SC(x, s2))
+          | (_, SOME(SCopy(x))) =>
+                use_positive_constraint (SC(s1, x))
+          | (NONE, _) =>
+                (s1 := (SOME o SCopy) s2; [[]])  (*TODO: Contains Check*)
+          | (_, NONE) =>
+                (s2 := (SOME o SCopy) s1; [[]])  (*TODO: Contains Check*)
+          | (SOME(Distance(p1,p2)), _) =>
+                (case !p2 of
+                    SOME(Move(p1,y,z)) => use_positive_constraint(SC(z,s2))
+                  | _ => [[X(SC(s1,s2))]])
+          | (_, SOME(Distance(p1,p2))) => 
+                (case !p2 of
+                    SOME(Move(p1,y,z)) => use_positive_constraint(SC(s1,z))
+                  | _ => [[X(SC(s1,s2))]])
+          | (SOME(Value(x)), SOME(Value(y))) =>
+                if x = y then
+                    [[]]
+                else
+                    []
+          | _ =>
+                [[X(SC(s1,s2))]]);
+    
+    fun inc n = (n := !n + 1; !n);
+
+    fun print_point point (pm,dm,sm,n) = case !point of
+        NONE => (case List.find (fn (x,y) => x = point) (!pm) of 
+            NONE => (pm := (point,(inc n))::(!pm); "p" ^ (PolyML.makestring (!n)) ) 
+          | SOME(x,y) => "p" ^ (PolyML.makestring y))
+      | SOME(Move(p,d,s)) => "Move("^(print_point p (pm,dm,sm,n))^", "^(print_direction d (pm,dm,sm,n))^", "^(print_distance s (pm,dm,sm,n))^")"
+      | SOME(PCopy(p)) => print_point p (pm,dm,sm,n)
+    and print_direction direction (pm,dm,sm,n) = case !direction of
+        NONE => (case List.find (fn (x,y) => x = direction) (!dm) of
+            NONE => (dm := (direction, (inc n))::(!dm); "d" ^ (PolyML.makestring (!n)))
+          | SOME(x,y) => "d" ^ (PolyML.makestring y))
+      | SOME(Direction(a,b)) => "Direction("^(print_point a (pm,dm,sm,n))^", "^(print_point b (pm,dm,sm,n))^")" 
+      | SOME(RDir(d,v)) => "RDir(" ^ (print_direction d (pm,dm,sm,n)) ^ ", " ^ v ^ ")"
+      | SOME(Right(d)) => "Right(" ^ (print_direction d (pm,dm,sm,n)) ^ ")"
+      | SOME(DCopy(d)) => print_direction d (pm,dm,sm,n)
+    and print_distance distance (pm,dm,sm,n) = case !distance of
+        NONE => (case List.find (fn (x,y) => x = distance) (!sm) of
+            NONE => (sm := (distance, (inc n))::(!sm); "s" ^ (PolyML.makestring (!n)))
+          | SOME(x,y) => "s" ^ (PolyML.makestring y))
+      | SOME(Distance(a,b)) => "Distance("^(print_point a (pm,dm,sm,n))^", "^(print_point b (pm,dm,sm,n))^")"
+      | SOME(Times(a,b)) => "Times("^(print_distance a (pm,dm,sm,n))^", "^(print_distance b (pm,dm,sm,n))^")"
+      | SOME(Divide(a,b)) => "Divide("^(print_distance a (pm,dm,sm,n))^", "^(print_distance b (pm,dm,sm,n))^")"
+      | SOME(Value(v)) => v
+      | SOME(SCopy(s)) => print_distance s (pm,dm,sm,n);
+    
+    fun print_constraint (PC(x,y)) z = (print_point x z) ^ " = " ^ (print_point y z)
+      | print_constraint (DC(x,y)) z = (print_direction x z) ^ " = " ^ (print_direction y z)
+      | print_constraint (SC(x,y)) z = (print_distance x z) ^ " = " ^ (print_distance y z)
+    
+    val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_point (ref(SOME(z))) (ref [], ref [], ref [], ref 0)));
+    val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_constraint z (ref [], ref [], ref [], ref 0)));
 end
 
 

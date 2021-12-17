@@ -93,7 +93,7 @@ end
 
 
 
-
+ 
 
 signature POSTPROCESING = 
 sig 
@@ -132,7 +132,7 @@ struct
                   | ([x],[y],"area") => (add_identification (variable_name_of x) "area" y; hints)
                   | ([x],[y],"angle") => (add_identification (variable_name_of x) "angle" y; hints)
                   | ([],[y],"unitlength") => (add_identification "1" "length" y; hints)
-                  | _ => raise PostProcessingException "Unexpected relation in structure transfer result";
+                  | (_,_,r) => raise PostProcessingException ("Unexpected relation '" ^ r ^ "'' in structure transfer result");
             val hints = List.foldr iteration [] relations;
             val variables = StringDict.keys identifications;
             val keep_tokens = List.map (fn x => (x, List.hd  (#2 (StringDict.get identifications x)))) variables;
@@ -152,7 +152,9 @@ struct
         end;
 
     fun postprocess_state state = 
-        let val result_composition : Composition.composition = State.patternCompOf state
+        let val _ = PolyML.print_depth 100;
+            val _ = PolyML.line_length 1000000;
+            val result_composition : Composition.composition = State.patternCompOf state
             val result_construction : Construction.construction = 
                 case Composition.resultingConstructions result_composition of 
                     [x] => x 
@@ -160,11 +162,18 @@ struct
             val (keep_tokens, replacements, hints) = parse_relations (State.goalsOf state);
             (*val identified = Identification.replace replacements result_construction;*)
             val instantiated = Instantiation.instantiate result_construction keep_tokens replacements;
-            val _ = PolyML.print (Seq.hd instantiated);
-            val constraints = Seq.map Geometry.get_constraints instantiated;
-            val _ = PolyML.print (Seq.hd constraints);
-            val left_constraints = Seq.map ((List.filter Geometry.use_positive_constraint) o #1) constraints;
-            val _ = PolyML.print (Seq.hd left_constraints);
+            fun prove_instance instance = 
+                let val _ = PolyML.print instance;
+                    val (pos_constraints, neg_constraints) = Geometry.get_constraints instance;
+                    val _ = PolyML.print (pos_constraints, neg_constraints);
+                    val left_constraints = List.map (fn x => (PolyML.print x ; Geometry.use_positive_constraint x)) pos_constraints;
+                    val _ = PolyML.print instance;
+                    val _ = PolyML.print left_constraints;
+                    val _ = PolyML.print neg_constraints;
+                in
+                    ()
+                end;
+            val _ = Seq.hd (Seq.map prove_instance instantiated);
             val _ = PolyML.print "================================================================";
             val points_map = "";
         in Seq.single state

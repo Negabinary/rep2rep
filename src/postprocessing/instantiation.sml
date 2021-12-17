@@ -54,10 +54,17 @@ struct
                       | (v, true) => case increment_all xs max of
                             (vs, false) => (v::vs, false)
                           | (vs, true) => (x::xs, true);
+            fun any_left [] = false
+              | any_left (x::xs) =
+                    case Seq.pull (#2 x) of
+                        NONE => any_left xs
+                      | SOME(_) => true
             fun next (xs, max) = case increment_all xs max of
-                (vs, false) => (vs, max)
-              | (vs, true) => next(xs, max + 1);  (*could include a check here for finite product*)
-            fun nextSeq x = Seq.make (fn () => SOME (x, nextSeq (next x)));
+                (vs, false) => SOME(vs, max)
+              | (vs, true) => if any_left xs then next(xs, max + 1) else NONE;  (*could include a check here for finite product*)
+            fun nextSeq x = case next x of
+                NONE => Seq.make (fn () => SOME (x, Seq.empty))
+              | SOME(v) => Seq.make (fn () => SOME (x, nextSeq (v)));
             val annotated = nextSeq (List.map (Basics.the o Seq.pull) enumerated, 1);
         in
             Seq.map
