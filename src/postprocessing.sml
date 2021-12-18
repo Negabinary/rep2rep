@@ -1,99 +1,6 @@
 import "util.dictionary";
 import "postprocessing.instantiation";
 
-(*
-signature POSTPROCESSING_STATE =
-sig
-    exception PostProcessingException of string;
-    type T;
-    val from_state : State.T -> T;
-    val convert_construction : Type.typeSystem -> Construction.construction -> Geometry.construction * Geometry.construction list * Geometry.equivalence list * Geometry.relation list;
-end
-
-
-structure PostprocessingState : POSTPROCESSING_STATE =
-struct
-    exception PostProcessingException of string;
-
-    type T = {
-        top : Geometry.construction,
-        geometryGoals : Geometry.relation list,
-        equivalenceGoals : Geometry.equivalence list,
-        constructions : Geometry.construction list
-    };
-
-    fun convert_construction type_system c = case c of
-        Construction.TCPair({token=token,constructor=constructor}, cs) =>
-            let val (root, gcs, rs, es) = Geometry.make_unit_construction (CSpace.nameOfConstructor(constructor));
-                val children_conversions = List.map (convert_construction type_system) cs;
-                val children_equivalences = List.funZip Geometry.mk_equivalence gcs (List.map #1 children_conversions);
-            in
-                (
-                    root, 
-                    root :: List.flatmap #2 children_conversions, 
-                    children_equivalences @ es @ List.flatmap #3 children_conversions,
-                    rs @ List.flatmap #4 children_conversions
-                )
-            end
-      | Construction.Source(token) => 
-            if (#subType type_system) ((CSpace.typeOfToken token), "line") then
-                (Geometry.mk_leaf_line (), [], [], [])
-            else if (#subType type_system) ((CSpace.typeOfToken token), "rect") then
-                (Geometry.mk_leaf_rect (), [], [], [])
-            else if (#subType type_system) ((CSpace.typeOfToken token), "angle") then
-                (Geometry.mk_leaf_angle (), [], [], [])
-            else raise PostProcessingException "unexpected leaf type"
-      | Construction.Reference(token) => 
-            if (#subType type_system) ((CSpace.typeOfToken token), "line") then
-                (Geometry.mk_leaf_line (), [], [], [])
-            else if (#subType type_system) ((CSpace.typeOfToken token), "rect") then
-                (Geometry.mk_leaf_rect (), [], [], [])
-            else if (#subType type_system) ((CSpace.typeOfToken token), "angle") then
-                (Geometry.mk_leaf_angle (), [], [], [])
-            else raise PostProcessingException "unexpected leaf type";
-            
-
-    fun from_state st =
-        let val composition = #composition st;
-            val construction = case Composition.constructionsInComposition composition of [] => raise PostProcessingException "No constructions!" | x::xs => x;
-            val (r, cs, es, rs) = convert_construction (#sourceTypeSystem st) (construction);
-        in {
-            top = r,
-            geometryGoals = rs,
-            equivalenceGoals = es,
-            constructions = cs
-        }
-        end
-
-            
-end
-
-*)
-
-
-signature IDENTIFICATION = 
-sig
-    val replace : ((CSpace.token * CSpace.token) list) -> Construction.construction -> Construction.construction;
-end
-
-structure Identification : IDENTIFICATION = 
-struct
-    fun replace replacements (Construction.TCPair(tc, constructions)) = Construction.TCPair(tc, List.map (replace replacements) constructions)
-      | replace replacements (Construction.Source(token)) =
-            (case List.find (fn (x,y) => x = token) replacements of
-                None => Construction.Source(token)
-              | SOME(x,y) => Construction.Reference(y))
-      | replace replacements (Construction.Reference(token)) =
-            (case List.find (fn (x,y) => x = token) replacements of
-                None => Construction.Reference(token)
-              | SOME(x,y) => Construction.Reference(y));
-end
-
-
-
-
-
- 
 
 signature POSTPROCESING = 
 sig 
@@ -160,77 +67,31 @@ struct
                     [x] => x 
                     | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
             val (keep_tokens, replacements, hints) = parse_relations (State.goalsOf state);
-            (*val identified = Identification.replace replacements result_construction;*)
             val instantiated = Instantiation.instantiate result_construction keep_tokens replacements;
             fun prove_instance instance = 
-                let val _ = PolyML.print instance;
-                    val (pos_constraints, neg_constraints) = Geometry.get_constraints instance;
-                    val _ = PolyML.print (pos_constraints, neg_constraints);
-                    val left_constraints = List.map (fn x => (PolyML.print x ; Geometry.use_positive_constraint x)) pos_constraints;
+                let val (pos_constraints, neg_constraints) = Geometry.get_constraints instance;
+                    val printer_config = (ref [], ref [], ref [], ref 0)
+                    (*val _ = PolyML.print (List.map (fn z => Geometry.print_constraint z printer_config) pos_constraints);
                     val _ = PolyML.print instance;
+                    val _ = PolyML.print "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";*)
+                    val left_constraints = List.map (fn x => (Geometry.use_positive_constraint x)) pos_constraints;
+                    (*val _ = PolyML.print pos_constraints;*)
+                    val _ = PolyML.print (Geometry.print_construction instance printer_config);
                     val _ = PolyML.print left_constraints;
-                    val _ = PolyML.print neg_constraints;
+                    (*val _ = PolyML.print (List.map (fn z => Geometry.print_constraint z printer_config) pos_constraints);*)
+                    val refuted = List.exists Geometry.holds neg_constraints orelse List.exists (fn x => x = []) left_constraints;
+                    (*val _ = PolyML.print instance;*)
+                    val _ = if refuted then (PolyML.print "REFUTED"; ()) else (PolyML.print "POSSIBLE!!!!"; ());
+                    val _ = PolyML.print "----------------------------------------------------------------";
                 in
                     ()
                 end;
-            val _ = Seq.hd (Seq.map prove_instance instantiated);
+            val _ = Seq.chop 100 (Seq.map (fn x => (prove_instance x)) instantiated);
             val _ = PolyML.print "================================================================";
             val points_map = "";
         in Seq.single state
         end;
 
-    fun postprocess states = Seq.flat (Seq.map postprocess_state states);
+    fun postprocess states = Seq.flat (Seq.map postprocess_state (Seq.take 2 states));
 
 end
-
-
-
-  
-    (*
-    fun interpret_relationships relationships = 
-        let datatype interpretation = Relations of relation list | Identification of string * CSpace.token | RelationOptions of relation list stream;
-            fun interpret_relationship r = 
-                case r of
-                    ([], [l1, l2], "sameDirection") => 
-                        let val l1 = Line(l1); val l2 = Line(l2); in 
-                            Relations([
-                                SameDirection(Start(l1),End(l1),Start(l2),End(l2))
-                            ])
-                  | ([], [l1, l2], "consecutive") =>
-                        let val l1 = Line(l1); val l2 = Line(l2); in 
-                            Relations([
-                                SamePoint(End(l1),Start(l2))
-                            ])
-                  | ([], [l1, l2], "oppDirection") =>
-                        let val l1 = Line(l1); val l2 = Line(l2); in 
-                            Relations([
-                                SameDirection(Start(l1),End(l1),End(l2),Start(l2))
-                            ])
-                  | ([], [l1, l2], "notParallel") =>
-                        let val l1 = Line(l1); val l2 = Line(l2); in 
-                            Relations([
-                                Not(SameDirection(Start(l1),End(l1),Start(l2),End(l2))), 
-                                Not(SameDirection(Start(l1),End(l1),End(l2),Start(l2)))
-                            ])
-                  | ([], [l1, l2], "startsOn") =>
-                        raise GeometryError("TODO: startsOn isn't implemented")
-                  | ([], [r1, r2], "shareSide") =>
-                        let val r1 = Rect(r1); val r2 = Rect(r2); in 
-                            Relations([
-                                SameDirection(StartR(r1),EndR(r1),StartR(r2),EndR(r2)),
-                                SamePoint(EndR(r1),StartR(r2)),
-                                Equals(WidthR(r1),WidthR(r2))
-                            ])
-                  | ([], [l1, l2], "perpendicular") =>
-                        let val l1 = Line(l1); val l2 = Line(l2); in
-                            Relations([
-                                SamePoint(End(l1),Start(l2)),
-                                RightAngle(End(l1),Start(l1),End(l2))
-                            ])
-                  | ([], [l1, r1], "sideOf") =>
-                        let val l1 = Line(l1); val r1 = Rect(r2) in
-                            Relations([
-                                SamePoint(End(l1),StartR(r1)),
-                                RightAngle(Start(l1),End(l1),EndR(r1))
-                            ])
-    *)

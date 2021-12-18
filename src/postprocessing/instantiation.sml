@@ -100,7 +100,6 @@ struct
                         Geometry.AngleCon(Geometry.RootAngle(from, center, p_to))
                     end
               | _ => raise InstantiationException ("Variable has unexpected type " ^ CSpace.typeOfToken token);
-            val inputs_geom = List.map (fn (variable, token) => (token, make_input variable token)) keep_tokens;
             fun sequence_for token = case CSpace.typeOfToken token of
                 "line" => line_sequence
               | "rect" => rect_sequence
@@ -116,6 +115,7 @@ struct
                       | zip _ _ = raise InstantiationException "Failed zip?"
                     val var_iso_map = zip replacements var_isos;
                     val Construction.TCPair(_, [lhs, rhs]) = construction;
+                    val inputs_geom = List.map (fn (variable, token) => (token, make_input variable token)) keep_tokens;
                     fun build (Construction.TCPair({token=token, constructor=constructor}, children)) = (
                         case (CSpace.nameOfConstructor constructor, List.map build children) of 
                             ("concat", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.LineCon(Geometry.Concat(l1,l2))
