@@ -1,11 +1,12 @@
 import "util.dictionary";
 import "postprocessing.instantiation";
+import "postprocessing.geometry_prover";
 
 
 signature POSTPROCESING = 
 sig 
-    val postprocess : State.T Seq.seq -> State.T Seq.seq;
-    val postprocess_state : State.T -> State.T Seq.seq;
+    val postprocess : State.T Seq.seq -> int -> unit;
+    val postprocess_state : State.T -> unit;
 end
 
 structure Postprocessing : POSTPROCESING = 
@@ -23,7 +24,7 @@ struct
     end
     structure StringDict = Dictionary(StringKeys)
 
-    fun parse_relations (relations : Relation.relationship list) : ((string * CSpace.token) list) * ((CSpace.token * CSpace.token) list) * ((CSpace.token * CSpace.token) list) = 
+    fun parse_relations (relations : Relation.relationship list) : ((string * CSpace.token) list) * ((CSpace.token * CSpace.token) list) * ((CSpace.token * CSpace.token) list) * bool = 
         let val identifications = StringDict.empty ();
             fun add_identification name kind value = 
                 let val (prev_kind, _) = StringDict.update identifications name (fn (k,z) => (k, value :: z));
@@ -54,44 +55,37 @@ struct
                         ) 
                         keep_tokens
                     );
+            val fully_transfered = List.all (fn x => String.size x = 1) variables
         in
-            (keep_tokens, replacements, hints)
+            (keep_tokens, replacements, hints, fully_transfered)
         end;
 
+    val _ = PolyML.print_depth 100;
+    val _ = PolyML.line_length 1000000;
+
     fun postprocess_state state = 
-        let val _ = PolyML.print_depth 100;
-            val _ = PolyML.line_length 1000000;
-            val result_composition : Composition.composition = State.patternCompOf state
-            val result_construction : Construction.construction = 
-                case Composition.resultingConstructions result_composition of 
+        let val result_construction : Construction.construction = 
+                case Composition.resultingConstructions (State.patternCompOf state) of 
                     [x] => x 
                     | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
-            val (keep_tokens, replacements, hints) = parse_relations (State.goalsOf state);
+            val (keep_tokens, replacements, hints, fully_transfered) = parse_relations (State.goalsOf state);
             val instantiated = Instantiation.instantiate result_construction keep_tokens replacements;
             fun prove_instance instance = 
-                let val (pos_constraints, neg_constraints) = Geometry.get_constraints instance;
-                    val printer_config = (ref [], ref [], ref [], ref 0)
-                    (*val _ = PolyML.print (List.map (fn z => Geometry.print_constraint z printer_config) pos_constraints);
-                    val _ = PolyML.print instance;
-                    val _ = PolyML.print "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";*)
-                    val left_constraints = List.map (fn x => (Geometry.use_positive_constraint x)) pos_constraints;
-                    (*val _ = PolyML.print pos_constraints;*)
-                    val _ = PolyML.print (Geometry.print_construction instance printer_config);
-                    val _ = PolyML.print left_constraints;
-                    (*val _ = PolyML.print (List.map (fn z => Geometry.print_constraint z printer_config) pos_constraints);*)
-                    val refuted = List.exists Geometry.holds neg_constraints orelse List.exists (fn x => x = []) left_constraints;
-                    (*val _ = PolyML.print instance;*)
-                    val _ = if refuted then (PolyML.print "REFUTED"; ()) else (PolyML.print "POSSIBLE!!!!"; ());
+                let val printer_config = (ref [], ref [], ref [], ref 0)
+                    val _ = case GeometryProver.can_build instance of
+                        NONE => (PolyML.print "REFUTED"; ())
+                      | SOME(x,[]) => (PolyML.print (Geometry.print_construction x printer_config); PolyML.print "PROVEN!!!!"; ())
+                      | SOME(x,c) => (PolyML.print (Geometry.print_construction x printer_config); PolyML.print c; PolyML.print "POSSIBLE"; ())
                     val _ = PolyML.print "----------------------------------------------------------------";
                 in
                     ()
                 end;
-            val _ = Seq.chop 100 (Seq.map (fn x => (prove_instance x)) instantiated);
-            val _ = PolyML.print "================================================================";
+            val _ = if fully_transfered then (Seq.chop 10 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
+            val _ = if fully_transfered then (PolyML.print "================================================================"; ()) else ();
             val points_map = "";
-        in Seq.single state
+        in ()
         end;
 
-    fun postprocess states = Seq.flat (Seq.map postprocess_state (Seq.take 2 states));
+    fun postprocess states limit = (PolyML.print (Seq.chop limit (Seq.map postprocess_state states)); ());
 
 end

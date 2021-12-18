@@ -98,532 +98,141 @@ Found 1 possible parses for opoeo
 "t13:t14:equality <- equality : [expr, equals, expr] -> equality <-[t9:t10:expr <- brackets : [open, expr, close] -> expr <-[t2:open, t6:t7:expr <- infixOp : [expr, binOp, expr] -> expr <-[t3:A, t4:times, t5:B], t8:close], t11:equals, t12:one]"
 
 Found 1 possible parses for additionDistributes
-"t48:t49:equality <- equality : [expr, equals, expr] -> equality <-[t29:t30:expr <- infixOp : [expr, binOp, expr] -> expr <-[t23:t24:expr <- brackets : [open, expr, close] -> expr <-[t16:open, t20:t21:expr <- infixOp : [expr, binOp, expr] -> expr <-[t17:A, t18:plus, t19:B], t22:close], t25:plus, t28:C], t31:equals, t46:t47:expr <- infixOp : [expr, binOp, expr] -> expr <-[t40:t41:expr <- brackets : [open, expr, close] -> expr <-[t33:open, t37:t38:expr <- infixOp : [expr, binOp, expr] -> expr <-[t34:B, t35:plus, t36:C], t39:close], t42:plus, t45:A]]"
+"t46:t47:equality <- equality : [expr, equals, expr] -> equality <-[t30:t31:expr <- infixOp : [expr, binOp, expr] -> expr <-[t26:t27:expr <- brackets : [open, expr, close] -> expr <-[t19:open, t23:t24:expr <- infixOp : [expr, binOp, expr] -> expr <-[t20:A, t21:plus, t22:B], t25:close], t28:times, t29:C], t32:equals, t44:t45:expr <- infixOp : [expr, binOp, expr] -> expr <-[t36:t37:expr <- infixOp : [expr, binOp, expr] -> expr <-[t33:A, t34:times, t35:C], t38:plus, t42:t43:expr <- infixOp : [expr, binOp, expr] -> expr <-[t39:B, t40:times, t41:C]]]"
 
 Applying structure transfer..."testtttttttttttttttttttttttttt"
+"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Concat(SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C))))))"
+[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   Y
+    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
+   Y Value(A) = Value(1)],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N
+    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N Value(A) = Value(1),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
+"POSSIBLE"
+"----------------------------------------------------------------"
+"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))))))"
+[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   Y
+    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
+   Y Value(A) = Value(1)],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N
+    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N Value(A) = Value(1),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
+"POSSIBLE"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Concat(SimilarTriangle(Reverse(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C))))))"
+[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   Y
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   Y Value(A) = Value(1)],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N Value(A) = Value(1),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]],
+ [[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   Y
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   Y Value(A) = Value(1)],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N Value(A) = Value(1),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
+"POSSIBLE"
+"----------------------------------------------------------------"
+"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(SimilarTriangle(Reverse(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))))))"
+[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   Y
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   Y Value(A) = Value(1)],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N Value(A) = Value(1),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]],
+ [[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   Y
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   Y Value(A) = Value(1)],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N
+    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
+  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
+   N Value(A) = Value(1),
+   X
+    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
+"POSSIBLE"
+"----------------------------------------------------------------"
+"================================================================"
+"ResolveRect(MKRect(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), JoinRect(MKRect(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), MKRect(Line(p1, Move(p1, d2, Value(B))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C))))))"
+"PROVEN!!!!"
+"----------------------------------------------------------------"
+"ResolveRect(MKRect(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), JoinRect(MKRect(Reverse(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), MKRect(Line(p1, Move(p1, d2, Value(B))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C))))))"
+"PROVEN!!!!"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"REFUTED"
+"----------------------------------------------------------------"
+"================================================================"
+([(), (), (), (), (), (), (), (), (), ()], Seq fn)
 "true"
 done
-  runtime: 232 ms 
-"ResolveRect(JoinRect(JoinRect(Rect(p1, p1, Divide(Value(A), Distance(p1, p1))), Rect(p1, p2, Divide(Value(B), Distance(p1, p2)))), Rect(p2, p1, Divide(Value(C), Distance(p2, p1)))), JoinRect(JoinRect(Rect(p1, p2, Divide(Value(B), Distance(p1, p2))), Rect(p2, p1, Divide(Value(C), Distance(p2, p1)))), Rect(p1, p1, Divide(Value(A), Distance(p1, p1)))))"
-[[[X Divide(Value(A), Distance(p1, p1)) = Divide(Value(B), Distance(p1, p2))]],
- [[]], [[X Direction(p1, p1) = Direction(p1, p2)]],
- [[X Divide(Value(A), Distance(p1, p1)) = Divide(Value(C), Distance(p2, p1))]],
- [[]], [[X Direction(p1, p2) = Direction(p2, p1)]],
- [[X Divide(Value(B), Distance(p1, p2)) = Divide(Value(C), Distance(p2, p1))]],
- [[]], [[X Direction(p1, p2) = Direction(p2, p1)]],
- [[X Divide(Value(B), Distance(p1, p2)) = Divide(Value(A), Distance(p1, p1))]],
- [[]], [[X Direction(p1, p1) = Direction(p1, p1)]], [[]], [[]],
- [[X Divide(Value(A), Distance(p1, p1)) = Divide(Value(B), Distance(p1, p2))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"================================================================"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Line(p1, Move(p1, d2, Value(B))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Line(p1, Move(p1, d2, Value(C)))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[], [[]], [], [[]], [], [[]], [], [[]], [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[[]], [[]], [], [[]], [], [[]], [], [[]], [],
- [[X
-    d1 = Direction(Move(Move(p2, d1, Value(C)), Direction(Move(p2, d1, Value(C)), Move(Move(p2, d1, Value(C)), Direction(p2, Move(p2, d1, Value(C))), Value(B))), Value(A)), Move(p2, d1, Value(C)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A))), Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Concat(Concat(Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A)))))))"
-[[[]], [[]], [], [[]], [], [[]], [], [[]], [],
- [[X
-    d1 = Direction(Move(p2, Direction(Move(p3, d1, Value(C)), Move(Move(p3, d1, Value(C)), Direction(p3, Move(p3, d1, Value(C))), Value(B))), Value(A)), p2)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))]],
- [], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Line(p1, Move(p1, d2, Value(A))))))"
-[[], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))]],
- [], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))]],
- [],
- [[X
-    d1 = Direction(Move(Move(p2, d1, Value(B)), Direction(p2, Move(p2, d1, Value(B))), Value(A)), Move(p2, d1, Value(B)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Line(p1, Move(p1, d2, Value(A)))))))"
-[[[]], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))]],
- [], [[X d1 = Direction(Move(p2, d1, Value(A)), p2)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Line(p1, Move(p1, d2, Value(B))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    d1 = Direction(Move(Move(p2, d1, Value(B)), d1, Value(C)), Move(p2, d1, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Reverse(Line(p1, Move(p1, d2, Value(C))))), Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[], [[]], [], [[]], [], [[]], [],
- [[X d1 = Direction(Move(p2, d1, Value(C)), p2)]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Reverse(Line(p1, Move(p1, d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[[]], [[]], [], [[]], [], [[]], [],
- [[X d1 = Direction(Move(p2, d1, Value(C)), p2)]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), Move(p1, d2, Value(C)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A))), Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Concat(Concat(Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Reverse(Line(p2, Move(p2, d3, Value(C))))), Reverse(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A)))))))"
-[[[]], [[]], [], [[]], [], [[]], [],
- [[X d1 = Direction(Move(p2, d1, Value(C)), p2)]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(p3, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), p3)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [[]],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Reverse(Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, d2, Value(A))))))"
-[[], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)), Move(Move(p1, d2, Value(A)), d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(p1, d2, Value(A)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Reverse(Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C))))), Reverse(Line(p1, Move(p1, d2, Value(A)))))))"
-[[[]], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)), Move(Move(p1, d2, Value(A)), d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(p1, d2, Value(A)), d2, Value(B))) = Direction(Move(p1, d2, Value(A)), p1)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))))), Angle(Move(p1, d2, Value(B)), Move(p1, d2, Value(B)), p3)))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)), p3))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [[]], [[]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(Move(p1, d2, Value(B)), p3), Distance(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Reverse(Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C))))), Rotate(Line(p1, Move(p1, d2, Value(A))), Angle(Move(p1, d2, Value(A)), p1, p3)))))"
-[[], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)), Move(Move(p1, d2, Value(A)), d2, Value(B)))]],
- [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(p1, d2, Value(A)), d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, d2, Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)), p3))), Angle(Move(Move(p1, d2, Value(B)), Direction(Move(p1, d2, Value(B)), p3), Distance(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))), Move(p1, d2, Value(B)), p4)))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [[]], [[]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(Move(p1, d2, Value(B)), p3), Distance(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Rotate(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Angle(Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)), Move(p1, d2, Value(C)), p3)), Reverse(Line(p1, Move(p1, d2, Value(C))))), Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [[]],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))), Angle(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1, p4)))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Concat(Concat(Rotate(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Angle(Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)), Move(p1, d2, Value(C)), p3)), Reverse(Line(p1, Move(p1, d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[[]], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), Move(p1, d2, Value(C)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A))), Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Concat(Concat(Rotate(Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Angle(Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)), Move(p2, d3, Value(C)), p4)), Reverse(Line(p2, Move(p2, d3, Value(C))))), Reverse(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A)))))))"
-[[[]], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(p3, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), p3)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Reverse(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))))), Angle(p1, p1, p4)))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1)]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1, p4))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [[]], [[]], [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Rotate(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Angle(Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)), Move(p1, d2, Value(C)), p3)), Reverse(Line(p1, Move(p1, d2, Value(C))))), Rotate(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Angle(Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), p1, p4)))))"
-[[], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [[]], [[]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1, p4))), Angle(Move(p1, Direction(p1, p4), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))), p1, p5)))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [[]], [[]], [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Line(p1, Move(p1, d2, Value(B))), Rotate(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))), Angle(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)), p3))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [[]],
- [[X d1 = Direction(Move(p2, d1, Value(B)), p3)]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p3) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"================================================================"
-  number of results: 2
-"ResolveRect(JoinRect(JoinRect(Rect(p1, p1, Divide(Value(A), Distance(p1, p1))), Rect(p1, p2, Divide(Value(B), Distance(p1, p2)))), Rect(p2, p1, Divide(Value(C), Distance(p2, p1)))), JoinRect(JoinRect(Rect(p1, p2, Divide(Value(B), Distance(p1, p2))), Rect(p2, p1, Divide(Value(C), Distance(p2, p1)))), Rect(p1, p1, Divide(Value(A), Distance(p1, p1)))))"
-[[[X Divide(Value(A), Distance(p1, p1)) = Divide(Value(B), Distance(p1, p2))]],
- [[]], [[X Direction(p1, p1) = Direction(p1, p2)]],
- [[X Divide(Value(A), Distance(p1, p1)) = Divide(Value(C), Distance(p2, p1))]],
- [[]], [[X Direction(p1, p2) = Direction(p2, p1)]],
- [[X Divide(Value(B), Distance(p1, p2)) = Divide(Value(C), Distance(p2, p1))]],
- [[]], [[X Direction(p1, p2) = Direction(p2, p1)]],
- [[X Divide(Value(B), Distance(p1, p2)) = Divide(Value(A), Distance(p1, p1))]],
- [[]], [[X Direction(p1, p1) = Direction(p1, p1)]], [[]], [[]],
- [[X Divide(Value(A), Distance(p1, p1)) = Divide(Value(B), Distance(p1, p2))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"================================================================"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Line(p1, Move(p1, d2, Value(B))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Line(p1, Move(p1, d2, Value(C)))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[], [[]], [], [[]], [], [[]], [], [[]], [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[[]], [[]], [], [[]], [], [[]], [], [[]], [],
- [[X
-    d1 = Direction(Move(Move(p2, d1, Value(C)), Direction(Move(p2, d1, Value(C)), Move(Move(p2, d1, Value(C)), Direction(p2, Move(p2, d1, Value(C))), Value(B))), Value(A)), Move(p2, d1, Value(C)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A))), Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Concat(Concat(Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A)))))))"
-[[[]], [[]], [], [[]], [], [[]], [], [[]], [],
- [[X
-    d1 = Direction(Move(p2, Direction(Move(p3, d1, Value(C)), Move(Move(p3, d1, Value(C)), Direction(p3, Move(p3, d1, Value(C))), Value(B))), Value(A)), p2)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))]],
- [], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Line(p1, Move(p1, d2, Value(A))))))"
-[[], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))]],
- [], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))]],
- [],
- [[X
-    d1 = Direction(Move(Move(p2, d1, Value(B)), Direction(p2, Move(p2, d1, Value(B))), Value(A)), Move(p2, d1, Value(B)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Line(p1, Move(p1, d2, Value(A)))))))"
-[[[]], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))]],
- [], [[X d1 = Direction(Move(p2, d1, Value(A)), p2)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Line(p1, Move(p1, d2, Value(B))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    d1 = Direction(Move(Move(p2, d1, Value(B)), d1, Value(C)), Move(p2, d1, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Reverse(Line(p1, Move(p1, d2, Value(C))))), Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[], [[]], [], [[]], [], [[]], [],
- [[X d1 = Direction(Move(p2, d1, Value(C)), p2)]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Reverse(Line(p1, Move(p1, d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[[]], [[]], [], [[]], [], [[]], [],
- [[X d1 = Direction(Move(p2, d1, Value(C)), p2)]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), Move(p1, d2, Value(C)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A))), Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Concat(Concat(Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Reverse(Line(p2, Move(p2, d3, Value(C))))), Reverse(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A)))))))"
-[[[]], [[]], [], [[]], [], [[]], [],
- [[X d1 = Direction(Move(p2, d1, Value(C)), p2)]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(p3, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), p3)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [[]],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Reverse(Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, d2, Value(A))))))"
-[[], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)), Move(Move(p1, d2, Value(A)), d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(p1, d2, Value(A)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Reverse(Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C))))), Reverse(Line(p1, Move(p1, d2, Value(A)))))))"
-[[[]], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)), Move(Move(p1, d2, Value(A)), d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(p1, d2, Value(A)), d2, Value(B))) = Direction(Move(p1, d2, Value(A)), p1)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))))), Angle(Move(p1, d2, Value(B)), Move(p1, d2, Value(B)), p3)))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)), p3))))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [[]], [[]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(Move(p1, d2, Value(B)), p3), Distance(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, d2, Value(A))), Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)))), Reverse(Concat(Concat(Reverse(Line(Move(p1, d2, Value(A)), Move(Move(p1, d2, Value(A)), d2, Value(B)))), Reverse(Line(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C))))), Rotate(Line(p1, Move(p1, d2, Value(A))), Angle(Move(p1, d2, Value(A)), p1, p3)))))"
-[[], [], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(p1, d2, Value(A))) = Direction(Move(Move(Move(p1, d2, Value(A)), d2, Value(B)), d2, Value(C)), Move(Move(p1, d2, Value(A)), d2, Value(B)))]],
- [[]], [[]], [],
- [[X
-    Direction(Move(Move(p1, d2, Value(A)), d2, Value(B)), Move(Move(p1, d2, Value(A)), d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, d2, Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Reverse(Line(p1, Move(p1, d2, Value(B)))), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)), Move(p1, d2, Value(B)), p3))), Angle(Move(Move(p1, d2, Value(B)), Direction(Move(p1, d2, Value(B)), p3), Distance(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))), Move(p1, d2, Value(B)), p4)))"
-[[[]], [], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p1) = Direction(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)))]],
- [[]], [[]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(B)), Move(p1, d2, Value(B))) = Direction(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(Move(p1, d2, Value(B)), p3), Distance(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Rotate(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Angle(Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)), Move(p1, d2, Value(C)), p3)), Reverse(Line(p1, Move(p1, d2, Value(C))))), Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [[]],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))), Angle(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1, p4)))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Concat(Concat(Rotate(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Angle(Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)), Move(p1, d2, Value(C)), p3)), Reverse(Line(p1, Move(p1, d2, Value(C))))), Reverse(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))))))"
-[[[]], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(Move(p1, d2, Value(C)), Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), Move(p1, d2, Value(C)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A))), Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)))), Line(p2, Move(p2, d3, Value(C)))), Reverse(Concat(Concat(Rotate(Line(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Angle(Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B)), Move(p2, d3, Value(C)), p4)), Reverse(Line(p2, Move(p2, d3, Value(C))))), Reverse(Line(p1, Move(p1, Direction(Move(p2, d3, Value(C)), Move(Move(p2, d3, Value(C)), Direction(p2, Move(p2, d3, Value(C))), Value(B))), Value(A)))))))"
-[[[]], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(Move(p3, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), p3)]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Reverse(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))))), Angle(p1, p1, p4)))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1)]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1, p4))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [[]], [[]], [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(Concat(Rotate(Line(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Angle(Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B)), Move(p1, d2, Value(C)), p3)), Reverse(Line(p1, Move(p1, d2, Value(C))))), Rotate(Line(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A))), Angle(Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)), p1, p4)))))"
-[[], [[]], [], [[]], [], [[]], [[]], [[]], [],
- [[X
-    Direction(Move(p1, d2, Value(C)), p3) = Direction(Move(p1, d2, Value(C)), p1)]],
- [[]], [[]], [[]],
- [[X
-    Direction(Move(p1, d2, Value(C)), p1) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, Direction(Move(p1, d2, Value(C)), Move(Move(p1, d2, Value(C)), Direction(p1, Move(p1, d2, Value(C))), Value(B))), Value(A)))))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Rotate(Concat(Concat(Rotate(Line(p1, Move(p1, d2, Value(B))), Angle(Move(p1, d2, Value(B)), p1, p3)), Reverse(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))))), Rotate(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Angle(Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)), p1, p4))), Angle(Move(p1, Direction(p1, p4), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))), p1, p5)))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [],
- [[X
-    Direction(p1, p2) = Direction(Move(Move(p1, d3, Value(B)), d3, Value(C)), Move(p1, d3, Value(B)))]],
- [[]], [[]], [],
- [[X
-    Direction(p1, Move(p1, d2, Value(B))) = Direction(p1, Move(p1, Direction(p1, p3), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))]],
- [[]], [[]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(Concat(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C)))), Concat(Concat(Line(p1, Move(p1, d2, Value(B))), Rotate(Line(Move(p1, d2, Value(B)), Move(Move(p1, d2, Value(B)), d2, Value(C))), Angle(Move(Move(p1, d2, Value(B)), d2, Value(C)), Move(p1, d2, Value(B)), p3))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))))"
-[[[]], [], [], [[]], [[]], [[]], [[]], [[]], [[]],
- [[X d1 = Direction(Move(p2, d1, Value(B)), p3)]], [],
- [[X
-    Direction(Move(p1, d2, Value(B)), p3) = Direction(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))]]]
-"REFUTED"
-"----------------------------------------------------------------"
-"================================================================"
-  informational suitability score: 0.015625
+  runtime: 465 ms 
+  number of results: 42
+  informational suitability score: 0.0001220703125
 
 Composing patterns and creating tikz figures...done
 

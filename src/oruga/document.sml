@@ -165,7 +165,7 @@ struct
       val _ = print ("\nApplying structure transfer...");
       val startTime = Time.now();
       val results = Transfer.structureTransfer KB sourceTypeSystem targetTypeSystem construction goal;
-      val results = if getPostprocessing C = "false" then results else (PolyML.print "testtttttttttttttttttttttttttt"; Postprocessing.postprocess results);
+      val _ = if getPostprocessing C = "false" then () else (PolyML.print "testtttttttttttttttttttttttttt"; Postprocessing.postprocess results limit);
       val _ = PolyML.print (getPostprocessing C)
       val endTime = Time.now();
       val runtime = Time.toMilliseconds endTime - Time.toMilliseconds startTime;

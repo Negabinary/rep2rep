@@ -27,7 +27,7 @@ comment opoeo:equationG =
 comment additionDistributes:equationM = open A + B close + C = A + open B + C close
 comment 48:49
 
-comment additionDistributes:equationM = open A + B close * C = A * C + B * C
+input additionDistributes:equationM = open A + B close * C = A * C + B * C
 comment 46:47
 
 comment additionDistributes:equationM = open A + B close + C = A + open B + C close
@@ -36,7 +36,7 @@ comment 48:49
 comment additionDistributes:equationM = open A * B close = open B * A close
 comment 36:37
 
-input additionDistributes:equationM = open A + B close + C = open B + C close + A
+comment additionDistributes:equationM = open A + B close + C = open B + C close + A
 comment 48:49
 
 comment additionDistributes:equationM = sin A = cos open 90 - A close
@@ -47,7 +47,7 @@ comment additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
 transfer
     sourceConstruction additionDistributes
     targetTypeSystem geometry
-    goal ([t48:t49:equality],[t':value]) :: repeq
+    goal ([t46:t47:equality],[t':value]) :: repeq
     output test2
     limit 10
     postprocess geometryPP
