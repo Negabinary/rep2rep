@@ -80,7 +80,7 @@ struct
                 in
                     ()
                 end;
-            val _ = if fully_transfered then (Seq.chop 10 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
+            val _ = if fully_transfered then (Seq.chop 5 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
             val _ = if fully_transfered then (PolyML.print "================================================================"; ()) else ();
             val points_map = "";
         in ()

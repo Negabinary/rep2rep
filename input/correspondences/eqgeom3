@@ -17,6 +17,7 @@ correspondence areaBothSides:(equationG,geometryG) =
     constructRel ([t:equality],[r:rect]) :: repeq
     strength 1.0
 
+comment TODO : think about how this works for angles greater than 360
 correspondence angleBothSides:(equationG,geometryG) = 
     source t:equality <- equality[t1:expr,t2:equals,t3:expr]
     target a:angle <- resolveAngle[a1:angle, a2:angle]
@@ -28,7 +29,7 @@ correspondence angleBothSides:(equationG,geometryG) =
 correspondence distanceBrackets:(equationG,geometryG) = 
     source t:expr <- brackets[t1:open, t2:expr, t3:close]
     target l:line
-    tokenRels   ([t2:expr],[l:line]) :: length
+    tokenRels  ([t2:expr],[l:line]) :: length
     constructRel ([t:expr],[l:line]) :: length
     strength 1.0
 
@@ -124,7 +125,7 @@ correspondence areaDivision:(equationG,geometryG) =
     constructRel ([t:expr],[l:line]) :: length
     strength 1.0
 
-comment TODO:READD angleAddition:(equationG,geometryG) =
+correspondence angleAddition:(equationG,geometryG) =
     source t:expr <- infixOp[t1:expr, tp:plus, t2:expr]
     target a:angle <- joinangle[a1:angle, a2:angle]
     tokenRels ([t1:expr],[a1:angle]) :: angle,
@@ -132,7 +133,7 @@ comment TODO:READD angleAddition:(equationG,geometryG) =
     constructRel ([t:expr],[a:angle]) :: angle
     strength 1.0
 
-comment TODO:READD angleSubtraction:(equationG,geometryG) =
+correspondence angleSubtraction:(equationG,geometryG) =
     source t:expr <- infixOp[t1:expr, tp:minus, t2:expr]
     target a:angle <- subangle[a1:angle, a2:angle]
     tokenRels ([t1:expr],[a1:angle]) :: angle,
@@ -140,9 +141,33 @@ comment TODO:READD angleSubtraction:(equationG,geometryG) =
     constructRel ([t:expr],[a:angle]) :: angle
     strength 1.0
 
-comment TODO:READD ninetyangle:(equationG,geometryG) =
+correspondence ninetyangle:(equationG,geometryG) =
     source t:ninety
     target a:angle
     tokenRels ([],[a:angle]) :: perpendicular
     constructRel ([t:ninety],[a:angle]) :: angle
+    strength 1.0
+
+correspondence sinangle:(equationG,geometryG) =
+    source t:expr <- app[t1:sin, t2:expr]
+    target l:line <- sine[lU:line, a:angle] 
+    tokenRels ([t2:expr],[a:angle]) :: angle,
+              ([],[lU:line]) :: unitlength
+    constructRel ([t:expr],[l:line]) :: distance
+    strength 1.0
+
+correspondence cosangle:(equationG,geometryG) =
+    source t:expr <- app[t1:cos, t2:expr]
+    target l:line <- cosine[lU:line, a:angle]
+    tokenRels ([t2:expr],[a:angle]) :: angle,
+              ([],[lU:line]) :: unitlength
+    constructRel ([t:expr],[l:line]) :: distance
+    strength 1.0
+
+correspondence tanangle:(equationG,geometryG) =
+    source t:expr <- app[t1:tan, t2:expr]
+    target l:line <- tangent[lU:line, a:angle]
+    tokenRels ([t2:expr],[a:angle]) :: angle,
+              ([],[lU:line]) :: unitlength
+    constructRel ([t:expr],[l:line]) :: distance
     strength 1.0

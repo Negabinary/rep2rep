@@ -14,15 +14,25 @@ conSpec geometryG:geometry =
     mkrect : [line, line] -> rect,
     divrect : [rect, line] -> line,
     joinrect : [rect, rect] -> rect,
-    subrect : [rect, rect] -> rect
+    subrect : [rect, rect] -> rect,
 
-comment,
-    sin : [line, angle] -> line,
-    cos : [line, angle] -> line
+
+
+    sine : [line, angle] -> line,
+    cosine : [line, angle] -> line,
+    tangent : [line, angle] -> line,
 
     anglebetween : [line, line] -> angle,
     joinangle : [angle, angle] -> angle,
     subangle : [angle, angle] -> angle,
 
-    rotate : [line, angle] -> line,
-    nextRect : [rect] -> rect
+    reverseline : [line] -> line,
+    rotateline : [line, angle] -> line,
+    moveline : [line, line] -> line,
+
+    reverseangle : [angle] -> angle,
+    moveangle : [angle] -> angle,
+    oppositeangle : [angle] -> angle,
+
+    nextRect : [rect] -> rect,
+    moveRect : [rect, line] -> rect

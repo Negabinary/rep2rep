@@ -16,7 +16,8 @@ struct
                        | Times of distance_con option ref * distance_con option ref
                        | Divide of distance_con option ref * distance_con option ref
                        | Value of string
-                       | SCopy of distance_con option ref;
+                       | SCopy of distance_con option ref
+                       | Dot of direction_con option ref * direction_con option ref;
     
     datatype relation = SamePoint of point_con option ref * point_con option ref
                       | SameDirection of direction_con option ref * direction_con option ref
@@ -29,16 +30,25 @@ struct
                       | DivRect of rect_con * line_con
                       | Reverse of line_con
                       | Rotate of line_con * angle_con
+                      | Sine of line_con * angle_con
+                      | Cosine of line_con * angle_con
+                      | Tangent of line_con * angle_con
+                      | MoveLine of line_con * line_con
         and angle_con = RootAngle of point_con option ref * point_con option ref * point_con option ref
                       | ResolveAngle of angle_con * angle_con
                       | AngleBetween of line_con * line_con
                       | JoinAngle of angle_con * angle_con
                       | SubAngle of angle_con * angle_con
+                      | ReverseAngle of angle_con
+                      | MoveAngle of angle_con * line_con
+                      | OppositeAngle of angle_con
          and rect_con = RootRect of point_con option ref * point_con option ref * distance_con option ref
                       | ResolveRect of rect_con * rect_con
                       | MKRect of line_con * line_con
                       | JoinRect of rect_con * rect_con
-                      | SubRect of rect_con * rect_con;
+                      | SubRect of rect_con * rect_con
+                      | NextRect of rect_con
+                      | MoveRect of rect_con * line_con;
     
     datatype construction = LineCon of line_con | AngleCon of angle_con | RectCon of rect_con;
 
@@ -63,13 +73,29 @@ struct
       | SameDirection of direction_con option ref * direction_con option ref
       | SameDistsance of distance_con option ref * distance_con option ref
     
-    fun get_line_start (RootLine(a,b)) = a
+    fun dirof l = (ref o SOME o Direction) (get_line_start l, get_line_end l)
+    and disof l = (ref o SOME o Distance) (get_line_start l, get_line_end l)
+    and get_line_start (RootLine(a,b)) = a
       | get_line_start (ResolveLine(a,b)) = get_line_start a
       | get_line_start (Concat(a,b)) = get_line_start a
       | get_line_start (SimilarTriangle(a,b,c)) = get_line_end c
       | get_line_start (DivRect(r,l)) = get_rect_end r
       | get_line_start (Reverse(l)) = get_line_end l
       | get_line_start (Rotate(l,a)) = get_line_start l
+      | get_line_start (Sine(l,a)) = (ref o SOME o Move) (
+            get_line_start l, 
+            (ref o SOME o Direction) (get_angle_middle a, get_angle_start a),
+            (ref o SOME o Times) (
+                (ref o SOME o Dot) (
+                    (ref o SOME o Direction) (get_angle_middle a, get_angle_start a), 
+                    (ref o SOME o Direction) (get_angle_middle a, get_angle_end a)
+                ), 
+                disof l
+            )
+        )
+      | get_line_start (Cosine(l,a)) = get_line_start l
+      | get_line_start (Tangent(l,a)) = get_line_end l
+      | get_line_start (MoveLine(l,lm)) = (ref o SOME o Move) (get_line_start l, dirof lm, disof lm)
 
     and get_line_end (RootLine(a,b)) = b
       | get_line_end (ResolveLine(a,b)) = get_line_end a
@@ -117,36 +143,69 @@ struct
                 (ref o SOME o Distance) (A,C)
             )
         end
+      | get_line_end (Sine(l, a)) = get_line_end l
+      | get_line_end (Cosine(l, a)) = get_line_start (Sine(l, a))
+      | get_line_end (Tangent(l, a)) = (ref o SOME o Move) (
+            get_angle_middle a,
+            (ref o SOME o Direction) (get_angle_middle a, get_angle_end a),
+            (ref o SOME o Divide) (disof l, (ref o SOME o Dot) (
+                    (ref o SOME o Direction) (get_angle_middle a, get_angle_start a), 
+                    (ref o SOME o Direction) (get_angle_middle a, get_angle_end a)
+                ))
+        )
+      | get_line_end (MoveLine(l,lm)) = (ref o SOME o Move) (get_line_end l, dirof lm, disof lm)
+      
         
     and get_angle_start (RootAngle(a,b,c)) = a
       | get_angle_start (ResolveAngle(a,b)) = get_angle_start a
       | get_angle_start (AngleBetween(a,b)) = get_line_end a
       | get_angle_start (JoinAngle(a,b)) = get_angle_start a
       | get_angle_start (SubAngle(a,b)) = get_angle_start a
+      | get_angle_start (ReverseAngle(a)) = get_angle_end a
+      | get_angle_start (MoveAngle(a,l)) = (ref o SOME o Move) (get_angle_start a, dirof l, disof l)
+      | get_angle_start (OppositeAngle(a)) = (ref o SOME o Move) (
+            get_angle_middle a,
+            (ref o SOME o Right o ref o SOME o Right o ref o SOME o Direction) (get_angle_middle a, get_angle_start a),
+            (ref o SOME o Distance) (get_angle_middle a, get_angle_start a)
+        )
     
     and get_angle_middle (RootAngle(a,b,c)) = b
       | get_angle_middle (ResolveAngle(a,b)) = get_angle_middle a
       | get_angle_middle (AngleBetween(a,b)) = get_line_start a
       | get_angle_middle (JoinAngle(a,b)) = get_angle_middle a
       | get_angle_middle (SubAngle(a,b)) = get_angle_middle a
+      | get_angle_middle (ReverseAngle(a)) = get_angle_middle a
+      | get_angle_middle (MoveAngle(a,l)) = (ref o SOME o Move) (get_angle_middle a, dirof l, disof l)
+      | get_angle_middle (OppositeAngle(a)) = get_angle_middle a
     
     and get_angle_end (RootAngle(a, b,c)) = c
       | get_angle_end (ResolveAngle(a, b)) = get_angle_end a
       | get_angle_end (AngleBetween(a, b)) = get_line_end b
       | get_angle_end (JoinAngle(a, b)) = get_angle_end b
       | get_angle_end (SubAngle(a, b)) = get_angle_start b
+      | get_angle_end (ReverseAngle(a)) = get_angle_start a
+      | get_angle_end (MoveAngle(a,l)) = (ref o SOME o Move) (get_angle_end a, dirof l, disof l)
+      | get_angle_end (OppositeAngle(a)) = (ref o SOME o Move) (
+            get_angle_middle a,
+            (ref o SOME o Right o ref o SOME o Right o ref o SOME o Direction) (get_angle_middle a, get_angle_end a),
+            (ref o SOME o Distance) (get_angle_middle a, get_angle_start a)
+        )
     
     and get_rect_start (RootRect(a, b, c)) = a
       | get_rect_start (ResolveRect(a, b)) = get_rect_start a
       | get_rect_start (MKRect(a, b)) = get_line_start a
       | get_rect_start (JoinRect(a, b)) = get_rect_start a
       | get_rect_start (SubRect(a, b)) = get_rect_start a
+      | get_rect_start (NextRect(a)) = get_rect_end a
+      | get_rect_start (MoveRect(a,b)) = (ref o SOME o Move) (get_rect_start a, dirof b, disof b)
     
     and get_rect_end (RootRect(a, b, c)) = b
       | get_rect_end (ResolveRect(a, b)) = get_rect_end a
       | get_rect_end (MKRect(a, b)) = get_line_end a
       | get_rect_end (JoinRect(a, b)) = get_rect_end b
       | get_rect_end (SubRect(a, b)) = get_rect_start b
+      | get_rect_end (NextRect(a)) = (ref o SOME o Move) (get_rect_end a, (ref o SOME o Right o ref o SOME o Direction) (get_rect_start a, get_rect_end a), get_rect_width a)
+      | get_rect_end (MoveRect(a,b)) = (ref o SOME o Move) (get_rect_end a, dirof b, disof b)
     
     and get_rect_width (RootRect(a, b, c)) = c
       | get_rect_width (ResolveRect(a, b)) = get_rect_width a
@@ -157,7 +216,9 @@ struct
             (ref o SOME o Distance) (A,B)
         end
       | get_rect_width (JoinRect(a, b)) = get_rect_width a
-      | get_rect_width (SubRect(a, b)) = get_rect_width a;
+      | get_rect_width (SubRect(a, b)) = get_rect_width a
+      | get_rect_width (NextRect(a)) = (ref o SOME o Distance) (get_rect_start a, get_rect_end a)
+      | get_rect_width (MoveRect(a, b)) = get_rect_width a;
 
     datatype constraint = PC of point_con option ref * point_con option ref
                         | DC of direction_con option ref * direction_con option ref
@@ -209,7 +270,40 @@ struct
                     PC(get_angle_start a, get_line_end l)
                 ], []
             )
-
+      | Sine(l, a) => mc
+            (mc (get_line_constraints l) (get_angle_constraints a))
+            (
+                [
+                    PC(get_line_start l, get_angle_middle a),
+                    DC(dirof l, (ref o SOME o Direction) (get_angle_middle a, get_angle_start a))
+                    (*TODO: Constrain minimum / maximum angle*)
+                ], []
+            )
+      | Cosine(l, a) => mc
+            (mc (get_line_constraints l) (get_angle_constraints a))
+            (
+                [
+                    PC(get_line_start l, get_angle_middle a),
+                    DC(dirof l, (ref o SOME o Direction) (get_angle_middle a, get_angle_start a))
+                ], []
+            )
+      | Tangent(l, a) => mc
+            (mc (get_line_constraints l) (get_angle_constraints a))
+            (
+                [
+                    PC(get_line_start l, get_angle_middle a),
+                    DC(dirof l, (ref o SOME o Direction) (get_angle_middle a, get_angle_start a))
+                ], []
+            )
+      | MoveLine(l, lm) => mc
+            (mc (get_line_constraints l) (get_line_constraints lm))
+            (
+                [
+                    PC(get_line_start l, get_line_start lm)
+                ], [
+                    DC(dirof l, dirof lm)
+                ]
+            )
     and get_angle_constraints angle = case angle of
         RootAngle(a,b,c) => (
             [], [
@@ -242,9 +336,20 @@ struct
       | SubAngle(a,b) => mc
             (mc (get_angle_constraints a) (get_angle_constraints b))
             (
-                [PC(get_angle_middle a, get_angle_middle b), PC(get_angle_end a, get_angle_end b)],
-                [PC(get_angle_start a, get_angle_start b)]
+                [
+                    PC(get_angle_middle a, get_angle_middle b), PC(get_angle_end a, get_angle_end b),
+                    PC(get_angle_start a, get_angle_start b)
+                ], []
             )
+      | ReverseAngle(a) => get_angle_constraints a
+      | MoveAngle(a,l) => mc
+            (mc (get_angle_constraints a) (get_line_constraints l))
+            (
+                [
+                    PC(get_angle_middle a, get_line_start l)
+                ], []
+            )
+      | OppositeAngle(a) => get_angle_constraints a
       
     and get_rect_constraints rect = case rect of
         RootRect(a,b,c) => (
@@ -296,6 +401,14 @@ struct
                     )
                 ],
                 [PC(get_rect_start a, get_rect_start b)]
+            )
+      | NextRect(a) => get_rect_constraints a
+      | MoveRect(a,l) => mc
+            (mc (get_rect_constraints a) (get_line_constraints l))
+            (
+                [
+                    PC(get_rect_start a, get_line_start l)
+                ], []
             );
     
     fun get_constraints object = case object of
@@ -365,7 +478,8 @@ struct
       | SOME(Times(x,y)) => pcs check x orelse pcs check y
       | SOME(Divide(x,y)) => pcs check x orelse pcs check y
       | SOME(Value(x)) => false
-      | SOME(SCopy(x)) => pcs check x;
+      | SOME(SCopy(x)) => pcs check x
+      | SOME(Dot(a,b)) => pcd check a orelse pcd check b;
     
     fun dcp check const = case !const of
         NONE => false
@@ -383,7 +497,8 @@ struct
       | SOME(Times(x,y)) => dcs check x orelse dcs check y
       | SOME(Divide(x,y)) => dcs check x orelse dcs check y
       | SOME(Value(x)) => false
-      | SOME(SCopy(x)) => dcs check x;
+      | SOME(SCopy(x)) => dcs check x
+      | SOME(Dot(a,b)) => direction_contains_check check a orelse direction_contains_check check b;
     
     fun scp check const = case !const of
         NONE => false
@@ -401,82 +516,80 @@ struct
       | SOME(Times(x,y)) => distance_contains_check check x orelse distance_contains_check check y
       | SOME(Divide(x,y)) => distance_contains_check check x orelse distance_contains_check check y
       | SOME(Value(x)) => false
-      | SOME(SCopy(x)) => distance_contains_check check x;
+      | SOME(SCopy(x)) => distance_contains_check check x
+      | SOME(Dot(a,b)) => scd check a orelse scd check b;
 
     datatype pos_neg_constraint = Y of constraint | N of constraint | X of constraint;
     (*Y = Yes, N = No, X = Extra condition that can't be proven*)
 
 
-    fun use_positive_constraint (PC(p1, p2)) = if same_point (p1,p2) then [[]] else (case (!p1, !p2, point_contains_check p1 p2, point_contains_check p2 p1) of
-            (SOME(PCopy(x)), _, _, _) =>
-                use_positive_constraint (PC(x, p2))
-          | (_, SOME(PCopy(x)), _, _) =>
-                use_positive_constraint (PC(p1, x))
-          | (NONE, _, false, _) =>
-                (p1 := (SOME o PCopy) p2; [[]])
-          | (_, NONE, _, false) =>
-                (p2 := (SOME o PCopy) p1; [[]])
-          | (SOME(Move(b1,d1,s1)), SOME(Move(b2,d2,s2)), _, _) =>
-                if b1 = p2 orelse b2 = p1 then [] else
-                [
-                    [Y(PC(b1,b2)), Y(DC(d1,d2)), Y(SC(s1,s2))],
-                    [N(PC(b1,b2)), N(DC(d1,d2)), X(PC(p1, p2))],
-                    [N(PC(b1,b2)), N(SC(s1,s2)), X(PC(p1, p2))]
-                ]
-          | (SOME(Move((b2),_,_)),_,_,_) => if b2 = p2 then [] else [[X(PC(p1, p2))]]
-          | (_,SOME(Move((b1),_,_)),_,_) => if b1 = p1 then [] else [[X(PC(p1, p2))]]
-          | _ => 
-                [[X(PC(p1, p2))]])
-      | use_positive_constraint (DC(d1, d2)) = if same_direction(d1, d2) then [[]] else (case (!d1, !d2, (direction_contains_check d1 d2, direction_contains_check d2 d1)) of
-            (SOME(DCopy(x)), _, _) =>
-                use_positive_constraint (DC(x, d2))
-          | (_, SOME(DCopy(x)), _) =>
-                use_positive_constraint (DC(d1, x))
-          | (NONE, _, (false, _)) =>
-                (d1 := (SOME o DCopy) d2; [[]])
-          | (_, NONE, (_, false)) => 
-                (d2 := (SOME o DCopy) d1; [[]])
-          | (SOME(Direction(p1,p2)), _, _) =>
-                (case !p2 of
-                    SOME(Move(x,y,z)) =>  use_positive_constraint(DC(y,d2))
-                  | _ => [[X(DC(d1,d2))]])
-          | (_, SOME(Direction(p1,p2)), _) =>
-                (case !p2 of
-                    SOME(Move(x,y,z)) => use_positive_constraint(DC(d1,y))
-                  | _ => [[X(DC(d1,d2))]])
-          | (SOME(RDir(b1,v1)),SOME(RDir(b2,v2)), _) =>
-                if v1 = v2 then
-                    use_positive_constraint (DC(b1, b2))
-                else
-                    [[N(DC(b1, b2)), X(DC(d1, d2))]]
-          | (SOME(Right(b1)),SOME(Right(b2)), _) =>
-                use_positive_constraint (DC(b1, b2))
-          | _ =>
-                [[X(DC(d1,d2))]])
-      | use_positive_constraint (SC(s1,s2)) = if same_distance(s1, s2) then [[]] else (case (!s1, !s2, (distance_contains_check s1 s2, distance_contains_check s2 s1)) of
-            (SOME(SCopy(x)), _, _) =>
-                use_positive_constraint (SC(x, s2))
-          | (_, SOME(SCopy(x)), _) =>
-                use_positive_constraint (SC(s1, x))
-          | (NONE, _, (false, _)) =>
-                (s1 := (SOME o SCopy) s2; [[]])
-          | (_, NONE, (_, false)) =>
-                (s2 := (SOME o SCopy) s1; [[]])
-          | (SOME(Distance(p1,p2)), _, _) =>
-                (case !p2 of
-                    SOME(Move(p1,y,z)) => use_positive_constraint(SC(z,s2))
-                  | _ => [[X(SC(s1,s2))]])
-          | (_, SOME(Distance(p1,p2)), _) => 
-                (case !p2 of
-                    SOME(Move(p1,y,z)) => use_positive_constraint(SC(s1,z))
-                  | _ => [[X(SC(s1,s2))]])
-          | (SOME(Value(x)), SOME(Value(y)), _) =>
-                if x = y then
-                    [[]]
-                else
-                    []
-          | _ =>
-                [[X(SC(s1,s2))]]);
+    datatype direction_intermediate = DIUnknown of direction_con option ref | DIBetween of point_con option ref * point_con option ref | DICompound of int * string list * (direction_intermediate * distance_con option ref) list
+
+    fun count eq y [] = 0
+      | count eq y (x::xs) = if eq x y then (count eq y xs) + 1 else count eq y xs;
+
+    fun same_intermediate (DIUnknown(x)) (DIUnknown(y)) = (x = y)
+      | same_intermediate (DIBetween(x1,y1)) (DIBetween(x2,y2)) = same_point (x1,x2) andalso same_point(x2,y2)
+      | same_intermediate (DICompound(x1,y1,z1)) (DICompound(x2,y2,z2)) = x1 = x2 andalso List.all (fn y => count (fn x => fn y => x = y) y y1 = count (fn x => fn y => x = y) y y2) y1 
+            andalso List.all (fn z => count (fn (p1,q1) => fn (p2,q2) => same_intermediate p1 p2 andalso same_distance (q1,q2)) z z1 = count (fn (p1,q1) => fn (p2,q2) => same_intermediate p1 p2 andalso same_distance (q1,q2)) z z2) z1
+      | same_intermediate _ _ = false;
+    
+    fun reverse_intermediate (DICompound(x, [], [(z,zz)])) = if x = 2 then z else DICompound((x + 2) mod 4, [], [(z,zz)])
+      | reverse_intermediate (DICompound(x,y,z)) = DICompound((x + 2) mod 4, y, z)
+      | reverse_intermediate x = DICompound(2,[],[(x, ref NONE)]);
+
+    fun direction_to_intermediate d (x,y) = 
+        let fun point_to_movements p m = (case !p of
+                  NONE => (m, p)
+                | SOME(PCopy(x)) => point_to_movements x m
+                | SOME(Move(x,y,z)) => point_to_movements x ((y,z)::m)
+            );
+            fun reverse_movements m = List.map (fn (d, s) => ((ref o SOME o Right) ((ref o SOME o Right) d),s)) m;
+            fun intersect eq [] l2 = []
+              | intersect eq (x::xs) l2 = if count eq x xs < count eq x l2  then x::(intersect eq xs l2) else intersect eq xs l2;
+            fun remove eq x [] = []
+              | remove eq x (y::ys) = if eq x y then ys else x::(remove eq x ys);
+            fun subtract eq [] l2 = l2
+              | subtract eq (x::xs) l2 = remove eq x (subtract eq xs l2);
+            fun factorize (a,b,c) (d,e,f) = (Int.min (a,d), intersect (fn x => fn y => x = y) b e, intersect (same_intermediate) c f);
+        in (case !d of
+            NONE => if x = 0 andalso y = [] then DIUnknown(d) else
+              DICompound(x, y, [(DIUnknown d, ref NONE)])
+          | SOME(DCopy(z)) => direction_to_intermediate z (x,y)
+          | SOME(Right(z)) => direction_to_intermediate z (x + 1, y)
+          | SOME(RDir(z,v)) => direction_to_intermediate z (x, v::y)
+          | SOME(Direction(p1,p2)) => if !p1 = NONE andalso !p2 = NONE andalso x = 0 andalso y = [] then DIBetween(p1,p2) else
+                let val (movements_1, start_1) = point_to_movements p1 [];
+                    val (movements_2, start_2) = point_to_movements p2 [];
+                    val start_movements = if same_point (start_1, start_2) then [] else [(
+                        (ref o SOME o Direction) (start_1, start_2),
+                        (ref o SOME o Distance) (start_1, start_2)
+                    )];
+                    val movements = (reverse_movements movements_1) @ start_movements @ movements_2;
+                    val simplified_movements = List.map (fn (x,y) => (direction_to_intermediate x (0,[]), y)) movements;
+                    (*cancel values that are the same but reversed*)
+                    fun is_reverse (di1,s1) (di2,s2) = same_distance(s1,s2) andalso same_intermediate (reverse_intermediate di1) (di2)
+                    fun cancel_reverse [] = []
+                      | cancel_reverse (x::xs) = if List.exists (fn y => is_reverse x y) xs then
+                            cancel_reverse (remove is_reverse x xs)
+                        else
+                            x::(cancel_reverse (xs));
+                    val sm2 = cancel_reverse simplified_movements;
+
+                    (*val (sm,sms) = case simplified_movements of [] => raise GeometryError "Expected more than one movement" | p::q => (p,q);*)
+                in
+                    DICompound(x mod 4, y, sm2) (*TODO: factorise*)
+                end)
+        end;
+
+    fun intermediate_to_direction (DIUnknown(x)) = x
+      | intermediate_to_direction (DIBetween(x,y)) = (ref o SOME o Direction) (x, y)
+      | intermediate_to_direction (DICompound(0,[],[])) = raise (GeometryError "Invalid intermediate direction!")
+      | intermediate_to_direction (DICompound(0,[],[(z,_)])) = intermediate_to_direction z
+      | intermediate_to_direction (DICompound(0,[],zs)) = let val point = ref NONE in (ref o SOME o Direction) (point,
+            (List.foldr (fn ((a,s),b) => (ref o SOME o Move) ((b, intermediate_to_direction a, s))) point zs)) end
+      | intermediate_to_direction (DICompound(0,(y::ys),zs)) = (ref o SOME o RDir) (intermediate_to_direction (DICompound(0,ys,zs)),y)
+      | intermediate_to_direction (DICompound(x,ys,zs)) = (ref o SOME o Right) (intermediate_to_direction (DICompound(x-1,ys,zs)))
     
     fun inc n = (n := !n + 1; !n);
 
@@ -502,11 +615,12 @@ struct
       | SOME(Times(a,b)) => "Times("^(print_distance a (pm,dm,sm,n))^", "^(print_distance b (pm,dm,sm,n))^")"
       | SOME(Divide(a,b)) => "Divide("^(print_distance a (pm,dm,sm,n))^", "^(print_distance b (pm,dm,sm,n))^")"
       | SOME(Value(v)) => "Value(" ^ v ^")"
-      | SOME(SCopy(s)) => print_distance s (pm,dm,sm,n);
+      | SOME(SCopy(s)) => print_distance s (pm,dm,sm,n)
+      | SOME(Dot(a,b)) => "Dot(" ^ print_direction a (pm,dm,sm,n) ^ "," ^ print_direction b (pm,dm,sm,n) ^ ")";
     
     fun print_constraint (PC(x,y)) z = (print_point x z) ^ " = " ^ (print_point y z)
       | print_constraint (DC(x,y)) z = (print_direction x z) ^ " = " ^ (print_direction y z)
-      | print_constraint (SC(x,y)) z = (print_distance x z) ^ " = " ^ (print_distance y z)
+      | print_constraint (SC(x,y)) z = (print_distance x z) ^ " = " ^ (print_distance y z);
     
     fun print_line (RootLine(a,b)) z = "Line(" ^ (print_point a z) ^ ", " ^ (print_point b z) ^ ")"
       | print_line (ResolveLine(a,b)) z = "ResolveLine(" ^ (print_line a z) ^ ", " ^ (print_line b z) ^ ")"
@@ -515,21 +629,31 @@ struct
       | print_line (DivRect(r,l)) z = "DivRect(" ^ (print_rect r z) ^ ", " ^ (print_line l z) ^ ")"
       | print_line (Reverse(a)) z = "Reverse(" ^ (print_line a z) ^ ")"
       | print_line (Rotate(l, a)) z = "Rotate(" ^ (print_line l z) ^ ", " ^ (print_angle a z) ^ ")"
+      | print_line (Sine(l, a)) z = "Sine(" ^ (print_line l z) ^ ", " ^ (print_angle a z) ^ ")"
+      | print_line (Cosine(l, a)) z = "Cos(" ^ (print_line l z) ^ ", " ^ (print_angle a z) ^ ")"
+      | print_line (Tangent(l, a)) z = "Tangent(" ^ (print_line l z) ^ ", " ^ (print_angle a z) ^ ")"
+      | print_line (MoveLine(l, lm)) z = "MoveLine(" ^ (print_line l z) ^ ", " ^ (print_line lm z) ^ ")"
     and print_angle (RootAngle(a,b,c)) z = "Angle(" ^ (print_point a z) ^ ", " ^ (print_point b z) ^ ", " ^ (print_point c z) ^ ")"
       | print_angle (ResolveAngle(a,b)) z = "ResolveAngle(" ^ (print_angle a z) ^ ", " ^ (print_angle b z) ^ ")"
       | print_angle (AngleBetween(a,b)) z = "AngleBetween(" ^ (print_line a z) ^ ", " ^ (print_line b z) ^ ")"
       | print_angle (JoinAngle(a,b)) z = "JoinAngle(" ^ (print_angle a z) ^ ", " ^ (print_angle b z) ^ ")"
       | print_angle (SubAngle(a,b)) z = "SubAngle(" ^ (print_angle a z) ^ ", " ^ (print_angle b z) ^ ")"
+      | print_angle (ReverseAngle(a)) z = "ReverseAngle(" ^ (print_angle a z) ^ ")"
+      | print_angle (MoveAngle(a,l)) z = "MoveAngle(" ^ (print_angle a z) ^ "," ^ (print_line l z) ^ ")"
+      | print_angle (OppositeAngle(a)) z = "OppositeAngle(" ^ (print_angle a z) ^ ")"
     and print_rect (RootRect(a,b,c)) z = "Rect(" ^ (print_point a z) ^ ", " ^ (print_point b z) ^ ", " ^ (print_distance c z) ^ ")"
       | print_rect (ResolveRect(a,b)) z = "ResolveRect(" ^ (print_rect a z) ^ ", " ^ (print_rect b z) ^ ")"
       | print_rect (MKRect(a,b)) z = "MKRect(" ^ (print_line a z) ^ ", " ^ (print_line b z) ^ ")"
       | print_rect (JoinRect(a,b)) z = "JoinRect(" ^ (print_rect a z) ^ ", " ^ (print_rect b z) ^ ")"
       | print_rect (SubRect(a,b)) z = "SubRect(" ^ (print_rect a z) ^ ", " ^ (print_rect b z) ^ ")"
+      | print_rect (NextRect(r)) z = "NextRect(" ^ (print_rect r z) ^ ")"
+      | print_rect (MoveRect(r, l)) z = "MoveRect(" ^ (print_rect r z) ^ "," ^ (print_line l z) ^ ")";
     
     fun print_construction (LineCon x) z = print_line x z
       | print_construction (AngleCon x) z = print_angle x z
       | print_construction (RectCon x) z = print_rect x z;
     
-    val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_point (ref(SOME(z))) (ref [], ref [], ref [], ref 0)));
-    val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_constraint z (ref [], ref [], ref [], ref 0)));
+    val printer_config = (ref [], ref [], ref [], ref 0)
+    val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_point (ref(SOME(z))) printer_config));
+    val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_constraint z printer_config));
 end
