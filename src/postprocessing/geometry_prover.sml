@@ -128,7 +128,7 @@ struct
     
     exception Falsifiable;
 
-    fun resolve_cdc st = 
+    fun resolve_cdc st n = 
         let val constraints = #constraints st;
             val _ = PolyML.print constraints;
             val _ = PolyML.print ">>>>>>>>>>";
@@ -149,27 +149,26 @@ struct
                 end;
             (*val _ = PolyML.print ("pre-shortening >> ", (#root st));*)
             val _ = Geometry.map_points (shorten_point, fn x => x) (#root st);
-            val (changed, new_constraints, unknowables) = if !assignment_flag then 
-                    (changed, new_constraints, unknowables) 
+            val (changed, new_constraints_2, new_unknowables_2) = if not changed andalso !assignment_flag then 
+                    (PolyML.print("REDEAL!!!!"); assignment_flag := false; (true, List.map (fn x => [[Y(x)]]) unknowables @ new_constraints, []))
                 else 
-                    (changed, List.map (fn x => [[X(x)]]) unknowables @ new_constraints, [])
-            val _ = assignment_flag := false;
+                    (changed, new_constraints, new_unknowables);
             (*val _ = PolyML.print ("post-shortening >> ", (#root st));*)
             val next_state = {
-                constraints=new_constraints,
+                constraints=new_constraints_2,
                 falsifiers=new_falsifiers,
-                unknowables=new_unknowables,
+                unknowables=new_unknowables_2,
                 root=(#root st)
             };
             (*val _ = PolyML.print(next_state);
             val _ = PolyML.print(">>>>")*)
             val _ = List.map (fn x => if holds x then raise Falsifiable else ()) new_falsifiers;
         in
-            if changed then resolve_cdc next_state else next_state
+            if changed then resolve_cdc next_state (n - 1) else next_state
         end;
     
     fun can_build construction = 
-        let val state = resolve_cdc (state_from_construction construction);
+        let val state = resolve_cdc (state_from_construction construction) 20;
         in
             SOME(#root state, (#constraints state) @ List.map (fn x => [[X(x)]]) (#unknowables state))
         end

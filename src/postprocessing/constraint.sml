@@ -11,6 +11,7 @@ sig
     val map : ('a -> 'b) -> 'a multiset -> 'b multiset;
     val pick : ('a -> bool) -> 'a multiset -> 'a option * 'a multiset;
     val pick_option : ('a -> 'b option) -> 'a multiset -> 'b option * 'a multiset;
+    val pick_map : (('a * 'a multiset -> 'b) -> 'a multiset -> 'b multiset);
     val eq : ('a -> 'a -> bool) -> 'a multiset -> 'a multiset -> bool;
     val fold : (('a * 'b) -> 'b) -> 'b -> 'a list -> 'b;
     val intersect : ('a -> 'a -> bool) -> 'a list -> 'a list -> 'a list;
@@ -46,7 +47,13 @@ struct
                     (p x,xs) 
                 else
                     let val (q,r) = pick_option p xs; in (q,x::r) end;
-
+    fun pick_map p xs =
+        let fun f p [] _ = []
+              | f p (y::ys) zs = p (y,zs@ys) :: f p ys (y::zs);
+        in
+            f p xs []
+        end
+    
     fun collide p [] ys = ys
       | collide p (x::xs) ys = (case pick (p x) ys of
             (NONE,_) => collide p xs (x::ys)
@@ -138,7 +145,8 @@ struct
 
     val empty_path = Path(Multiset.empty)
 
-    fun turn_step n ((x, y, DRBetween(z1,z2)), s) = ((n + x) mod 4) |> (fn x' => if x' > 1 then ((x' - 2, y, DRBetween(z2,z1)), s) else ((x', y, DRBetween(z1,z2)), s));  
+    fun turn_step n ((x, y, DRBetween(z1,z2)), s) = ((n + x) mod 4) |> (fn x' => if x' > 1 then ((x' - 2, y, DRBetween(z2,z1)), s) else ((x', y, DRBetween(z1,z2)), s))
+      | turn_step n ((x, y, DRUnknown(z)), s) = (((n + x) mod 4, y, DRUnknown(z)), s);
     
     fun compare_step ((x1,y1,DRBetween(a1,b1)),(wn1,wd1)) ((x2,y2,DRBetween(a2,b2)),(wn2,wd2)) = if a1 = a2 andalso b1 = b2 then
             (x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 andalso Multiset.eq compare_distance_term wn1 wn2 andalso Multiset.eq compare_distance_term wd1 wd2)
@@ -195,6 +203,9 @@ struct
             Path(Multiset.collide check_cancel x y)
         end;
     
+    fun combine_paths [] = Path([])
+      | combine_paths (x::xs) = combine_path x (combine_paths xs);
+    
     fun multiply_distance (x1,y1) (x2,y2) = 
             let val (uncancelled_num, uncancelled_denom) = (Multiset.append x1 x2, Multiset.append y1 y2)
                 val intersection = Multiset.intersect compare_distance_term uncancelled_num uncancelled_denom
@@ -231,14 +242,14 @@ struct
       | SOME(Geometry.Move(x,y,z)) => let val (start_point, return_path) = point_to_path(x) in (start_point, combine_path (distance_direction_to_path(z,y)) return_path) end
     )
     and distance_direction_to_path (dist, dir) = (case !dir of
-        NONE => Path(Multiset.single ((0, Multiset.empty, DRUnknown dir), rep_distance dist))
+        NONE => Path(Multiset.map (fn x => ((0, Multiset.empty, DRUnknown dir), x)) (rep_distances dist))
       | SOME(Geometry.Direction(x,y)) =>
             let val path = path_between x y;
                 val path_length = distance_of path;
             in
                 case (singular_direction path) of
-                NONE => multiply_path (divide_path path path_length) (rep_distance dist)
-              | SOME(d,_) => Path([(d, rep_distance dist)])
+                NONE => combine_paths (List.map (fn x => multiply_path (divide_path path path_length) x) (rep_distances dist))
+              | SOME(d,_) => combine_paths (List.map (fn x => Path([(d, x)]) ) (rep_distances dist))
             end
       | SOME(Geometry.Right(x)) => right_path (distance_direction_to_path(dist,x))
       | SOME(Geometry.RDir(x,v)) => rdir_path (distance_direction_to_path(dist,x)) v
@@ -258,14 +269,21 @@ struct
                     ))
                 )
         end  
-    and rep_distance dist = case !dist of
-        NONE => ([SRTermUnknown(dist)],[])
-      | SOME(Geometry.Distance(a,b)) => distance_of (path_between a b)
-      | SOME(Geometry.Times(a,b)) => multiply_distance (rep_distance a) (rep_distance b)
-      | SOME(Geometry.Divide(a,b)) => divide_distance (rep_distance a) (rep_distance b)
-      | SOME(Geometry.Value(s)) => ([SRTermValue s],[])
-      | SOME(Geometry.SCopy(x)) => rep_distance x
-      | SOME(Geometry.Dot(x,y)) => ([SRTermDot(distance_direction_to_path (ref NONE, x), distance_direction_to_path (ref NONE, y))],[])
+    and rep_distances dist = case !dist of
+        NONE => [([SRTermUnknown(dist)],[])]
+      | SOME(Geometry.Distance(a,b)) => 
+            let val (full_path as (Path(full_steps))) = path_between a b;
+            in
+                if is_some (singular_direction full_path) then
+                    List.map (distance_of o Path o Multiset.single) full_steps
+                else
+                    [distance_of full_path]
+            end 
+      | SOME(Geometry.Times(a,b)) => List.flatmap (fn x => List.map (fn y => multiply_distance x y) (rep_distances b)) (rep_distances a)
+      | SOME(Geometry.Divide(a,b)) => List.flatmap (fn x => List.map (fn y => divide_distance x y) (rep_distances b)) (rep_distances a)
+      | SOME(Geometry.Value(s)) => [([SRTermValue s],[])]
+      | SOME(Geometry.SCopy(x)) => rep_distances x
+      | SOME(Geometry.Dot(x,y)) => [([SRTermDot(distance_direction_to_path (ref NONE, x), distance_direction_to_path (ref NONE, y))],[])]
     ;
     (*
     fun get_unknowns ((_,_,a),(n,d)) = get_dir_unknowns a @ Multiset.flatmap get_dis_unknowns n @ Multiset.flatmap get_dis_unknowns d
@@ -318,24 +336,33 @@ struct
       | is_step_free  _ = NONE;
 
 
-    fun get_circle_constraints (Path([])) = [[]]
-      | get_circle_constraints (Path([x])) = []
-      | get_circle_constraints (Path(xs)) = 
-            let val start = ref NONE;
-            in 
-                case singular_direction (Path(xs)) of
-                    SOME(x) => []
-                  | NONE =>
-                case Multiset.pick_option is_step_free xs of
-                    (SOME(p,q),r) => 
-                        let val p2p = path_to_points (Path(r)) q in
-                        if Geometry.point_contains_check p p2p then
-                            [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
-                        else
-                            (PolyML.print (Geometry.PC(p, p2p)); Geometry.af (); p := (SOME o Geometry.PCopy) (p2p); [[]])
-                        end
-                  | (NONE,r) => [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
-            end;
+    exception Proven of Geometry.pos_neg_constraint list list;
+    exception Refuted;
+
+
+    fun get_circle_constraints (p as Path(xs)) = 
+        let val _ = if p = empty_path then raise Proven [[]] else ();
+            val _ = if is_some (singular_direction p) then raise Refuted else ();
+            fun try_set_point point new_value = if Geometry.point_contains_check point new_value then
+                    ()
+                else
+                    (
+                        PolyML.print (Geometry.PC(point, new_value)); 
+                        Geometry.af (); 
+                        point := (SOME o Geometry.PCopy) (new_value);
+                        raise Proven [[]]
+                    )
+            fun set_step_if_free (((0,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
+                if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso x2 = y1) then
+                    try_set_point x1 (path_to_points (Path(other_steps)) y1)
+                else
+                    ()
+              | set_step_if_free  _ = ();
+            val _ = Multiset.pick_map set_step_if_free xs;
+            val start = ref NONE;
+        in
+            [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
+        end handle (Proven x) => x | Refuted => [];
     
     fun get_distance_constraints (path_1, path_2) start = if compare_path_distance (path_1) (path_2) then [[]] else
         let val distance_2 = distance_of path_2;
@@ -343,7 +370,12 @@ struct
         in
             case unitpath of
                 (Path([])) => raise ZeroPath
-              | (p as Path([(dir,(n,d))])) => (
+              | (p as Path([(dir,(n,d))])) => 
+                    if Multiset.all (fn x => case x of (SRTermValue x) => true | _ => false) n andalso Multiset.all (fn x => case x of (SRTermValue x) => true | _ => false) d then
+                        raise Refuted
+                    else
+              
+                (
                     case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) n of
                         (SOME(s),ss) => 
                             let val new_step = ((0,[],DRUnknown (ref NONE)),(d,ss));
@@ -366,9 +398,9 @@ struct
                             end
                       | (NONE,_) =>
                     let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
-
-              )
-        end
+                )
+              | (p) => let val dist = ref NONE; val dir = (0, [], DRUnknown(ref NONE)); in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ([SRTermPath p],[]))))]] end
+        end handle (Proven x) => x | Refuted => [];
 
     fun get_direction_constraints (Path(l1), Path(l2)) = if compare_path_direction (Path(l1)) (Path(l2)) then [[]] else case (singular_direction(Path l1), singular_direction(Path l2)) of
         (SOME((a,b,DRUnknown(x)),s), _) =>
