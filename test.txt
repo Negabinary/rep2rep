@@ -15,13 +15,21 @@ Adding constructors for constructor specification geometryG of type system geome
   mkrect : [line, line] -> rect
   divrect : [rect, line] -> line
   joinrect : [rect, rect] -> rect
-  subrect : [rect, rect] -> rectcomment
-  sin : [line, angle] -> line
-  cos : [line, angle] -> lineanglebetween:[line,line]->angle
+  subrect : [rect, rect] -> rect
+  sine : [line, angle] -> line
+  cosine : [line, angle] -> line
+  tangent : [line, angle] -> line
+  anglebetween : [line, line] -> angle
   joinangle : [angle, angle] -> angle
   subangle : [angle, angle] -> angle
-  rotate : [line, angle] -> line
+  reverseline : [line] -> line
+  rotateline : [line, angle] -> line
+  moveline : [line, line] -> line
+  reverseangle : [angle] -> angle
+  moveangle : [angle] -> angle
+  oppositeangle : [angle] -> angle
   nextRect : [rect] -> rect
+  moveRect : [rect, line] -> rect
 ...done
 
 Adding correspondence distanceBothSides...
@@ -81,7 +89,7 @@ done
 
 Adding correspondence areaSubtraction...
   source pattern is well formed
-  WARNING: target pattern is not well formed
+  target pattern is well formed
 done
 
 Adding correspondence areaMultiplcation...
@@ -94,148 +102,522 @@ Adding correspondence areaDivision...
   target pattern is well formed
 done
 
+Adding correspondence angleAddition...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence angleSubtraction...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence ninetyangle...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence sinangle...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence cosangle...
+  source pattern is well formed
+  target pattern is well formed
+done
+
+Adding correspondence tanangle...
+  source pattern is well formed
+  target pattern is well formed
+done
+
 Found 1 possible parses for opoeo
 "t13:t14:equality <- equality : [expr, equals, expr] -> equality <-[t9:t10:expr <- brackets : [open, expr, close] -> expr <-[t2:open, t6:t7:expr <- infixOp : [expr, binOp, expr] -> expr <-[t3:A, t4:times, t5:B], t8:close], t11:equals, t12:one]"
 
 Found 1 possible parses for additionDistributes
-"t46:t47:equality <- equality : [expr, equals, expr] -> equality <-[t30:t31:expr <- infixOp : [expr, binOp, expr] -> expr <-[t26:t27:expr <- brackets : [open, expr, close] -> expr <-[t19:open, t23:t24:expr <- infixOp : [expr, binOp, expr] -> expr <-[t20:A, t21:plus, t22:B], t25:close], t28:times, t29:C], t32:equals, t44:t45:expr <- infixOp : [expr, binOp, expr] -> expr <-[t36:t37:expr <- infixOp : [expr, binOp, expr] -> expr <-[t33:A, t34:times, t35:C], t38:plus, t42:t43:expr <- infixOp : [expr, binOp, expr] -> expr <-[t39:B, t40:times, t41:C]]]"
+"t48:t49:equality <- equality : [expr, equals, expr] -> equality <-[t29:t30:expr <- infixOp : [expr, binOp, expr] -> expr <-[t23:t24:expr <- brackets : [open, expr, close] -> expr <-[t16:open, t20:t21:expr <- infixOp : [expr, binOp, expr] -> expr <-[t17:A, t18:plus, t19:B], t22:close], t25:plus, t28:C], t31:equals, t46:t47:expr <- infixOp : [expr, binOp, expr] -> expr <-[t32:A, t35:plus, t44:t45:expr <- brackets : [open, expr, close] -> expr <-[t37:open, t41:t42:expr <- infixOp : [expr, binOp, expr] -> expr <-[t38:B, t39:plus, t40:C], t43:close]]]"
 
 Applying structure transfer..."testtttttttttttttttttttttttttt"
-"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Concat(SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C))))))"
-[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   Y
-    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
-   Y Value(A) = Value(1)],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N
-    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N Value(A) = Value(1),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
-"POSSIBLE"
-"----------------------------------------------------------------"
-"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))))))"
-[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   Y
-    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
-   Y Value(A) = Value(1)],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N
-    Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))) = Direction(p1, Move(p1, d2, Value(C))),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N Value(A) = Value(1),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, d2, Value(C)), Move(p1, Direction(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Divide(Times(Distance(p1, Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Distance(p1, Move(p1, d2, Value(C)))), Distance(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)))))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
-"POSSIBLE"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Concat(SimilarTriangle(Reverse(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C))))))"
-[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   Y
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   Y Value(A) = Value(1)],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N Value(A) = Value(1),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]],
- [[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   Y
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   Y Value(A) = Value(1)],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N Value(A) = Value(1),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d3, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
-"POSSIBLE"
-"----------------------------------------------------------------"
-"ResolveLine(SimilarTriangle(Concat(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A))), Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), Reverse(Concat(SimilarTriangle(Reverse(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))), SimilarTriangle(Line(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))), Line(p1, Move(p1, d2, Value(C)))))))"
-[[[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   Y
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   Y Value(A) = Value(1)],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N Value(A) = Value(1),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]],
- [[Y Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   Y
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   Y Value(A) = Value(1)],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N
-    Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))) = Direction(p1, Move(p1, d2, Value(C))),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))],
-  [N Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)) = p1,
-   N Value(A) = Value(1),
-   X
-    Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Direction(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), Move(Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1)), d2, Value(B))), Value(A)) = Move(p1, Direction(p1, Move(p1, d2, Value(C))), Value(1))]]]
-"POSSIBLE"
-"----------------------------------------------------------------"
-"================================================================"
-"ResolveRect(MKRect(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), JoinRect(MKRect(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), MKRect(Line(p1, Move(p1, d2, Value(B))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C))))))"
+[[[Y Divide(Value(A), Distance(p1, p2)) = Divide(Value(B), Distance(p3, p4))]],
+ [[Y p2 = p3]], [[Y Direction(p1, p2) = Direction(p3, p4)]],
+ [[Y Divide(Value(A), Distance(p1, p2)) = Divide(Value(C), Distance(p5, p6))]],
+ [[Y p4 = p5]], [[Y Direction(p1, p4) = Direction(p5, p6)]],
+ [[Y Divide(Value(B), Distance(p3, p4)) = Divide(Value(C), Distance(p5, p6))]],
+ [[Y p4 = p5]], [[Y Direction(p3, p4) = Direction(p5, p6)]],
+ [[Y Divide(Value(A), Distance(p1, p2)) = Divide(Value(B), Distance(p3, p4))]],
+ [[Y p2 = p3]], [[Y Direction(p1, p2) = Direction(p3, p6)]], [[Y p1 = p1]],
+ [[Y p6 = p6]],
+ [[Y Divide(Value(A), Distance(p1, p2)) = Divide(Value(A), Distance(p1, p2))]]]
+">>>>>>>>>>"
+"Distance constraint"
+Divide(Value(A), Distance(p1, p2)) = Divide(Value(A), Distance(p1, p2))
+p7 = Move(p7, d8, Divide(Value(A), Distance(p1, p2)))
+p7 = Move(p7, d8, Divide(Value(A), Distance(p1, p2)))
+[[]]
+"Point constraint"
+p6 = p6
+p9 = p9
+[[]]
+"Point constraint"
+p1 = p1
+p10 = p10
+[[]]
+"Direction constraint"
+Direction(p1, p2) = Direction(p3, p6)
+p11 = Move(p11, Direction(p1, p2), s12)
+p11 = Move(p11, Direction(p3, p6), s12)
+[[]]
+"Point constraint"
+Move(p1, Direction(p3, p6), s12) = p3
+p13 = Move(Move(p13, Direction(p1, p3), Distance(p1, p3)), Right(Right(Direction(p3, p6))), s12)
+p1 = Move(p3, Right(Right(Direction(p3, p6))), s12)
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(p3, Right(Right(Direction(p3, p6))), s12), Move(Move(p3, Right(Right(Direction(p3, p6))), s12), Direction(p3, p6), s12))) = Divide(Value(B), Distance(p3, p4))
+p14 = Move(p14, d15, Divide(Value(A), s12))
+p14 = Move(p14, d15, Divide(Value(B), Distance(p3, p4)))
+("new_dist >> ", s12 = Divide(Times(Value(A), Distance(p3, p4)), Value(B)))
+s12 = Divide(Times(Value(A), Distance(p3, p4)), Value(B))
+[[]]
+"Direction constraint"
+Direction(p3, p4) = Direction(p5, p6)
+p16 = Move(p16, Direction(p3, p4), s17)
+p16 = Move(p16, Direction(p5, p6), s17)
+[[]]
+"Point constraint"
+Move(p3, Direction(p5, p6), s17) = p5
+p18 = Move(Move(p18, Direction(p3, p5), Distance(p3, p5)), Right(Right(Direction(p5, p6))), s17)
+p3 = Move(p5, Right(Right(Direction(p5, p6))), s17)
+[[]]
+"Distance constraint"
+Divide(Value(B), Distance(Move(p5, Right(Right(Direction(p5, p6))), s17), Move(Move(p5, Right(Right(Direction(p5, p6))), s17), Direction(p5, p6), s17))) = Divide(Value(C), Distance(p5, p6))
+p19 = Move(p19, d20, Divide(Value(B), s17))
+p19 = Move(p19, d20, Divide(Value(C), Distance(p5, p6)))
+("new_dist >> ", s17 = Divide(Times(Value(B), Distance(p5, p6)), Value(C)))
+s17 = Divide(Times(Value(B), Distance(p5, p6)), Value(C))
+[[]]
+"Direction constraint"
+Direction(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C)))) = Direction(p5, p6)
+p21 = Move(p21, Direction(p5, p6), s22)
+p21 = Move(p21, Direction(p5, p6), s22)
+[[]]
+"Point constraint"
+Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))) = p5
+p23 = p23
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Move(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))))) = Divide(Value(C), Distance(p5, p6))
+p24 = Move(p24, d25, Divide(Value(C), Distance(p5, p6)))
+p24 = Move(p24, d25, Divide(Value(C), Distance(p5, p6)))
+[[]]
+"Direction constraint"
+Direction(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Move(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B)))) = Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))
+p26 = Move(p26, Direction(p5, p6), s27)
+p26 = Move(p26, Direction(p5, p6), s27)
+[[]]
+"Point constraint"
+Move(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))) = Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C)))
+p28 = p28
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Move(Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Right(Right(Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6))), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))), Direction(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), p6), Divide(Times(Value(A), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C))))), Value(B))))) = Divide(Value(B), Distance(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Move(Move(p5, Right(Right(Direction(p5, p6))), Divide(Times(Value(B), Distance(p5, p6)), Value(C))), Direction(p5, p6), Divide(Times(Value(B), Distance(p5, p6)), Value(C)))))
+p29 = Move(p29, d30, Divide(Value(C), Distance(p5, p6)))
+p29 = Move(p29, d30, Divide(Value(C), Distance(p5, p6)))
+[[]]
+[[[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]],
+ [[]], [[]], [[]]]
+">>>>>>>>>>"
+[]
+">>>>>>>>>>"
+"ResolveRect(JoinRect(JoinRect(Rect(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Move(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Divide(Value(A), Distance(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Move(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B)))))), Rect(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Divide(Value(B), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))))), Rect(p1, p2, Divide(Value(C), Distance(p1, p2)))), JoinRect(Rect(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Move(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Divide(Value(A), Distance(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Move(Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Right(Right(Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2))), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B))), Direction(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), p2), Divide(Times(Value(A), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))))), Value(B)))))), JoinRect(Rect(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Divide(Value(B), Distance(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Move(Move(p1, Right(Right(Direction(p1, p2))), Divide(Times(Value(B), Distance(p1, p2)), Value(C))), Direction(p1, p2), Divide(Times(Value(B), Distance(p1, p2)), Value(C)))))), Rect(p1, p2, Divide(Value(C), Distance(p1, p2))))))"
 "PROVEN!!!!"
 "----------------------------------------------------------------"
-"ResolveRect(MKRect(Concat(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A))), Line(p1, Move(p1, d2, Value(B)))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), JoinRect(MKRect(Reverse(Line(p1, Move(p1, Direction(p1, Move(p1, d2, Value(B))), Value(A)))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C)))), MKRect(Line(p1, Move(p1, d2, Value(B))), Line(p1, Move(p1, Right(Direction(p1, Move(p1, d2, Value(B)))), Value(C))))))"
-"PROVEN!!!!"
-"----------------------------------------------------------------"
+[[[Y
+    Divide(Value(A), Distance(p31, p32)) = Divide(Value(B), Distance(p33, p34))]],
+ [[Y p32 = p33]], [[Y Direction(p31, p32) = Direction(p33, p34)]],
+ [[Y
+    Divide(Value(A), Distance(p31, p32)) = Divide(Value(C), Distance(p35, p36))]],
+ [[Y p34 = p35]], [[Y Direction(p31, p34) = Direction(p35, p36)]],
+ [[Y
+    Divide(Value(B), Distance(p33, p34)) = Divide(Value(C), Distance(p35, p36))]],
+ [[Y p34 = p35]], [[Y Direction(p33, p34) = Direction(p35, p36)]],
+ [[Y
+    Divide(Value(A), Distance(p31, p32)) = Divide(Value(B), Distance(p33, p34))]],
+ [[Y p32 = p33]], [[Y Direction(p31, p32) = Direction(p33, p36)]],
+ [[Y p31 = p31]],
+ [[Y
+    p36 = Move(p36, Right(Direction(p31, p36)), Divide(Value(A), Distance(p31, p32)))]],
+ [[Y Divide(Value(A), Distance(p31, p32)) = Distance(p31, p36)]]]
+">>>>>>>>>>"
+"Distance constraint"
+Divide(Value(A), Distance(p31, p32)) = Distance(p31, p36)
+p37 = Move(p37, d38, Divide(Value(A), Distance(p31, p32)))
+p37 = Move(p37, d38, Distance(p31, p36))
+[[X
+   s39 = Divide(Times(s39, Value(A)), Times(Distance(p31, p32), Distance(p31, p36)))]]
+"Point constraint"
+p36 = Move(p36, Right(Direction(p31, p36)), Divide(Value(A), Distance(p31, p32)))
+p40 = Move(p40, Right(Direction(p31, p36)), Divide(Value(A), Distance(p31, p32)))
+[]
+"Point constraint"
+p31 = p31
+p41 = p41
+[[]]
+"Direction constraint"
+Direction(p31, p32) = Direction(p33, p36)
+p42 = Move(p42, Direction(p31, p32), s43)
+p42 = Move(p42, Direction(p33, p36), s43)
+[[]]
+"Point constraint"
+Move(p31, Direction(p33, p36), s43) = p33
+p44 = Move(Move(p44, Direction(p31, p33), Distance(p31, p33)), Right(Right(Direction(p33, p36))), s43)
+p31 = Move(p33, Right(Right(Direction(p33, p36))), s43)
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(p33, Right(Right(Direction(p33, p36))), s43), Move(Move(p33, Right(Right(Direction(p33, p36))), s43), Direction(p33, p36), s43))) = Divide(Value(B), Distance(p33, p34))
+p45 = Move(p45, d46, Divide(Value(A), s43))
+p45 = Move(p45, d46, Divide(Value(B), Distance(p33, p34)))
+("new_dist >> ", s43 = Divide(Times(Value(A), Distance(p33, p34)), Value(B)))
+s43 = Divide(Times(Value(A), Distance(p33, p34)), Value(B))
+[[]]
+"Direction constraint"
+Direction(p33, p34) = Direction(p35, p36)
+p47 = Move(p47, Direction(p33, p34), s48)
+p47 = Move(p47, Direction(p35, p36), s48)
+[[]]
+"Point constraint"
+Move(p33, Direction(p35, p36), s48) = p35
+p49 = Move(Move(p49, Direction(p33, p35), Distance(p33, p35)), Right(Right(Direction(p35, p36))), s48)
+p33 = Move(p35, Right(Right(Direction(p35, p36))), s48)
+[[]]
+"Distance constraint"
+Divide(Value(B), Distance(Move(p35, Right(Right(Direction(p35, p36))), s48), Move(Move(p35, Right(Right(Direction(p35, p36))), s48), Direction(p35, p36), s48))) = Divide(Value(C), Distance(p35, p36))
+p50 = Move(p50, d51, Divide(Value(B), s48))
+p50 = Move(p50, d51, Divide(Value(C), Distance(p35, p36)))
+("new_dist >> ", s48 = Divide(Times(Value(B), Distance(p35, p36)), Value(C)))
+s48 = Divide(Times(Value(B), Distance(p35, p36)), Value(C))
+[[]]
+"Direction constraint"
+Direction(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C)))) = Direction(p35, p36)
+p52 = Move(p52, Direction(p35, p36), s53)
+p52 = Move(p52, Direction(p35, p36), s53)
+[[]]
+"Point constraint"
+Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))) = p35
+p54 = p54
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Move(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))))) = Divide(Value(C), Distance(p35, p36))
+p55 = Move(p55, d56, Divide(Value(C), Distance(p35, p36)))
+p55 = Move(p55, d56, Divide(Value(C), Distance(p35, p36)))
+[[]]
+"Direction constraint"
+Direction(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Move(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B)))) = Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))
+p57 = Move(p57, Direction(p35, p36), s58)
+p57 = Move(p57, Direction(p35, p36), s58)
+[[]]
+"Point constraint"
+Move(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))) = Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C)))
+p59 = p59
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Move(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))))) = Divide(Value(B), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C)))))
+p60 = Move(p60, d61, Divide(Value(C), Distance(p35, p36)))
+p60 = Move(p60, d61, Divide(Value(C), Distance(p35, p36)))
+[[]]
+[[[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]],
+ [[]], [],
+ [[X
+    s39 = Divide(Times(s39, Value(A)), Times(Distance(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Move(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B)))), Distance(Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Right(Right(Direction(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), p36))), Divide(Times(Value(A), Distance(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Move(Move(p35, Right(Right(Direction(p35, p36))), Divide(Times(Value(B), Distance(p35, p36)), Value(C))), Direction(p35, p36), Divide(Times(Value(B), Distance(p35, p36)), Value(C))))), Value(B))), p36)))]]]
+">>>>>>>>>>"
 "REFUTED"
 "----------------------------------------------------------------"
+[[[Y
+    Divide(Value(A), Distance(p62, p63)) = Divide(Value(B), Distance(p64, p65))]],
+ [[Y p63 = p64]], [[Y Direction(p62, p63) = Direction(p64, p65)]],
+ [[Y
+    Divide(Value(A), Distance(p62, p63)) = Divide(Value(C), Distance(p66, p67))]],
+ [[Y p65 = p66]], [[Y Direction(p62, p65) = Direction(p66, p67)]],
+ [[Y
+    Divide(Value(B), Distance(p64, p65)) = Divide(Value(C), Distance(p66, p67))]],
+ [[Y p65 = p66]], [[Y Direction(p64, p65) = Direction(p66, p67)]],
+ [[Y Distance(p62, p63) = Divide(Value(B), Distance(p64, p65))]],
+ [[Y
+    Move(p63, Right(Direction(p62, p63)), Divide(Value(A), Distance(p62, p63))) = p64]],
+ [[Y
+    Direction(p63, Move(p63, Right(Direction(p62, p63)), Divide(Value(A), Distance(p62, p63)))) = Direction(p64, p67)]],
+ [[Y p62 = p62]], [[Y p67 = p67]],
+ [[Y Divide(Value(A), Distance(p62, p63)) = Distance(p62, p63)]]]
+">>>>>>>>>>"
+"Distance constraint"
+Divide(Value(A), Distance(p62, p63)) = Distance(p62, p63)
+p68 = Move(p68, d69, Divide(Value(A), Distance(p62, p63)))
+p68 = Move(p68, d69, Distance(p62, p63))
+[[X
+   s70 = Divide(Times(s70, Value(A)), Times(Distance(p62, p63), Distance(p62, p63)))]]
+"Point constraint"
+p67 = p67
+p71 = p71
+[[]]
+"Point constraint"
+p62 = p62
+p72 = p72
+[[]]
+"Direction constraint"
+Direction(p63, Move(p63, Right(Direction(p62, p63)), Divide(Value(A), Distance(p62, p63)))) = Direction(p64, p67)
+p73 = Move(p73, Right(Direction(p62, p63)), s74)
+p73 = Move(p73, Direction(p64, p67), s74)
+[[]]
+"Point constraint"
+Move(Move(p62, Direction(p64, p67), s74), Right(Direction(p62, Move(p62, Direction(p64, p67), s74))), Divide(Value(A), Distance(p62, Move(p62, Direction(p64, p67), s74)))) = p64
+p75 = Move(Move(Move(p75, Direction(p62, p64), Distance(p62, p64)), Right(Right(Direction(p64, p67))), s74), Right(Right(Right(Direction(p64, p67)))), Divide(Value(A), s74))
+p62 = Move(Move(p64, Right(Right(Direction(p64, p67))), s74), Right(Right(Right(Direction(p64, p67)))), Divide(Value(A), s74))
+[[]]
+"Distance constraint"
+Distance(Move(Move(p64, Right(Right(Direction(p64, p67))), s74), Right(Right(Right(Direction(p64, p67)))), Divide(Value(A), s74)), Move(Move(Move(p64, Right(Right(Direction(p64, p67))), s74), Right(Right(Right(Direction(p64, p67)))), Divide(Value(A), s74)), Direction(p64, p67), s74)) = Divide(Value(B), Distance(p64, p65))
+p76 = Move(p76, d77, s74)
+p76 = Move(p76, d77, Divide(Value(B), Distance(p64, p65)))
+("new_dist >> ", s74 = Divide(Value(B), Distance(p64, p65)))
+s74 = Divide(Value(B), Distance(p64, p65))
+[[]]
+"Direction constraint"
+Direction(p64, p65) = Direction(p66, p67)
+p78 = Move(p78, Direction(p64, p65), s79)
+p78 = Move(p78, Direction(p66, p67), s79)
+[[]]
+"Point constraint"
+Move(p64, Direction(p66, p67), s79) = p66
+p80 = Move(Move(p80, Direction(p64, p66), Distance(p64, p66)), Right(Right(Direction(p66, p67))), s79)
+p64 = Move(p66, Right(Right(Direction(p66, p67))), s79)
+[[]]
+"Distance constraint"
+Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), s79), Move(Move(p66, Right(Right(Direction(p66, p67))), s79), Direction(p66, p67), s79))) = Divide(Value(C), Distance(p66, p67))
+p81 = Move(p81, d82, Divide(Value(B), s79))
+p81 = Move(p81, d82, Divide(Value(C), Distance(p66, p67)))
+("new_dist >> ", s79 = Divide(Times(Value(B), Distance(p66, p67)), Value(C)))
+s79 = Divide(Times(Value(B), Distance(p66, p67)), Value(C))
+[[]]
+"Direction constraint"
+Direction(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))) = Direction(p66, p67)
+p83 = Move(Move(Move(p83, Right(Direction(p66, p67)), Divide(Times(Value(A), Times(Distance(p66, p67), s84)), Times(Value(C), Distance(p85, Move(Move(Move(p85, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(p66, p67), Divide(Times(Value(C), s84), Times(Distance(p66, p67), Distance(p86, Move(Move(Move(p86, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(p66, p67), Divide(Times(Value(B), Times(Distance(p66, p67), s84)), Times(Value(C), Distance(p87, Move(Move(Move(p87, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))))
+p83 = Move(p83, Direction(p66, p67), s84)
+[[X
+   p67 = Move(Move(Move(p66, Right(Direction(p66, p67)), Divide(Times(Value(A), Times(Distance(p66, p67), s84)), Times(Value(C), Distance(p88, Move(Move(Move(p88, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(p66, p67), Divide(Times(Value(C), s84), Times(Distance(p66, p67), Distance(p89, Move(Move(Move(p89, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(p66, p67), Divide(Times(Value(B), Times(Distance(p66, p67), s84)), Times(Value(C), Distance(p90, Move(Move(Move(p90, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))))]]
+"Point constraint"
+Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))) = p66
+p91 = p91
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Move(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))))) = Divide(Value(C), Distance(p66, p67))
+p92 = Move(p92, d93, Divide(Times(Value(A), Distance(p66, p67)), Value(C)))
+p92 = Move(p92, d93, Divide(Value(C), Distance(p66, p67)))
+[[X
+   s94 = Divide(Times(s94, Times(Value(A), Times(Distance(p66, p67), Distance(p66, p67)))), Times(Value(C), Value(C)))]]
+"Direction constraint"
+Direction(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Move(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))) = Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))
+p95 = Move(p95, Direction(p66, p67), s96)
+p95 = Move(p95, Direction(p66, p67), s96)
+[[]]
+"Point constraint"
+Move(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))) = Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))
+p97 = Move(p97, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C)))
+[]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Move(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))))) = Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))
+p98 = Move(p98, d99, Divide(Times(Value(A), Distance(p66, p67)), Value(C)))
+p98 = Move(p98, d99, Divide(Value(C), Distance(p66, p67)))
+[[X
+   s100 = Divide(Times(s100, Times(Value(A), Times(Distance(p66, p67), Distance(p66, p67)))), Times(Value(C), Value(C)))]]
+[[[X
+    s100 = Divide(Times(s100, Times(Value(A), Times(Distance(p66, p67), Distance(p66, p67)))), Times(Value(C), Value(C)))]],
+ [], [[]],
+ [[X
+    s94 = Divide(Times(s94, Times(Value(A), Times(Distance(p66, p67), Distance(p66, p67)))), Times(Value(C), Value(C)))]],
+ [[]],
+ [[X
+    p67 = Move(Move(Move(p66, Right(Direction(p66, p67)), Divide(Times(Value(A), Times(Distance(p66, p67), s84)), Times(Value(C), Distance(p88, Move(Move(Move(p88, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(p66, p67), Divide(Times(Value(C), s84), Times(Distance(p66, p67), Distance(p89, Move(Move(Move(p89, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(p66, p67), Divide(Times(Value(B), Times(Distance(p66, p67), s84)), Times(Value(C), Distance(p90, Move(Move(Move(p90, Right(Direction(p66, p67)), Divide(Times(Value(A), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Value(C), Distance(p66, p67))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))))]],
+ [[]], [[]], [[]], [[]], [[]], [[]], [[]], [[]],
+ [[X
+    s70 = Divide(Times(s70, Value(A)), Times(Distance(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Move(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Distance(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Move(Move(Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67))), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))), Right(Right(Right(Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67)))), Divide(Value(A), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C))))))), Direction(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), p67), Divide(Value(B), Distance(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Move(Move(p66, Right(Right(Direction(p66, p67))), Divide(Times(Value(B), Distance(p66, p67)), Value(C))), Direction(p66, p67), Divide(Times(Value(B), Distance(p66, p67)), Value(C)))))))))]]]
+">>>>>>>>>>"
 "REFUTED"
 "----------------------------------------------------------------"
+[[[Y
+    Divide(Value(A), Distance(p101, p102)) = Divide(Value(B), Distance(p103, p104))]],
+ [[Y p102 = p103]], [[Y Direction(p101, p102) = Direction(p103, p104)]],
+ [[Y
+    Divide(Value(A), Distance(p101, p102)) = Divide(Value(C), Distance(p105, p106))]],
+ [[Y p104 = p105]], [[Y Direction(p101, p104) = Direction(p105, p106)]],
+ [[Y
+    Divide(Value(B), Distance(p103, p104)) = Divide(Value(C), Distance(p105, p106))]],
+ [[Y p104 = p105]], [[Y Direction(p103, p104) = Direction(p105, p106)]],
+ [[Y Distance(p101, p102) = Divide(Value(B), Distance(p103, p104))]],
+ [[Y
+    Move(p102, Right(Direction(p101, p102)), Divide(Value(A), Distance(p101, p102))) = p103]],
+ [[Y
+    Direction(p102, Move(p102, Right(Direction(p101, p102)), Divide(Value(A), Distance(p101, p102)))) = Direction(p103, p106)]],
+ [[Y p101 = p101]],
+ [[Y p106 = Move(p106, Right(Direction(p102, p106)), Distance(p101, p102))]],
+ [[Y Divide(Value(A), Distance(p101, p102)) = Distance(p102, p106)]]]
+">>>>>>>>>>"
+"Distance constraint"
+Divide(Value(A), Distance(p101, p102)) = Distance(p102, p106)
+p107 = Move(p107, d108, Divide(Value(A), Distance(p101, p102)))
+p107 = Move(p107, d108, Distance(p102, p106))
+[[X
+   s109 = Divide(Times(s109, Value(A)), Times(Distance(p101, p102), Distance(p102, p106)))]]
+"Point constraint"
+p106 = Move(p106, Right(Direction(p102, p106)), Distance(p101, p102))
+p110 = Move(p110, Right(Direction(p102, p106)), Distance(p101, p102))
+[]
+"Point constraint"
+p101 = p101
+p111 = p111
+[[]]
+"Direction constraint"
+Direction(p102, Move(p102, Right(Direction(p101, p102)), Divide(Value(A), Distance(p101, p102)))) = Direction(p103, p106)
+p112 = Move(p112, Right(Direction(p101, p102)), s113)
+p112 = Move(p112, Direction(p103, p106), s113)
+[[]]
+"Point constraint"
+Move(Move(p101, Direction(p103, p106), s113), Right(Direction(p101, Move(p101, Direction(p103, p106), s113))), Divide(Value(A), Distance(p101, Move(p101, Direction(p103, p106), s113)))) = p103
+p114 = Move(Move(Move(p114, Direction(p101, p103), Distance(p101, p103)), Right(Right(Direction(p103, p106))), s113), Right(Right(Right(Direction(p103, p106)))), Divide(Value(A), s113))
+p101 = Move(Move(p103, Right(Right(Direction(p103, p106))), s113), Right(Right(Right(Direction(p103, p106)))), Divide(Value(A), s113))
+[[]]
+"Distance constraint"
+Distance(Move(Move(p103, Right(Right(Direction(p103, p106))), s113), Right(Right(Right(Direction(p103, p106)))), Divide(Value(A), s113)), Move(Move(Move(p103, Right(Right(Direction(p103, p106))), s113), Right(Right(Right(Direction(p103, p106)))), Divide(Value(A), s113)), Direction(p103, p106), s113)) = Divide(Value(B), Distance(p103, p104))
+p115 = Move(p115, d116, s113)
+p115 = Move(p115, d116, Divide(Value(B), Distance(p103, p104)))
+("new_dist >> ", s113 = Divide(Value(B), Distance(p103, p104)))
+s113 = Divide(Value(B), Distance(p103, p104))
+[[]]
+"Direction constraint"
+Direction(p103, p104) = Direction(p105, p106)
+p117 = Move(p117, Direction(p103, p104), s118)
+p117 = Move(p117, Direction(p105, p106), s118)
+[[]]
+"Point constraint"
+Move(p103, Direction(p105, p106), s118) = p105
+p119 = Move(Move(p119, Direction(p103, p105), Distance(p103, p105)), Right(Right(Direction(p105, p106))), s118)
+p103 = Move(p105, Right(Right(Direction(p105, p106))), s118)
+[[]]
+"Distance constraint"
+Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), s118), Move(Move(p105, Right(Right(Direction(p105, p106))), s118), Direction(p105, p106), s118))) = Divide(Value(C), Distance(p105, p106))
+p120 = Move(p120, d121, Divide(Value(B), s118))
+p120 = Move(p120, d121, Divide(Value(C), Distance(p105, p106)))
+("new_dist >> ",
+ s118 = Divide(Times(Value(B), Distance(p105, p106)), Value(C)))
+s118 = Divide(Times(Value(B), Distance(p105, p106)), Value(C))
+[[]]
+"Direction constraint"
+Direction(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))) = Direction(p105, p106)
+p122 = Move(Move(Move(p122, Right(Direction(p105, p106)), Divide(Times(Value(A), Times(Distance(p105, p106), s123)), Times(Value(C), Distance(p124, Move(Move(Move(p124, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(p105, p106), Divide(Times(Value(C), s123), Times(Distance(p105, p106), Distance(p125, Move(Move(Move(p125, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(p105, p106), Divide(Times(Value(B), Times(Distance(p105, p106), s123)), Times(Value(C), Distance(p126, Move(Move(Move(p126, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))))
+p122 = Move(p122, Direction(p105, p106), s123)
+[[X
+   p106 = Move(Move(Move(p105, Right(Direction(p105, p106)), Divide(Times(Value(A), Times(Distance(p105, p106), s123)), Times(Value(C), Distance(p127, Move(Move(Move(p127, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(p105, p106), Divide(Times(Value(C), s123), Times(Distance(p105, p106), Distance(p128, Move(Move(Move(p128, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(p105, p106), Divide(Times(Value(B), Times(Distance(p105, p106), s123)), Times(Value(C), Distance(p129, Move(Move(Move(p129, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))))]]
+"Point constraint"
+Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))) = p105
+p130 = p130
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Move(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))))) = Divide(Value(C), Distance(p105, p106))
+p131 = Move(p131, d132, Divide(Times(Value(A), Distance(p105, p106)), Value(C)))
+p131 = Move(p131, d132, Divide(Value(C), Distance(p105, p106)))
+[[X
+   s133 = Divide(Times(s133, Times(Value(A), Times(Distance(p105, p106), Distance(p105, p106)))), Times(Value(C), Value(C)))]]
+"Direction constraint"
+Direction(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Move(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))) = Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))
+p134 = Move(p134, Direction(p105, p106), s135)
+p134 = Move(p134, Direction(p105, p106), s135)
+[[]]
+"Point constraint"
+Move(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))) = Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))
+p136 = Move(p136, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C)))
+[]
+"Distance constraint"
+Divide(Value(A), Distance(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Move(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))))) = Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))
+p137 = Move(p137, d138, Divide(Times(Value(A), Distance(p105, p106)), Value(C)))
+p137 = Move(p137, d138, Divide(Value(C), Distance(p105, p106)))
+[[X
+   s139 = Divide(Times(s139, Times(Value(A), Times(Distance(p105, p106), Distance(p105, p106)))), Times(Value(C), Value(C)))]]
+[[[X
+    s139 = Divide(Times(s139, Times(Value(A), Times(Distance(p105, p106), Distance(p105, p106)))), Times(Value(C), Value(C)))]],
+ [], [[]],
+ [[X
+    s133 = Divide(Times(s133, Times(Value(A), Times(Distance(p105, p106), Distance(p105, p106)))), Times(Value(C), Value(C)))]],
+ [[]],
+ [[X
+    p106 = Move(Move(Move(p105, Right(Direction(p105, p106)), Divide(Times(Value(A), Times(Distance(p105, p106), s123)), Times(Value(C), Distance(p127, Move(Move(Move(p127, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(p105, p106), Divide(Times(Value(C), s123), Times(Distance(p105, p106), Distance(p128, Move(Move(Move(p128, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(p105, p106), Divide(Times(Value(B), Times(Distance(p105, p106), s123)), Times(Value(C), Distance(p129, Move(Move(Move(p129, Right(Direction(p105, p106)), Divide(Times(Value(A), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Value(C), Distance(p105, p106))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))))]],
+ [[]], [[]], [[]], [[]], [[]], [[]], [[]], [],
+ [[X
+    s109 = Divide(Times(s109, Value(A)), Times(Distance(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Move(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Distance(Move(Move(Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106))), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), Right(Right(Right(Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106)))), Divide(Value(A), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C))))))), Direction(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), p106), Divide(Value(B), Distance(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Move(Move(p105, Right(Right(Direction(p105, p106))), Divide(Times(Value(B), Distance(p105, p106)), Value(C))), Direction(p105, p106), Divide(Times(Value(B), Distance(p105, p106)), Value(C)))))), p106)))]]]
+">>>>>>>>>>"
 "REFUTED"
 "----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"REFUTED"
-"----------------------------------------------------------------"
-"================================================================"
-([(), (), (), (), (), (), (), (), (), ()], Seq fn)
-"true"
-done
-  runtime: 465 ms 
-  number of results: 42
-  informational suitability score: 0.0001220703125
-
-Composing patterns and creating tikz figures...done
-
-Generating LaTeX document...done!
-  output file: output/latex/test2.tex
-
+[[[Y
+    Divide(Value(A), Distance(p140, p141)) = Divide(Value(B), Distance(p142, p143))]],
+ [[Y p141 = p142]], [[Y Direction(p140, p141) = Direction(p142, p143)]],
+ [[Y
+    Divide(Value(A), Distance(p140, p141)) = Divide(Value(C), Distance(p144, p145))]],
+ [[Y p143 = p144]], [[Y Direction(p140, p143) = Direction(p144, p145)]],
+ [[Y Distance(p142, p143) = Divide(Value(C), Distance(p144, p145))]],
+ [[Y
+    Move(p143, Right(Direction(p142, p143)), Divide(Value(B), Distance(p142, p143))) = p144]],
+ [[Y
+    Direction(p143, Move(p143, Right(Direction(p142, p143)), Divide(Value(B), Distance(p142, p143)))) = Direction(p144, p145)]],
+ [[Y Divide(Value(A), Distance(p140, p141)) = Distance(p142, p143)]],
+ [[Y p141 = p143]], [[Y Direction(p140, p141) = Direction(p143, p145)]],
+ [[Y p140 = p140]], [[Y p145 = p145]],
+ [[Y
+    Divide(Value(A), Distance(p140, p141)) = Divide(Value(A), Distance(p140, p141))]]]
+">>>>>>>>>>"
+"Distance constraint"
+Divide(Value(A), Distance(p140, p141)) = Divide(Value(A), Distance(p140, p141))
+p146 = Move(p146, d147, Divide(Value(A), Distance(p140, p141)))
+p146 = Move(p146, d147, Divide(Value(A), Distance(p140, p141)))
+[[]]
+"Point constraint"
+p145 = p145
+p148 = p148
+[[]]
+"Point constraint"
+p140 = p140
+p149 = p149
+[[]]
+"Direction constraint"
+Direction(p140, p141) = Direction(p143, p145)
+p150 = Move(p150, Direction(p140, p141), s151)
+p150 = Move(p150, Direction(p143, p145), s151)
+[[]]
+"Point constraint"
+Move(p140, Direction(p143, p145), s151) = p143
+p152 = Move(Move(p152, Direction(p140, p143), Distance(p140, p143)), Right(Right(Direction(p143, p145))), s151)
+p140 = Move(p143, Right(Right(Direction(p143, p145))), s151)
+[[]]
+"Distance constraint"
+Divide(Value(A), Distance(Move(p143, Right(Right(Direction(p143, p145))), s151), Move(Move(p143, Right(Right(Direction(p143, p145))), s151), Direction(p143, p145), s151))) = Distance(p142, p143)
+p153 = Move(p153, d154, Divide(Value(A), s151))
+p153 = Move(p153, d154, Distance(p142, p143))
+("new_dist >> ", s151 = Divide(Value(A), Distance(p142, p143)))
+s151 = Divide(Value(A), Distance(p142, p143))
+[[]]
+"Direction constraint"
+Direction(p143, Move(p143, Right(Direction(p142, p143)), Divide(Value(B), Distance(p142, p143)))) = Direction(p144, p145)
+p155 = Move(p155, Right(Direction(p142, p143)), s156)
+p155 = Move(p155, Direction(p144, p145), s156)
+[[]]
+"Point constraint"
+Move(Move(p142, Direction(p144, p145), s156), Right(Direction(p142, Move(p142, Direction(p144, p145), s156))), Divide(Value(B), Distance(p142, Move(p142, Direction(p144, p145), s156)))) = p144
+p157 = Move(Move(Move(p157, Direction(p142, p144), Distance(p142, p144)), Right(Right(Direction(p144, p145))), s156), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), s156))
+p142 = Move(Move(p144, Right(Right(Direction(p144, p145))), s156), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), s156))
+[[]]
+"Distance constraint"
+Distance(Move(Move(p144, Right(Right(Direction(p144, p145))), s156), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), s156)), Move(Move(Move(p144, Right(Right(Direction(p144, p145))), s156), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), s156)), Direction(p144, p145), s156)) = Divide(Value(C), Distance(p144, p145))
+p158 = Move(p158, d159, s156)
+p158 = Move(p158, d159, Divide(Value(C), Distance(p144, p145)))
+("new_dist >> ", s156 = Divide(Value(C), Distance(p144, p145)))
+s156 = Divide(Value(C), Distance(p144, p145))
+[[]]
+"Direction constraint"
+Direction(Move(Move(Move(Move(p144, Right(Right(Direction(p144, p145))), Divide(Value(C), Distance(p144, p145))), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), Divide(Value(C), Distance(p144, p145)))), Direction(p144, p145), Divide(Value(C), Distance(p144, p145))), Right(Right(Direction(Move(Move(Move(p144, Right(Right(Direction(p144, p145))), Divide(Value(C), Distance(p144, p145))), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), Divide(Value(C), Distance(p144, p145)))), Direction(p144, p145), Divide(Value(C), Distance(p144, p145))), p145))), Divide(Value(A), Distance(Move(Move(p144, Right(Right(Direction(p144, p145))), Divide(Value(C), Distance(p144, p145))), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), Divide(Value(C), Distance(p144, p145)))), Move(Move(Move(p144, Right(Right(Direction(p144, p145))), Divide(Value(C), Distance(p144, p145))), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), Divide(Value(C), Distance(p144, p145)))), Direction(p144, p145), Divide(Value(C), Distance(p144, p145)))))), Move(Move(Move(p144, Right(Right(Direction(p144, p145))), Divide(Value(C), Distance(p144, p145))), Right(Right(Right(Direction(p144, p145)))), Divide(Value(B), Divide(Value(C), Distance(p144, p145)))), Direction(p144, p145), Divide(Value(C), Distance(p144, p145)))) = Direction(p144, p145)

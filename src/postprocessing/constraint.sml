@@ -10,6 +10,7 @@ sig
     val collide : ('a -> 'a -> bool) -> 'a multiset -> 'a multiset -> 'a multiset;
     val map : ('a -> 'b) -> 'a multiset -> 'b multiset;
     val pick : ('a -> bool) -> 'a multiset -> 'a option * 'a multiset;
+    val pick_option : ('a -> 'b option) -> 'a multiset -> 'b option * 'a multiset;
     val eq : ('a -> 'a -> bool) -> 'a multiset -> 'a multiset -> bool;
     val fold : (('a * 'b) -> 'b) -> 'b -> 'a list -> 'b;
     val intersect : ('a -> 'a -> bool) -> 'a list -> 'a list -> 'a list;
@@ -38,6 +39,14 @@ struct
                 (SOME(x),xs) 
             else
                 let val (q,r) = pick p xs; in (q,x::r) end;
+    
+    fun pick_option p [] = (NONE, [])
+      | pick_option p (x::xs) = 
+                if is_some (p x) then
+                    (p x,xs) 
+                else
+                    let val (q,r) = pick_option p xs; in (q,x::r) end;
+
     fun collide p [] ys = ys
       | collide p (x::xs) ys = (case pick (p x) ys of
             (NONE,_) => collide p xs (x::ys)
@@ -94,12 +103,17 @@ sig
 
     
     val point_to_path : Geometry.point_con option ref -> Geometry.point_con option ref * path;
+    val path_between : Geometry.point_con option ref -> Geometry.point_con option ref -> path;
     val distance_direction_to_path : Geometry.distance_con option ref * Geometry.direction_con option ref -> path;
+    val path_to_points : path -> Geometry.point_con option ref -> Geometry.point_con option ref;
 
     val get_direction_constraints : path * path -> Geometry.pos_neg_constraint list list;
-    (*
-    val get_distance_constraints : path * path -> Geometry.constraint list list;
+    val get_circle_constraints : path -> Geometry.pos_neg_constraint list list;
+    val get_distance_constraints : path * path -> Geometry.point_con option ref -> Geometry.pos_neg_constraint list list;
+
+    exception PathError of string;
     
+    (*
     val direction_of_path : path -> Geometry.direction_con option ref;
     val distance_of_path : path -> Geometry.distance_con option ref;
     *)
@@ -167,10 +181,6 @@ struct
       | step_to_direction ((0, [], DRUnknown(x)), s) = x
       | step_to_direction ((0, (v::vs), d), s) = (ref o SOME o Geometry.RDir) (step_to_direction ((0,vs,d),s), v)
       | step_to_direction ((n, vs, d), s) = (ref o SOME o Geometry.Right) (step_to_direction ((n-1, vs, d), s));
-    
-    fun distance_of (Path([])) = raise ZeroPath
-      | distance_of (Path([(_,x)])) = x
-      | distance_of x = ([SRTermPath x],[]);
 
     fun reverse_step ((x,y,z),w) = (((x + 2) mod 4,y,z),w);
     fun reverse_path (Path(x)) = Path(Multiset.map reverse_step x);
@@ -198,9 +208,18 @@ struct
     fun right_path (Path(x)) = Path(Multiset.map (fn ((x,y,z),s) => (((x+1) mod 4, y, z), s)) x);
     fun rdir_path (Path(x)) v = Path(Multiset.map (fn ((x,y,z),s) => ((x, cons v y, z), s)) x);
     
+    fun distance_of (Path([])) = raise ZeroPath
+      | distance_of (Path([(_,x)])) = x
+      | distance_of (p as Path((_,(fn1,fd1))::xs)) = 
+            let val (fnum, fdenom) = Multiset.fold (fn ((_,(n,d)), (hn, hd)) => (Multiset.intersect compare_distance_term n hn, Multiset.intersect compare_distance_term d hd)) (fn1,fd1) xs;
+            in
+                (SRTermPath (divide_path p (fnum, fdenom)) :: fnum, fdenom)
+            end;
+    
     fun singular_direction (Path((((a,b,c),s)::xs))) = 
             if Multiset.all (fn ((a1,b1,c1),_) => compare_step ((a1,b1,c1),s) ((a,b,c),s)) xs then
-            SOME((a,b,c),s) else NONE;
+            SOME((a,b,c),s) else NONE
+      | singular_direction (Path([])) = raise ZeroPath;
     
     fun point_to_path p = (case !p of
         NONE => (p, empty_path)
@@ -226,7 +245,7 @@ struct
             val (start_b, path_b) = point_to_path b;
         in
             if start_a = start_b then 
-                combine_path path_a path_b 
+                combine_path (reverse_path path_a) path_b 
             else 
                 combine_path (combine_path (reverse_path path_a) path_b) (
                     Path(Multiset.single (
@@ -255,7 +274,7 @@ struct
             let val end_point = path_to_points (Path(steps)) start_point;
             in (ref o SOME o Geometry.Move) (end_point, step_to_direction step, step_to_distance step)
             end
-    and step_to_distance (d,([],[])) = raise PathError ("unexpected distance")
+    and step_to_distance (d,([],[])) = (PolyML.print(d); raise PathError ("unexpected distance "))
       | step_to_distance (d,([SRTermBetween(x,y)],[])) = (ref o SOME o Geometry.Distance) (x,y)
       | step_to_distance (d,([SRTermUnknown(z)],[])) = z
       | step_to_distance (d,([SRTermValue(s)],[])) = (ref o SOME o Geometry.Value) s
@@ -281,48 +300,102 @@ struct
             step_to_distance (d, (xs, [])),
             step_to_distance (d, (ys, []))
         );
-
-
-    fun get_direction_constraints (Path(l1), Path(l2)) = case (singular_direction(l1), singular_direction(l2)) of
-        (SOME((a,b,c),s), _) => 
-
-        (*
-            (And resolve..)
-            Case 1: all segments have the same direction
-            Case 2: all segments can be paired up
-            TODO: case 3 - lines up but some reversed
-        *)
-        let val case_1 = Multiset.map (Geometry.Y o Geometry.DC) (Multiset.daisy_chain (Multiset.map step_to_direction (Multiset.append l1 l2)));
-            val pairable = Multiset.intersect compare_step l1 l2;
-            val unpaired_1 = Multiset.subtract compare_step pairable l1;
-            val unpaired_2 = Multiset.subtract compare_step pairable l2;
-            val simplified_1 = case singular_direction unpaired_1 of [x] => SOME(step_to_direction x) | _ => NONE;
-            val simplified_2 = case singular_direction unpaired_2 of [x] => SOME(step_to_direction x) | _ => NONE;
-            val cases_2 = if Multiset.size unpaired_1 <> Multiset.size unpaired_2 then 
-                    [] 
-                else 
-                    List.map
-                        (fn a => 
-                            List.flatmap 
-                                (fn (s1,s2) => [(Geometry.Y o Geometry.DC)(step_to_direction s1, step_to_direction s2), (Geometry.Y o Geometry.SC)(step_to_distance s1, step_to_distance s2)]) 
-                                a
-                        )
-                        (Multiset.list_of (Multiset.pairings unpaired_1 unpaired_2));
-            val cases_all = 
-                let val start_1 = ref NONE;
-                    val start_2 = ref NONE;
-                    val d1 = (ref o SOME o Geometry.Direction) (start_1, path_to_points (Path l1) start_1);
-                    val d2 = (ref o SOME o Geometry.Direction) (start_2, path_to_points (Path l2) start_2);
-                in [Geometry.X(Geometry.DC(d1,d2))]
-                end 
-                :: (case_1 :: cases_2);
-        in
-            case (simplified_1, simplified_2) of
-                (SOME(x), SOME(y)) => [[(Geometry.Y o Geometry.DC)(x,y)]]
-              | (SOME(x), NONE) => [[(Geometry.Y o Geometry.DC)(x,let val s = ref NONE in (ref o SOME o Geometry.Direction) (s, path_to_points (Path (unpaired_2)) s) end)]]
-              | (NONE, SOME(y)) => [[(Geometry.Y o Geometry.DC)(y,let val s = ref NONE in (ref o SOME o Geometry.Direction) (s, path_to_points (Path (unpaired_1)) s) end)]]
-              | (NONE, NONE) => cases_all
-                
-        end
     
+    fun path_to_direction (Path(x)) = (case (singular_direction(Path(x))) of
+            NONE => let val start = ref NONE; in (ref o SOME o Geometry.Direction) (start, path_to_points (Path(x)) start) end
+          | SOME(step) => step_to_direction step
+    );
+
+    fun is_step_free ((0,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])) = 
+            if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso x2 = y1) then
+                SOME(x1,y1)
+            else
+                NONE
+      | is_step_free  _ = NONE;
+
+
+    fun get_circle_constraints (Path([])) = [[]]
+      | get_circle_constraints (Path([x])) = []
+      | get_circle_constraints (Path(xs)) = 
+            let val start = ref NONE;
+            in 
+                case Multiset.pick_option is_step_free xs of
+                    (SOME(p,q),r) => 
+                        let val p2p = path_to_points (Path(r)) q in
+                        if Geometry.point_contains_check p p2p then
+                            [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
+                        else
+                            (PolyML.print (Geometry.PC(p, p2p)); p := (SOME o Geometry.PCopy) (p2p); [[]])
+                        end
+                  | (NONE,r) => [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
+            end;
+    
+    fun get_distance_constraints (path_1, path_2) start = if compare_path_distance (path_1) (path_2) then [[]] else
+        let val distance_2 = distance_of path_2;
+            val unitpath = divide_path path_1 distance_2;
+        in
+            case unitpath of
+                (Path([])) => raise ZeroPath
+              | (p as Path([(dir,(n,d))])) => (
+                    case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) n of
+                        (SOME(s),ss) => 
+                            let val new_step = ((0,[],DRUnknown (ref NONE)),(d,ss));
+                                val new_dist = step_to_distance new_step;
+                            in if Geometry.distance_contains_check s new_dist then 
+                                let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
+                            else
+                                (PolyML.print (Geometry.SC(s, new_dist)); s := (SOME o Geometry.SCopy) new_dist; [[]])
+                            end
+                      | (NONE,_) => 
+                    case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) d of
+                        (SOME(s),ss) =>
+                            let val new_step = ((0,[],DRUnknown (ref NONE)),(n,ss));
+                                val new_dist = step_to_distance new_step;
+                                val _ = PolyML.print ("new_dist >> ", Geometry.SC(s, new_dist));
+                            in if Geometry.distance_contains_check s new_dist then 
+                                let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
+                            else
+                                (PolyML.print (Geometry.SC(s, new_dist)); s := (SOME o Geometry.SCopy) new_dist; [[]])
+                            end
+                      | (NONE,_) =>
+                    let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
+
+              )
+        end
+
+    fun get_direction_constraints (Path(l1), Path(l2)) = if compare_path_direction (Path(l1)) (Path(l2)) then [[]] else case (singular_direction(Path l1), singular_direction(Path l2)) of
+        (SOME((a,b,DRUnknown(x)),s), _) =>
+            let val poss_x = path_to_direction (Path(l2)) 
+            in 
+                if Geometry.direction_contains_check x poss_x then 
+                    [[Geometry.X(Geometry.DC(x, poss_x))]] 
+                else 
+                    (x := (SOME o Geometry.DCopy) poss_x; [[]]) 
+            end
+      | (_, SOME((a,b,DRUnknown(x)),s)) =>
+            let val poss_x = path_to_direction (Path(l1)) 
+            in 
+                if Geometry.direction_contains_check x poss_x then 
+                    [[Geometry.X(Geometry.DC(x, poss_x))]] 
+                else 
+                    (x := (SOME o Geometry.DCopy) poss_x; [[]]) 
+            end
+      | (SOME((a,b,DRBetween(p1,p2)),s), _) =>
+            let val poss_x = path_to_points (Path(l2)) p1
+            in 
+                if Geometry.point_contains_check p2 poss_x then 
+                    [[Geometry.X(Geometry.PC(p2, poss_x))]] 
+                else 
+                    (p2 := (SOME o Geometry.PCopy) poss_x; [[]]) 
+            end
+      | (_, SOME((a,b,DRBetween(p1,p2)),s)) =>
+            let val poss_x = path_to_points (Path(l1)) p1
+            in 
+                if Geometry.point_contains_check p2 poss_x then 
+                    [[Geometry.X(Geometry.PC(p2, poss_x))]] 
+                else 
+                    (p2 := (SOME o Geometry.PCopy) poss_x; [[]]) 
+            end
+      | (NONE, NONE) =>
+            [[Geometry.X(Geometry.DC(path_to_direction (Path(l1)) , path_to_direction (Path(l2)) ))]];
 end
