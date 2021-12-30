@@ -44,7 +44,7 @@ struct
             constraints
         end
     | use_positive_constraint (DC(d1, d2)) = 
-        let val _ = PolyML.print "Direction constraint";
+        (let val _ = PolyML.print "Direction constraint";
             val _ = PolyML.print (DC(d1, d2));
             val dist = ref NONE; val start = ref NONE;
             val path_1 = Path.distance_direction_to_path (dist, d1);
@@ -54,9 +54,9 @@ struct
             val constraints = PolyML.print(Path.get_direction_constraints (path_1, path_2));
         in 
             constraints
-        end
+        end handle Path.ZeroPath => [])
     | use_positive_constraint (SC(s1,s2)) = 
-        let val _ = PolyML.print "Distance constraint";
+        (let val _ = PolyML.print "Distance constraint";
             val _ = PolyML.print (SC(s1, s2));
             val dir = ref NONE; val start = ref NONE;
             val path_1 = Path.distance_direction_to_path (s1, dir);
@@ -66,7 +66,7 @@ struct
             val constraints = PolyML.print(Path.get_distance_constraints (path_1, path_2) (ref NONE));
         in 
             constraints
-        end;
+        end handle Path.ZeroPath => []);
     (*
     YES => means the conjunction is proven and equivalent to []
     MAYBE(x : c) => means the conjunction is true if the possibly simpler conjunction x is true
@@ -140,6 +140,21 @@ struct
               | (MAYBE(cs', fs', us', cd'),(cs, fs, us, cd)) => (cs'@cs, fs'@fs, us'@us, cd' orelse cd)
             val (new_constraints, new_falsifiers, new_unknowables, changed) = 
                     List.foldr iter ([], falsifiers, unknowables, false) constraints;
+            fun shorten_point point = 
+                let val (start, path) = Path.point_to_path point in 
+                if is_some (!point) then
+                    (point := !(Path.path_to_points path start); point)
+                else
+                    point
+                end;
+            (*val _ = PolyML.print ("pre-shortening >> ", (#root st));*)
+            val _ = Geometry.map_points (shorten_point, fn x => x) (#root st);
+            val (changed, new_constraints, unknowables) = if !assignment_flag then 
+                    (changed, new_constraints, unknowables) 
+                else 
+                    (changed, List.map (fn x => [[X(x)]]) unknowables @ new_constraints, [])
+            val _ = assignment_flag := false;
+            (*val _ = PolyML.print ("post-shortening >> ", (#root st));*)
             val next_state = {
                 constraints=new_constraints,
                 falsifiers=new_falsifiers,

@@ -4,3 +4,4 @@ dist/rep2rep
 output/latex/*
 !output/latex/commands.sty
 dist/rep2rep
+test.txt

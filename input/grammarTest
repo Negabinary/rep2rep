@@ -24,13 +24,16 @@ input opoeo:equationM = open A * B close = 1
 comment opoeo:equationG =
      t11:equality <- equality [t8:expr <- brackets[t2:open, t6:test:expr <- infixOp[t3:A, t4:plus, t5:B], t7:close], t9:equals, t10:one]
 
-comment additionDistributes:equationM = open A + B close + C = A + open B + C close
+input additionDistributes:equationM = A + B = B + A
+comment 26:27
+
+comment additionDistributes:equationM = open A + B close + C = A + open C + B close
 comment 48:49
 
 comment additionDistributes:equationM = open A + B close * C = A * C + B * C
 comment 46:47
 
-input additionDistributes:equationM = open A + B close + C = A + open B + C close
+comment additionDistributes:equationM = open A + B close + C = A + open B + C close
 comment 48:49
 
 comment additionDistributes:equationM = open A * B close = open B * A close
@@ -47,7 +50,7 @@ comment additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
 transfer
     sourceConstruction additionDistributes
     targetTypeSystem geometry
-    goal ([t48:t49:equality],[t':value]) :: repeq
+    goal ([t26:t27:equality],[t':value]) :: repeq
     output test2
     limit 100
     postprocess geometryPP

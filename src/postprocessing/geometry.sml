@@ -4,6 +4,9 @@ struct
     val counter = ref 0;
     fun unique_name () = (counter := !counter + 1; "g" ^ (PolyML.makestring (!counter)));
 
+    val assignment_flag = ref false;
+    fun af () = assignment_flag := true;
+
     exception GeometryError of string;
 
     datatype point_con = Move of point_con option ref * direction_con option ref * distance_con option ref
@@ -50,7 +53,38 @@ struct
                       | NextRect of rect_con
                       | MoveRect of rect_con * line_con;
     
+    fun map_points_l (fp,fs) (RootLine (x,y)) = RootLine(fp x, fp y)
+      | map_points_l f (ResolveLine (x,y)) = ResolveLine(map_points_l f x, map_points_l f y)
+      | map_points_l f (Concat (x,y)) = Concat(map_points_l f x, map_points_l f y)
+      | map_points_l f (SimilarTriangle (x,y,z)) = SimilarTriangle(map_points_l f x, map_points_l f y, map_points_l f z)
+      | map_points_l f (DivRect (x,y)) = DivRect (map_points_r f x, map_points_l f y)
+      | map_points_l f (Reverse (x)) = Reverse (map_points_l f x)
+      | map_points_l f (Rotate (x,y)) = Rotate (map_points_l f x, map_points_a f y)
+      | map_points_l f (Sine (x,y)) = Sine (map_points_l f x, map_points_a f y)
+      | map_points_l f (Cosine (x,y)) = Cosine (map_points_l f x, map_points_a f y)
+      | map_points_l f (Tangent (x,y)) = Tangent (map_points_l f x, map_points_a f y)
+      | map_points_l f (MoveLine (x,y)) = MoveLine (map_points_l f x, map_points_l f y)
+    and map_points_a (fp,fs) (RootAngle (x,y,z)) = RootAngle(fp x, fp y, fp z)
+      | map_points_a f (ResolveAngle (x,y)) = ResolveAngle (map_points_a f x, map_points_a f y)
+      | map_points_a f (AngleBetween (x,y)) = AngleBetween (map_points_l f x, map_points_l f y)
+      | map_points_a f (JoinAngle (x,y)) = JoinAngle (map_points_a f x, map_points_a f y)
+      | map_points_a f (SubAngle (x,y)) = SubAngle (map_points_a f x, map_points_a f y)
+      | map_points_a f (ReverseAngle (x)) = ReverseAngle (map_points_a f x)
+      | map_points_a f (MoveAngle (x,y)) = MoveAngle (map_points_a f x, map_points_l f y)
+      | map_points_a f (OppositeAngle (x)) = OppositeAngle (map_points_a f x)
+    and map_points_r (fp,fs) (RootRect (x,y,w)) = RootRect (fp x, fp y, fs w)
+      | map_points_r f (ResolveRect (x,y)) = ResolveRect (map_points_r f x, map_points_r f y)
+      | map_points_r f (MKRect (x,y)) = MKRect (map_points_l f x, map_points_l f y)
+      | map_points_r f (JoinRect (x,y)) = JoinRect (map_points_r f x, map_points_r f y)
+      | map_points_r f (SubRect (x,y)) = SubRect (map_points_r f x, map_points_r f y)
+      | map_points_r f (NextRect (x)) = NextRect (map_points_r f x)
+      | map_points_r f (MoveRect (x,y)) = MoveRect (map_points_r f x, map_points_l f y);
+    
     datatype construction = LineCon of line_con | AngleCon of angle_con | RectCon of rect_con;
+
+    fun map_points f (LineCon x) = LineCon(map_points_l f x)
+      | map_points f (AngleCon x) = AngleCon(map_points_a f x)
+      | map_points f (RectCon x) = RectCon(map_points_r f x);
 
     fun mk_leaf_line () = LineCon(RootLine(ref NONE, ref NONE));
     fun mk_leaf_angle () = AngleCon(RootAngle(ref NONE, ref NONE, ref NONE));
@@ -656,4 +690,5 @@ struct
     val printer_config = (ref [], ref [], ref [], ref 0)
     val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_point (ref(SOME(z))) printer_config));
     val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_constraint z printer_config));
+    val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_construction z printer_config));
 end
