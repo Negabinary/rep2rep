@@ -143,11 +143,11 @@ struct
             fun shorten_point point = 
                 let val (start, path) = Path.point_to_path point in 
                 if is_some (!point) then
-                    (point := !(Path.path_to_points path start); point)
+                    (point := (SOME o PCopy) (Path.path_to_points path start); point)
                 else
                     point
                 end;
-            (*val _ = PolyML.print ("pre-shortening >> ", (#root st));*)
+            val _ = PolyML.print ("pre-shortening >> ", (#root st));
             val _ = Geometry.map_points (shorten_point, fn x => x) (#root st);
             val (changed, new_constraints_2, new_unknowables_2) = if not changed andalso !assignment_flag then 
                     (PolyML.print("REDEAL!!!!"); assignment_flag := false; (true, List.map (fn x => [[Y(x)]]) unknowables @ new_constraints, []))

@@ -389,6 +389,7 @@ struct
                         PolyML.print ("Set >> ", Geometry.PC(point, new_value)); 
                         Geometry.af (); 
                         point := (SOME o Geometry.PCopy) (new_value);
+                        PolyML.print ("Set >> ", Geometry.PC(point, new_value)); 
                         raise Proven [[]]
                     )
             fun set_step_if_free (((0,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
