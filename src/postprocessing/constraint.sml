@@ -187,7 +187,9 @@ struct
             val scaled_2 = Multiset.map (fn (x,(n,d)) => (x,(Multiset.subtract compare_distance_term num2 n, Multiset.subtract compare_distance_term denom2 d))) steps2;
         in
             Multiset.eq compare_step scaled_1 scaled_2
-        end;
+        end
+    
+    datatype tvl = YES | NO | MAYBE;
     
     fun step_to_direction ((0, [], DRBetween(x,y)), s) = (ref o SOME o Geometry.Direction) (x,y)
       | step_to_direction ((0, [], DRUnknown(x)), s) = x
@@ -196,6 +198,31 @@ struct
 
     fun reverse_step step = turn_step 2 step;
     fun reverse_path (Path(x)) = Path(Multiset.map reverse_step x);
+
+    (*complete*)
+    fun same_step_direction ((x1,y1,DRUnknown z1), _) ((x2,y2,DRUnknown z2), _) =
+            if z1 <> z2 then
+                MAYBE
+            else if x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
+                YES
+            else
+                NO
+      | same_step_direction ((x1,y1,DRBetween (p1, q1)), _) ((x2,y2,DRBetween (p2, q2)), _) =
+            if p1 = p2 andalso q1 = q2 then
+                if x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
+                    YES
+                else
+                    NO
+            else if p1 = q2 andalso q1 = p2 then
+                if (x1 = (x2 + 2) mod 4) andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
+                    YES
+                else
+                    NO
+            else
+                MAYBE
+      | same_step_direction _ _ = MAYBE;
+    
+    fun opposite_step_direction step1 = same_step_direction (reverse_step step1);
 
     fun combine_path (Path(x)) (Path(y)) = 
         let fun check_cancel a b = (compare_step (reverse_step a) b);
@@ -336,6 +363,18 @@ struct
       | is_step_free  _ = NONE;
 
 
+    (*same, opposite, perpendicular/different, anything*)
+    fun sort_steps_by_direction step [] = ([],[],[],[])
+      | sort_steps_by_direction step (x::xs) = 
+            let val (a,b,c,d) = sort_steps_by_direction step xs in case (same_step_direction step x, opposite_step_direction step x) of
+                (YES, NO) => (x::a,b,c,d)
+              | (NO, YES) => (a,x::b,c,d)
+              | (NO, NO) => (a,b,x::c,d)
+              | (MAYBE, MAYBE) => (a,b,c,x::d)
+              | (YES, YES) => raise (PathError "step is opposite to itself")
+            end;
+
+
     exception Proven of Geometry.pos_neg_constraint list list;
     exception Refuted;
 
@@ -347,7 +386,7 @@ struct
                     ()
                 else
                     (
-                        PolyML.print (Geometry.PC(point, new_value)); 
+                        PolyML.print ("Set >> ", Geometry.PC(point, new_value)); 
                         Geometry.af (); 
                         point := (SOME o Geometry.PCopy) (new_value);
                         raise Proven [[]]

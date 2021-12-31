@@ -34,7 +34,7 @@ struct
     
 
     fun use_positive_constraint (PC(p1, p2)) = 
-        let val _ = PolyML.print "Point constraint";
+        (let val _ = PolyML.print "Point constraint";
             val _ = PolyML.print (PC(p1, p2));
             val start = ref NONE;
             val circle = Path.path_between p1 p2;
@@ -42,7 +42,7 @@ struct
             val constraints = PolyML.print (Path.get_circle_constraints circle);
         in 
             constraints
-        end
+        end handle Path.ZeroPath => [])
     | use_positive_constraint (DC(d1, d2)) = 
         (let val _ = PolyML.print "Direction constraint";
             val _ = PolyML.print (DC(d1, d2));

@@ -72,10 +72,11 @@ struct
             val instantiated = Instantiation.instantiate result_construction keep_tokens replacements;
             fun prove_instance instance = 
                 let val printer_config = (ref [], ref [], ref [], ref 0)
+                    val _ = PolyML.print instance;
                     val _ = case GeometryProver.can_build instance of
                         NONE => (PolyML.print "REFUTED"; ())
-                      | SOME(x,[]) => (PolyML.print (Geometry.print_construction x printer_config); PolyML.print "PROVEN!!!!"; ())
-                      | SOME(x,c) => (PolyML.print (Geometry.print_construction x printer_config); PolyML.print c; PolyML.print "POSSIBLE"; ())
+                      | SOME(x,[]) => (PolyML.print x; PolyML.print "PROVEN!!!!"; ())
+                      | SOME(x,c) => (PolyML.print x; PolyML.print c; PolyML.print "POSSIBLE"; ())
                     val _ = PolyML.print "----------------------------------------------------------------";
                 in
                     ()
