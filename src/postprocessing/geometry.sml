@@ -350,9 +350,9 @@ struct
             (mc (get_angle_constraints a) (get_angle_constraints b))
             (
                 [
-                    PC(get_angle_start a, get_angle_start a),
-                    PC(get_angle_middle a, get_angle_middle a),
-                    PC(get_angle_end a, get_angle_end a)
+                    PC(get_angle_start a, get_angle_start b),
+                    PC(get_angle_middle a, get_angle_middle b),
+                    PC(get_angle_end a, get_angle_end b)
                 ], []
             )
       | AngleBetween(a,b) => mc
@@ -394,7 +394,7 @@ struct
       | ResolveRect(a,b) => mc
             (mc (get_rect_constraints a) (get_rect_constraints b))
             ([
-                PC(get_rect_start a, get_rect_start a),
+                PC(get_rect_start a, get_rect_start b),
                 PC(get_rect_end a, get_rect_end b),
                 SC(get_rect_width a, get_rect_width b)
             ],[])
@@ -638,7 +638,7 @@ struct
             NONE => (dm := (direction, (inc n))::(!dm); "d" ^ (PolyML.makestring (!n)))
           | SOME(x,y) => "d" ^ (PolyML.makestring y))
       | SOME(Direction(a,b)) => "Direction("^(print_point a (pm,dm,sm,n))^", "^(print_point b (pm,dm,sm,n))^")" 
-      | SOME(RDir(d,v)) => "RDir(" ^ (print_direction d (pm,dm,sm,n)) ^ ", " ^ "Value(" ^ v ^")" ^ ")"
+      | SOME(RDir(d,v)) => "RDir(" ^ (print_direction d (pm,dm,sm,n)) ^ ", " ^ v ^ ")"
       | SOME(Right(d)) => "Right(" ^ (print_direction d (pm,dm,sm,n)) ^ ")"
       | SOME(DCopy(d)) => print_direction d (pm,dm,sm,n)
     and print_distance distance (pm,dm,sm,n) = case !distance of

@@ -24,6 +24,7 @@ sig
     val pairings : 'a multiset -> 'b multiset -> ('a * 'b) multiset multiset;
     val size : 'a multiset -> int;
     val all : ('a -> bool) -> 'a multiset -> bool;
+    val cancel : ('a -> 'a -> bool) -> ('a multiset * 'a multiset) -> ('a multiset * 'a multiset);
 end
 
 structure Multiset : MULTISET =
@@ -93,11 +94,11 @@ struct
             in
                 List.flatmap (fn (z,zs) => List.map (fn w => (x,z)::w) (pairings xs zs)) (take_each ys [])
             end;
-      
+
+    fun cancel f (x,y) = let val intersection = intersect f x y in (subtract f intersection x, subtract f intersection y) end;
+
     val size = List.length;
     val all = List.all;
-
-    exception ZeroPath;
 end
 
 signature PATH =
@@ -132,6 +133,28 @@ end
 structure Path : PATH =
 struct
 
+    val debug = false;
+
+    datatype tvl = YES | NO | MAYBE;
+    
+    fun tvl_and NO _ = NO
+      | tvl_and _ NO = NO
+      | tvl_and YES YES = YES
+      | tvl_and _ _ = MAYBE;
+    
+    fun tvl_or _ YES = YES
+      | tvl_or YES _ = YES
+      | tvl_or _ MAYBE = MAYBE
+      | tvl_or MAYBE _ = MAYBE
+      | tvl_or NO NO = NO
+    
+    fun tvl_xnor YES YES = YES
+      | tvl_xnor YES NO = NO
+      | tvl_xnor NO YES = NO
+      | tvl_xnor _ _ = MAYBE;
+    
+    fun definite f x y = f x y = YES;
+
     exception ZeroPath;
     exception PathError of string;
 
@@ -147,7 +170,96 @@ struct
 
     fun turn_step n ((x, y, DRBetween(z1,z2)), s) = ((n + x) mod 4) |> (fn x' => if x' > 1 then ((x' - 2, y, DRBetween(z2,z1)), s) else ((x', y, DRBetween(z1,z2)), s))
       | turn_step n ((x, y, DRUnknown(z)), s) = (((n + x) mod 4, y, DRUnknown(z)), s);
+    fun reverse_step step = turn_step 2 step;
+    fun reverse_path (Path(x)) = Path(Multiset.map reverse_step x);
+
+    (*complete*)
+    fun same_step_direction ((x1,y1,DRUnknown z1), _) ((x2,y2,DRUnknown z2), _) =
+            if z1 <> z2 then
+                MAYBE
+            else if x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
+                YES
+            else
+                NO
+      | same_step_direction ((x1,y1,DRBetween (p1, q1)), _) ((x2,y2,DRBetween (p2, q2)), _) =
+            if p1 = p2 andalso q1 = q2 then
+                if x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
+                    YES
+                else
+                    NO
+            else if p1 = q2 andalso q1 = p2 then
+                if (x1 = (x2 + 2) mod 4) andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
+                    YES
+                else
+                    NO
+            else
+                MAYBE
+      | same_step_direction _ _ = MAYBE;
     
+
+    fun same_step step1 step2 = tvl_and (same_step_direction step1 step2) (same_step_distance step1 step2)
+    and same_step_distance (_,dist_1) (_,dist_2) = if divide_distance dist_1 dist_2 = (Multiset.empty, Multiset.empty) then YES else MAYBE (*when can we guarantee they're not the same?*)
+    and divide_distance (x1,y1) (x2,y2) = Multiset.cancel (fn x => fn y => same_distance_term x y = YES) (Multiset.append x1 y2, Multiset.append y1 x2)
+    and same_distance_term (SRTermBetween(x1,y1)) (SRTermBetween(x2,y2)) = if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso y1 = x2) then YES else MAYBE
+      | same_distance_term (SRTermUnknown(x)) (SRTermUnknown(y)) = if x = y then YES else MAYBE
+      | same_distance_term (SRTermPath(p1)) (SRTermPath(p2)) = same_path_distance p1 p2
+      | same_distance_term (SRTermDot(x1,y1)) (SRTermDot(x2,y2)) = 
+            tvl_or 
+                (tvl_xnor
+                    (same_path_direction x1 x2)
+                    (same_path_direction y1 y2))
+                (tvl_xnor
+                    (same_path_direction x1 y2)
+                    (same_path_direction y1 x2))
+      | same_distance_term (SRTermValue(v1)) (SRTermValue(v2)) = if v1 = v2 then YES else NO
+      | same_distance_term _ _ = MAYBE
+    and same_path_distance (Path(steps_1)) (Path(steps_2)) = 
+        let fun normalise_direction [] = []
+              | normalise_direction (((nn, vv, dd), ss)::xs) =
+                    let val (x1,y1) = Multiset.fold (fn (((x,y,z),w),(hx,hy)) => (Int.min (x, hx), Multiset.intersect (fn p => fn q => p = q) y hy)) (nn, vv) xs;
+                    in 
+                        Multiset.map (fn ((x,y,z),w) => ((x - x1, Multiset.subtract (fn p => fn q => p = q) y1 y, z), w)) (((nn, vv, dd), ss)::xs)
+                    end
+            val (cancelled_1, cancelled_2) = Multiset.cancel (definite same_step) (normalise_direction steps_1, normalise_direction steps_2);
+        in
+            case (cancelled_1, cancelled_2) of
+                ([], []) => YES
+              | (_, _) => MAYBE
+        end
+    and singular_steps_direction [] = YES
+      | singular_steps_direction [x] = YES
+      | singular_steps_direction (x::(y::z)) = tvl_and (same_step_direction x y) (singular_steps_direction (y::z))
+    and same_path_direction (Path(steps_1)) (Path(steps_2)) = 
+        let fun normalise_distance [] = []
+              | normalise_distance ((dd,(aa,bb))::xs) =
+                    let val (numerator, denominator) = 
+                                Multiset.fold 
+                                    (fn ((_,(n,d)), (hn, hd)) => (Multiset.intersect (definite same_distance_term) n hn, Multiset.intersect (definite same_distance_term) d hd)) 
+                                    (aa,bb) xs;
+                    in
+                        Multiset.map (fn (x,(n,d)) => (x,(Multiset.subtract (definite same_distance_term) numerator n, Multiset.subtract (definite same_distance_term) denominator d))) ((dd,(aa,bb))::xs)
+                    end
+            val (cancelled_1, cancelled_2) = Multiset.cancel (definite same_step) (normalise_distance steps_1, normalise_distance steps_2);
+        in
+            (case (cancelled_1, cancelled_2) of
+                ([], []) => YES
+              | ([], _) => MAYBE (*We don't know whether the right might cancel down*)
+              | (_, []) => MAYBE
+              | ((x::xs), (y::ys)) => if singular_steps_direction (x::xs) = YES andalso singular_steps_direction (y::ys) = YES andalso same_step_direction x y = YES then YES else MAYBE
+            )
+        end
+    
+    fun combine_path (Path(x)) (Path(y)) = 
+        let fun check_cancel a b = (same_step (reverse_step a) b) = YES;
+        in 
+            Path(Multiset.collide check_cancel x y)
+        end;
+
+    fun combine_paths l = List.foldr (fn (x,y) => combine_path x y) (Path []) l;
+
+
+
+
     fun compare_step ((x1,y1,DRBetween(a1,b1)),(wn1,wd1)) ((x2,y2,DRBetween(a2,b2)),(wn2,wd2)) = if a1 = a2 andalso b1 = b2 then
             (x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 andalso Multiset.eq compare_distance_term wn1 wn2 andalso Multiset.eq compare_distance_term wd1 wd2)
         else if a1 = b2 andalso b1 = a2 then
@@ -189,49 +301,17 @@ struct
             Multiset.eq compare_step scaled_1 scaled_2
         end
     
-    datatype tvl = YES | NO | MAYBE;
-    
+    fun singular_direction (Path((((a,b,c),s)::xs))) = 
+            if Multiset.all (fn ((a1,b1,c1),_) => compare_step ((a1,b1,c1),s) ((a,b,c),s)) xs then
+            SOME((a,b,c),s) else NONE
+      | singular_direction (Path([])) = raise ZeroPath;
+
     fun step_to_direction ((0, [], DRBetween(x,y)), s) = (ref o SOME o Geometry.Direction) (x,y)
       | step_to_direction ((0, [], DRUnknown(x)), s) = x
       | step_to_direction ((0, (v::vs), d), s) = (ref o SOME o Geometry.RDir) (step_to_direction ((0,vs,d),s), v)
       | step_to_direction ((n, vs, d), s) = (ref o SOME o Geometry.Right) (step_to_direction ((n-1, vs, d), s));
-
-    fun reverse_step step = turn_step 2 step;
-    fun reverse_path (Path(x)) = Path(Multiset.map reverse_step x);
-
-    (*complete*)
-    fun same_step_direction ((x1,y1,DRUnknown z1), _) ((x2,y2,DRUnknown z2), _) =
-            if z1 <> z2 then
-                MAYBE
-            else if x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
-                YES
-            else
-                NO
-      | same_step_direction ((x1,y1,DRBetween (p1, q1)), _) ((x2,y2,DRBetween (p2, q2)), _) =
-            if p1 = p2 andalso q1 = q2 then
-                if x1 = x2 andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
-                    YES
-                else
-                    NO
-            else if p1 = q2 andalso q1 = p2 then
-                if (x1 = (x2 + 2) mod 4) andalso Multiset.eq (fn x => fn y => x = y) y1 y2 then
-                    YES
-                else
-                    NO
-            else
-                MAYBE
-      | same_step_direction _ _ = MAYBE;
     
     fun opposite_step_direction step1 = same_step_direction (reverse_step step1);
-
-    fun combine_path (Path(x)) (Path(y)) = 
-        let fun check_cancel a b = (compare_step (reverse_step a) b);
-        in 
-            Path(Multiset.collide check_cancel x y)
-        end;
-    
-    fun combine_paths [] = Path([])
-      | combine_paths (x::xs) = combine_path x (combine_paths xs);
     
     fun multiply_distance (x1,y1) (x2,y2) = 
             let val (uncancelled_num, uncancelled_denom) = (Multiset.append x1 x2, Multiset.append y1 y2)
@@ -248,6 +328,7 @@ struct
     fun multiply_path (Path(x)) y = Path(Multiset.map (fn (d,s) => (d, multiply_distance s y)) x);
     fun divide_path (Path(x)) y = Path(Multiset.map (fn (d,s) => (d, divide_distance s y)) x);
     fun right_path (Path(x)) = Path(Multiset.map (fn step => turn_step 1 step) x);
+    fun turn_path n (Path(x)) = Path(Multiset.map (fn step => turn_step n step) x);
     fun rdir_path (Path(x)) v = Path(Multiset.map (fn ((x,y,z),s) => ((x, cons v y, z), s)) x);
     
     fun distance_of (Path([])) = raise ZeroPath
@@ -257,11 +338,6 @@ struct
             in
                 (SRTermPath (divide_path p (fnum, fdenom)) :: fnum, fdenom)
             end;
-    
-    fun singular_direction (Path((((a,b,c),s)::xs))) = 
-            if Multiset.all (fn ((a1,b1,c1),_) => compare_step ((a1,b1,c1),s) ((a,b,c),s)) xs then
-            SOME((a,b,c),s) else NONE
-      | singular_direction (Path([])) = raise ZeroPath;
     
     fun point_to_path p = (case !p of
         NONE => (p, empty_path)
@@ -371,27 +447,35 @@ struct
               | (NO, YES) => (a,x::b,c,d)
               | (NO, NO) => (a,b,x::c,d)
               | (MAYBE, MAYBE) => (a,b,c,x::d)
-              | (YES, YES) => raise (PathError "step is opposite to itself")
+              | (_, _) => raise (PathError "step is opposite to itself??")
             end;
 
 
     exception Proven of Geometry.pos_neg_constraint list list;
     exception Refuted;
 
+    fun try_set_point point new_value = if Geometry.point_contains_check point new_value then
+                ()
+            else
+                (
+                    (if debug then PolyML.print else (fn x => x)) ("Set >> ", Geometry.PC(point, new_value)); 
+                    Geometry.af (); 
+                    point := (SOME o Geometry.PCopy) (new_value);
+                    (if debug then PolyML.print else (fn x => x)) ("Set >> ", Geometry.PC(point, new_value)); 
+                    raise Proven [[]]
+                );
+    
+    fun try_set_direction direction new_value = if Geometry.direction_contains_check direction new_value then
+                ()
+            else
+                (
+                    Geometry.af (); 
+                    direction := (SOME o Geometry.DCopy) (new_value);
+                    raise Proven [[]]
+                );
 
     fun get_circle_constraints (p as Path(xs)) = 
         let val _ = if p = empty_path then raise Proven [[]] else ();
-            val _ = if is_some (singular_direction p) then raise Refuted else ();
-            fun try_set_point point new_value = if Geometry.point_contains_check point new_value then
-                    ()
-                else
-                    (
-                        PolyML.print ("Set >> ", Geometry.PC(point, new_value)); 
-                        Geometry.af (); 
-                        point := (SOME o Geometry.PCopy) (new_value);
-                        PolyML.print ("Set >> ", Geometry.PC(point, new_value)); 
-                        raise Proven [[]]
-                    )
             fun set_step_if_free (((0,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
                 if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso x2 = y1) then
                     try_set_point x1 (path_to_points (Path(other_steps)) y1)
@@ -399,6 +483,7 @@ struct
                     ()
               | set_step_if_free  _ = ();
             val _ = Multiset.pick_map set_step_if_free xs;
+            val _ = if is_some (singular_direction p) then raise Refuted else ();
             val start = ref NONE;
         in
             [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
@@ -423,18 +508,18 @@ struct
                             in if Geometry.distance_contains_check s new_dist then 
                                 let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
                             else
-                                (PolyML.print (Geometry.SC(s, new_dist)); Geometry.af (); s := (SOME o Geometry.SCopy) new_dist; [[]])
+                                ((if debug then PolyML.print else (fn x => x)) (Geometry.SC(s, new_dist)); Geometry.af (); s := (SOME o Geometry.SCopy) new_dist; [[]])
                             end
                       | (NONE,_) => 
                     case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) d of
                         (SOME(s),ss) =>
                             let val new_step = ((0,[],DRUnknown (ref NONE)),(n,ss));
                                 val new_dist = step_to_distance new_step;
-                                val _ = PolyML.print ("new_dist >> ", Geometry.SC(s, new_dist));
+                                val _ = (if debug then PolyML.print else (fn x => x)) ("new_dist >> ", Geometry.SC(s, new_dist));
                             in if Geometry.distance_contains_check s new_dist then 
                                 let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
                             else
-                                (PolyML.print (Geometry.SC(s, new_dist)); Geometry.af (); s := (SOME o Geometry.SCopy) new_dist; [[]])
+                                ((if debug then PolyML.print else (fn x => x)) (Geometry.SC(s, new_dist)); Geometry.af (); s := (SOME o Geometry.SCopy) new_dist; [[]])
                             end
                       | (NONE,_) =>
                     let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
@@ -442,39 +527,25 @@ struct
               | (p) => let val dist = ref NONE; val dir = (0, [], DRUnknown(ref NONE)); in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ([SRTermPath p],[]))))]] end
         end handle (Proven x) => x | Refuted => [];
 
-    fun get_direction_constraints (Path(l1), Path(l2)) = if compare_path_direction (Path(l1)) (Path(l2)) then [[]] else case (singular_direction(Path l1), singular_direction(Path l2)) of
-        (SOME((a,b,DRUnknown(x)),s), _) =>
-            let val poss_x = path_to_direction (Path(l2)) 
-            in 
-                if Geometry.direction_contains_check x poss_x then 
-                    [[Geometry.X(Geometry.DC(x, poss_x))]] 
-                else 
-                    (Geometry.af (); x := (SOME o Geometry.DCopy) poss_x; [[]]) 
-            end
-      | (_, SOME((a,b,DRUnknown(x)),s)) =>
-            let val poss_x = path_to_direction (Path(l1)) 
-            in 
-                if Geometry.direction_contains_check x poss_x then 
-                    [[Geometry.X(Geometry.DC(x, poss_x))]] 
-                else 
-                    (Geometry.af (); x := (SOME o Geometry.DCopy) poss_x; [[]]) 
-            end
-      | (SOME((a,b,DRBetween(p1,p2)),s), _) =>
-            let val poss_x = path_to_points (Path(l2)) p1
-            in 
-                if Geometry.point_contains_check p2 poss_x then 
-                    [[Geometry.X(Geometry.PC(p2, poss_x))]] 
-                else 
-                    (Geometry.af (); p2 := (SOME o Geometry.PCopy) poss_x; [[]]) 
-            end
-      | (_, SOME((a,b,DRBetween(p1,p2)),s)) =>
-            let val poss_x = path_to_points (Path(l1)) p1
-            in 
-                if Geometry.point_contains_check p2 poss_x then 
-                    [[Geometry.X(Geometry.PC(p2, poss_x))]] 
-                else 
-                    (Geometry.af (); p2 := (SOME o Geometry.PCopy) poss_x; [[]]) 
-            end
-      | (NONE, NONE) =>
-            [[Geometry.X(Geometry.DC(path_to_direction (Path(l1)) , path_to_direction (Path(l2)) ))]];
+    fun get_direction_constraints ((path_1 as Path(steps_1 as (s1::_))),(path_2 as Path(steps_2 as (s2::_)))) = (
+        let val _ = (if debug then PolyML.print else (fn x => x)) "bp0";
+            val _ = case same_path_direction path_1 path_2 of
+                        YES => raise Proven [[]]
+                      | NO => raise Refuted
+                      | _ => ()
+            val _ = (if debug then PolyML.print else (fn x => x)) "bp1";
+            val _ = case (singular_steps_direction steps_1, s1) of
+                        (YES, ((a,[],DRUnknown(x)),s)) => try_set_direction x (path_to_direction (turn_path (4-a) path_2))
+                      | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 (path_to_points (turn_path (4-a) path_2) p1)
+                      | _ => ()
+            val _ = (if debug then PolyML.print else (fn x => x)) "bp2";
+            val _ = case (singular_steps_direction steps_2, s2) of
+                        (YES, ((a,[],DRUnknown(x)),s)) => try_set_direction x (path_to_direction (turn_path (4-a) path_1))
+                      | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 (path_to_points (turn_path (4-a) path_1) p1)
+                      | _ => ()
+            val _ = (if debug then PolyML.print else (fn x => x)) "bp3";
+        in
+            [[Geometry.X(Geometry.DC(path_to_direction (path_1) , path_to_direction (path_2)))]]
+        end handle (Proven x) => x | Refuted => [])
+      | get_direction_constraints _ = raise ZeroPath;
 end

@@ -33,15 +33,16 @@ struct
                 end
                 handle
                     StringDict.KeyError => StringDict.insert identifications (name, (kind, [value]));
-            fun iteration (relation,hints) = 
+            fun iteration (relation,(hints, repeq)) = 
                 case relation of
-                    ([x],[y],"hint") => (x,y) :: hints
-                  | ([x],[y],"length") => (add_identification (variable_name_of x) "length" y; hints)
-                  | ([x],[y],"area") => (add_identification (variable_name_of x) "area" y; hints)
-                  | ([x],[y],"angle") => (add_identification (variable_name_of x) "angle" y; hints)
-                  | ([],[y],"unitlength") => (add_identification "1" "length" y; hints)
+                    ([x],[y],"hint") => ((x,y) :: hints, repeq)
+                  | ([x],[y],"length") => (add_identification (variable_name_of x) "length" y; (hints, repeq))
+                  | ([x],[y],"area") => (add_identification (variable_name_of x) "area" y; (hints, repeq))
+                  | ([x],[y],"angle") => (add_identification (variable_name_of x) "angle" y; (hints, repeq))
+                  | ([],[y],"unitlength") => (add_identification "1" "length" y; (hints, repeq))
+                  | (_,_,"repeq") => (hints, true)
                   | (_,_,r) => raise PostProcessingException ("Unexpected relation '" ^ r ^ "'' in structure transfer result");
-            val hints = List.foldr iteration [] relations;
+            val (hints, repeq) = List.foldr iteration ([], false) relations;
             val variables = StringDict.keys identifications;
             val keep_tokens = List.map (fn x => (x, List.hd  (#2 (StringDict.get identifications x)))) variables;
             val replacements = 
@@ -55,7 +56,7 @@ struct
                         ) 
                         keep_tokens
                     );
-            val fully_transfered = List.all (fn x => String.size x = 1) variables
+            val fully_transfered = List.all (fn x => String.size x = 1) variables andalso not repeq
         in
             (keep_tokens, replacements, hints, fully_transfered)
         end;
@@ -63,12 +64,16 @@ struct
     val _ = PolyML.print_depth 100;
     val _ = PolyML.line_length 1000000;
 
+    exception NotFullyTransfered;
+
     fun postprocess_state state = 
         let val result_construction : Construction.construction = 
                 case Composition.resultingConstructions (State.patternCompOf state) of 
                     [x] => x 
                     | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
             val (keep_tokens, replacements, hints, fully_transfered) = parse_relations (State.goalsOf state);
+            val _ = PolyML.print fully_transfered;
+            val _ = if not fully_transfered then raise NotFullyTransfered else ();
             val instantiated = Instantiation.instantiate result_construction keep_tokens replacements;
             fun prove_instance instance = 
                 let val printer_config = (ref [], ref [], ref [], ref 0)
@@ -81,11 +86,11 @@ struct
                 in
                     ()
                 end;
-            val _ = if fully_transfered then (Seq.chop 50 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
+            val _ = if fully_transfered then (Seq.chop 40 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
             val _ = if fully_transfered then (PolyML.print "================================================================"; ()) else ();
             val points_map = "";
         in ()
-        end;
+        end handle NotFullyTransfered => ();
 
     fun postprocess states limit = (PolyML.print (Seq.chop limit (Seq.map postprocess_state states)); ());
 

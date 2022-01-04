@@ -114,11 +114,11 @@ struct
                         Geometry.AngleCon(Geometry.RootAngle(from, center, p_to))
                     end
               | _ => raise InstantiationException ("Variable has unexpected type " ^ CSpace.typeOfToken token);
-            fun sequence_for token = case CSpace.typeOfToken token of
+            fun sequence_for token = case Type.nameOfType (CSpace.typeOfToken token) of
                 "line" => line_sequence
               | "rect" => rect_sequence
               | "angle" => angle_sequence
-              | _ => raise InstantiationException "Unexpected type for isomorphism!";
+              | x => raise InstantiationException ("Unexpected type for isomorphism: " ^ x);
             val root_sequence = sequence_for (Construction.constructOf construction);
             val sequences = root_sequence :: (List.map (sequence_for o #2) replacements);
             val all_possibilities = multiply_sequences sequences;
@@ -138,6 +138,19 @@ struct
                           | ("divrect", [Geometry.RectCon(r1), Geometry.LineCon(l2)]) => Geometry.LineCon(Geometry.DivRect(r1,l2))
                           | ("joinrect", [Geometry.RectCon(r1), Geometry.RectCon(r2)]) => Geometry.RectCon(Geometry.JoinRect(r1, r2))
                           | ("subrect", [Geometry.RectCon(r1), Geometry.RectCon(r2)]) => Geometry.RectCon(Geometry.SubRect(r1, r2))
+                          | ("sine", [Geometry.LineCon(l1), Geometry.AngleCon(a2)]) => Geometry.LineCon(Geometry.Sine(l1, a2))
+                          | ("cosine", [Geometry.LineCon(l1), Geometry.AngleCon(a2)]) => Geometry.LineCon(Geometry.Cosine(l1, a2))
+                          | ("tangent", [Geometry.LineCon(l1), Geometry.AngleCon(a2)]) => Geometry.LineCon(Geometry.Tangent(l1, a2))
+                          | ("anglebetween", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.AngleCon(Geometry.AngleBetween(l1, l2))
+                          | ("joinangle", [Geometry.AngleCon(a1), Geometry.AngleCon(a2)]) => Geometry.AngleCon(Geometry.JoinAngle(a1, a2))
+                          | ("subangle", [Geometry.AngleCon(a1), Geometry.AngleCon(a2)]) => Geometry.AngleCon(Geometry.SubAngle(a1, a2))
+                          | ("reverseline", [Geometry.LineCon(l1)]) => Geometry.LineCon(Geometry.Reverse(l1))
+                          | ("rotateline", [Geometry.LineCon(l1), Geometry.AngleCon(a2)]) => Geometry.LineCon(Geometry.Rotate(l1, a2))
+                          | ("moveline", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.LineCon(Geometry.MoveLine(l1, l2))
+                          | ("reverseangle", [Geometry.AngleCon(a1)]) => Geometry.AngleCon(Geometry.ReverseAngle(a1))
+                          | ("oppositeangle", [Geometry.AngleCon(a1)]) => Geometry.AngleCon(Geometry.OppositeAngle(a1))
+                          | ("nextRect", [Geometry.RectCon(r1)]) => Geometry.RectCon(Geometry.NextRect(r1))
+                          | ("moveRect", [Geometry.RectCon(r1), Geometry.LineCon(l2)]) => Geometry.RectCon(Geometry.MoveRect(r1, l2))
                           | (x,y) => raise InstantiationException ("unexpected constructor '" ^ x ^ "'' in instantiation")
                           (* TODO: Add the rest of the correspondences *)
                     )
