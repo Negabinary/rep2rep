@@ -232,7 +232,7 @@ fun structureTransfer KB sourceT targetT ct unistructured goal =
                                     goals = [goal],
                                     composition = Composition.makePlaceholderComposition t,
                                     knowledge = KB}
-    val ign = Heuristic.ignore 15 4999 45 unistructured
+    val ign = Heuristic.ignore 500 4999 100 unistructured
   in structureTransferTac Heuristic.transferProofMultStrengths ign Heuristic.forgetRelaxed initialState
   end
 

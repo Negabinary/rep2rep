@@ -447,6 +447,11 @@ struct
             then findTypeSystemWithName DC (String.concat c)
             else getTargetTySys L
       val targetTypeSystem = getTargetTySys C
+      fun getPostprocessing [] = "false"
+        | getPostprocessing ((x,c)::L) =
+            if x = SOME postprocessKW
+            then "true"
+            else getPostprocessing L
       fun getGoal [] = raise ParseError "no goal for transfer"
         | getGoal ((x,c)::L) =
             if x = SOME goalKW
@@ -526,6 +531,8 @@ struct
       val _ = print ("\nApplying structure transfer to "^ #name constructionRecord ^ "...");
       val startTime = Time.now();
       val results = Transfer.masterTransfer iterative unistructured targetPattern KB sourceTypeSystem targetTypeSystem construction goal;
+      val _ = if getPostprocessing C = "false" then () else (PolyML.print "testtttttttttttttttttttttttttt"; Postprocessing.postprocess results limit);
+      val _ = PolyML.print (getPostprocessing C)
       val nres = length (Seq.list_of results);
       val (listOfResults,_) = Seq.chop limit results;
       val endTime = Time.now();

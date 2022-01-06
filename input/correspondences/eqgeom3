@@ -153,7 +153,7 @@ correspondence sinangle:(equationG,geometryG) =
     target l:line <- sine[lU:line, a:angle] 
     tokenRels ([t2:expr],[a:angle]) :: angle,
               ([],[lU:line]) :: unitlength
-    constructRel ([t:expr],[l:line]) :: distance
+    constructRel ([t:expr],[l:line]) :: length
     strength 1.0
 
 correspondence cosangle:(equationG,geometryG) =
@@ -161,7 +161,7 @@ correspondence cosangle:(equationG,geometryG) =
     target l:line <- cosine[lU:line, a:angle]
     tokenRels ([t2:expr],[a:angle]) :: angle,
               ([],[lU:line]) :: unitlength
-    constructRel ([t:expr],[l:line]) :: distance
+    constructRel ([t:expr],[l:line]) :: length
     strength 1.0
 
 correspondence tanangle:(equationG,geometryG) =
@@ -169,5 +169,5 @@ correspondence tanangle:(equationG,geometryG) =
     target l:line <- tangent[lU:line, a:angle]
     tokenRels ([t2:expr],[a:angle]) :: angle,
               ([],[lU:line]) :: unitlength
-    constructRel ([t:expr],[l:line]) :: distance
+    constructRel ([t:expr],[l:line]) :: length
     strength 1.0
