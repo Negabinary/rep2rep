@@ -14,7 +14,7 @@ struct
 
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
-    val debug = false;
+    val debug = true;
 
     type state = {
         falsifiers : constraint list,
@@ -78,14 +78,14 @@ struct
     fun check_if_conjunction_proven falsifiers [] = YES
       | check_if_conjunction_proven falsifiers (x::xs) = 
             case (x, check_if_conjunction_proven falsifiers xs) of
-                (Y(a),YES) => if holds a then YES else MAYBE([x])
-              | (Y(a),MAYBE(cs)) => if holds a then MAYBE(cs) else MAYBE(x::cs)
+                (Y(a),YES) => if Path.does_hold a then YES else MAYBE([x])
+              | (Y(a),MAYBE(cs)) => if Path.does_hold a then MAYBE(cs) else MAYBE(x::cs)
               | (Y(a),NO) => NO
               | (X(a),YES) => MAYBE([x])
               | (X(a),MAYBE(cs)) => MAYBE(x::cs)
               | (X(a),NO) => NO
-              | (N(a),YES) => if holds a then NO else MAYBE([x])
-              | (N(a),MAYBE(cs)) => if holds a then NO else MAYBE(x::cs)
+              | (N(a),YES) => if Path.does_hold a then NO else MAYBE([x])
+              | (N(a),MAYBE(cs)) => if Path.does_hold a then NO else MAYBE(x::cs)
               | (N(a),NO) => NO;
 
     (*
@@ -119,22 +119,20 @@ struct
                     if List.exists (fn x => x = NO) conjunction_statuses then true else false
                 )
         end;
+
+    exception Falsifiable;
     
     (*
     YES => means that after resolution the disjunction is now proven
     MAYBE(c-d-c, falsifiables, unprovables, changed) => means that after resolution the disjunction looks like the c-d-c
     NO => means that a contradiction arose during resolution
     *)
-    fun resolve_disjunction falsifiers [] = NO
+    fun resolve_disjunction falsifiers [] = raise Falsifiable
       | resolve_disjunction falsifiers [x] = MAYBE(make_conjunction_true falsifiers x)
       | resolve_disjunction falsifiers xs = check_if_disjunction_proven falsifiers xs;
-    
-    exception Falsifiable;
 
     fun resolve_cdc st n = 
         let val constraints = #constraints st;
-            (*val _ = PolyML.print constraints;
-            val _ = PolyML.print ">>>>>>>>>>";*)
             val falsifiers = #falsifiers st;
             val unknowables = #unknowables st;
             fun shorten_point point = 
@@ -144,13 +142,13 @@ struct
                 else
                     point
                 end handle ZeroPath => raise Falsifiable;
-            fun iter (disj,prev) = case (Geometry.map_points (shorten_point, fn x => x) (#root st); (resolve_disjunction (#2 prev) disj, prev)) of
+            fun iter (disj,prev) = case (PolyML.print "t1"; Geometry.map_points (shorten_point, fn x => x) (#root st); PolyML.print "t2"; (resolve_disjunction (#2 prev) disj, prev)) of
                 (NO, _) => raise Falsifiable
               | (YES, x) => x
               | (MAYBE(cs', fs', us', cd'),(cs, fs, us, cd)) => (cs'@cs, fs'@fs, us'@us, cd' orelse cd)
             val (new_constraints, new_falsifiers, new_unknowables, changed) = 
                     List.foldr iter ([], falsifiers, unknowables, false) constraints;
-            val _ = Geometry.map_points (shorten_point, fn x => x) (#root st);
+            val _ = (PolyML.print "t1"; Geometry.map_points (shorten_point, fn x => x) (#root st); PolyML.print "t2"); 
             val (changed, new_constraints_2, new_unknowables_2) = if not changed andalso !assignment_flag then 
                     (assignment_flag := false; (true, List.map (fn x => [[Y(x)]]) unknowables @ new_constraints, []))
                 else 
@@ -161,9 +159,7 @@ struct
                 unknowables=new_unknowables_2,
                 root=(#root st)
             };
-            (*val _ = PolyML.print(next_state);
-            val _ = PolyML.print(">>>>")*)
-            val _ = List.map (fn x => if holds x then raise Falsifiable else ()) new_falsifiers;
+            val _ = List.map (fn x => if Path.does_hold x then raise Falsifiable else ()) new_falsifiers;
         in
             if changed then resolve_cdc next_state (n - 1) else next_state
         end;
@@ -171,7 +167,7 @@ struct
     fun can_build construction = 
         let val state = resolve_cdc (state_from_construction construction) 20;
         in
-            SOME(#root state, (#constraints state) @ List.map (fn x => [[X(x)]]) (#unknowables state))
+            SOME(#root state, (#constraints state) @ List.map (fn x => [[X(x)]]) (#unknowables state) @ List.map (fn x => [[N(x)]]) (List.filter (fn x => not (Path.does_not_hold x)) (#falsifiers state)))
         end
         handle
             Falsifiable => NONE;

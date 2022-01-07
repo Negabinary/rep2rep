@@ -54,4 +54,6 @@ transfer
     goal ([t46:t47:equality],[t':value]) :: repeq
     output test2
     limit 100
+
+comment
     postprocess geometryPP

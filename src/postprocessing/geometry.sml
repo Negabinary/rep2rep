@@ -102,11 +102,6 @@ struct
       | (RectCon(x),RectCon(y)) => RectCon(ResolveRect(x,y))
       | _ => raise GeometryError "Resolve type mismatch"
     
-    datatype constraint =
-        SamePoint of point_con option ref * point_con option ref
-      | SameDirection of direction_con option ref * direction_con option ref
-      | SameDistsance of distance_con option ref * distance_con option ref
-    
     fun dirof l = (ref o SOME o Direction) (get_line_start l, get_line_end l)
     and disof l = (ref o SOME o Distance) (get_line_start l, get_line_end l)
     and get_line_start (RootLine(a,b)) = a
@@ -258,6 +253,9 @@ struct
                         | DC of direction_con option ref * direction_con option ref
                         | SC of distance_con option ref * distance_con option ref;
     
+    datatype pos_neg_constraint = Y of constraint | N of constraint | X of constraint;
+      (*Y = Yes, N = No, X = Extra condition that can't be proven*)
+    
     fun mc (a,b) (c,d) = (a @ c, b @ d);
 
     fun get_line_constraints line = case line of
@@ -343,7 +341,8 @@ struct
             [], [
                 PC(a,b),
                 PC(b,c),
-                PC(a,c)
+                PC(a,c),
+                DC((ref o SOME o Direction)(b,a), (ref o SOME o Direction)(b,c))
             ]
         )
       | ResolveAngle(a,b) => mc
@@ -450,6 +449,7 @@ struct
       | AngleCon(x) => get_angle_constraints(x)
       | RectCon(x) => get_rect_constraints(x);
 
+    (*
     (*sufficient but not necessary*)
     fun same_point (p1, p2) = case (!p1, !p2) of
         (NONE, NONE) => p1 = p2
@@ -489,11 +489,8 @@ struct
             x = y
       | _ => false;
 
-    fun holds (PC(p1,p2)) = same_point(p1,p2)
-      | holds (DC(p1,p2)) = same_direction(p1,p2)
-      | holds (SC(p1,p2)) = same_distance(p1,p2);
-
     val (sp, sd, ss) = (same_point, same_direction, same_distance);
+    *)
     
 
     fun point_contains_check check const = case !const of
@@ -553,78 +550,6 @@ struct
       | SOME(SCopy(x)) => distance_contains_check check x
       | SOME(Dot(a,b)) => scd check a orelse scd check b;
 
-    datatype pos_neg_constraint = Y of constraint | N of constraint | X of constraint;
-    (*Y = Yes, N = No, X = Extra condition that can't be proven*)
-
-
-    datatype direction_intermediate = DIUnknown of direction_con option ref | DIBetween of point_con option ref * point_con option ref | DICompound of int * string list * (direction_intermediate * distance_con option ref) list
-
-    fun count eq y [] = 0
-      | count eq y (x::xs) = if eq x y then (count eq y xs) + 1 else count eq y xs;
-
-    fun same_intermediate (DIUnknown(x)) (DIUnknown(y)) = (x = y)
-      | same_intermediate (DIBetween(x1,y1)) (DIBetween(x2,y2)) = same_point (x1,x2) andalso same_point(x2,y2)
-      | same_intermediate (DICompound(x1,y1,z1)) (DICompound(x2,y2,z2)) = x1 = x2 andalso List.all (fn y => count (fn x => fn y => x = y) y y1 = count (fn x => fn y => x = y) y y2) y1 
-            andalso List.all (fn z => count (fn (p1,q1) => fn (p2,q2) => same_intermediate p1 p2 andalso same_distance (q1,q2)) z z1 = count (fn (p1,q1) => fn (p2,q2) => same_intermediate p1 p2 andalso same_distance (q1,q2)) z z2) z1
-      | same_intermediate _ _ = false;
-    
-    fun reverse_intermediate (DICompound(x, [], [(z,zz)])) = if x = 2 then z else DICompound((x + 2) mod 4, [], [(z,zz)])
-      | reverse_intermediate (DICompound(x,y,z)) = DICompound((x + 2) mod 4, y, z)
-      | reverse_intermediate x = DICompound(2,[],[(x, ref NONE)]);
-
-    fun direction_to_intermediate d (x,y) = 
-        let fun point_to_movements p m = (case !p of
-                  NONE => (m, p)
-                | SOME(PCopy(x)) => point_to_movements x m
-                | SOME(Move(x,y,z)) => point_to_movements x ((y,z)::m)
-            );
-            fun reverse_movements m = List.map (fn (d, s) => ((ref o SOME o Right) ((ref o SOME o Right) d),s)) m;
-            fun intersect eq [] l2 = []
-              | intersect eq (x::xs) l2 = if count eq x xs < count eq x l2  then x::(intersect eq xs l2) else intersect eq xs l2;
-            fun remove eq x [] = []
-              | remove eq x (y::ys) = if eq x y then ys else x::(remove eq x ys);
-            fun subtract eq [] l2 = l2
-              | subtract eq (x::xs) l2 = remove eq x (subtract eq xs l2);
-            fun factorize (a,b,c) (d,e,f) = (Int.min (a,d), intersect (fn x => fn y => x = y) b e, intersect (same_intermediate) c f);
-        in (case !d of
-            NONE => if x = 0 andalso y = [] then DIUnknown(d) else
-              DICompound(x, y, [(DIUnknown d, ref NONE)])
-          | SOME(DCopy(z)) => direction_to_intermediate z (x,y)
-          | SOME(Right(z)) => direction_to_intermediate z (x + 1, y)
-          | SOME(RDir(z,v)) => direction_to_intermediate z (x, v::y)
-          | SOME(Direction(p1,p2)) => if !p1 = NONE andalso !p2 = NONE andalso x = 0 andalso y = [] then DIBetween(p1,p2) else
-                let val (movements_1, start_1) = point_to_movements p1 [];
-                    val (movements_2, start_2) = point_to_movements p2 [];
-                    val start_movements = if same_point (start_1, start_2) then [] else [(
-                        (ref o SOME o Direction) (start_1, start_2),
-                        (ref o SOME o Distance) (start_1, start_2)
-                    )];
-                    val movements = (reverse_movements movements_1) @ start_movements @ movements_2;
-                    val simplified_movements = List.map (fn (x,y) => (direction_to_intermediate x (0,[]), y)) movements;
-                    (*cancel values that are the same but reversed*)
-                    fun is_reverse (di1,s1) (di2,s2) = same_distance(s1,s2) andalso same_intermediate (reverse_intermediate di1) (di2)
-                    fun cancel_reverse [] = []
-                      | cancel_reverse (x::xs) = if List.exists (fn y => is_reverse x y) xs then
-                            cancel_reverse (remove is_reverse x xs)
-                        else
-                            x::(cancel_reverse (xs));
-                    val sm2 = cancel_reverse simplified_movements;
-
-                    (*val (sm,sms) = case simplified_movements of [] => raise GeometryError "Expected more than one movement" | p::q => (p,q);*)
-                in
-                    DICompound(x mod 4, y, sm2) (*TODO: factorise*)
-                end)
-        end;
-
-    fun intermediate_to_direction (DIUnknown(x)) = x
-      | intermediate_to_direction (DIBetween(x,y)) = (ref o SOME o Direction) (x, y)
-      | intermediate_to_direction (DICompound(0,[],[])) = raise (GeometryError "Invalid intermediate direction!")
-      | intermediate_to_direction (DICompound(0,[],[(z,_)])) = intermediate_to_direction z
-      | intermediate_to_direction (DICompound(0,[],zs)) = let val point = ref NONE in (ref o SOME o Direction) (point,
-            (List.foldr (fn ((a,s),b) => (ref o SOME o Move) ((b, intermediate_to_direction a, s))) point zs)) end
-      | intermediate_to_direction (DICompound(0,(y::ys),zs)) = (ref o SOME o RDir) (intermediate_to_direction (DICompound(0,ys,zs)),y)
-      | intermediate_to_direction (DICompound(x,ys,zs)) = (ref o SOME o Right) (intermediate_to_direction (DICompound(x-1,ys,zs)))
-    
     fun inc n = (n := !n + 1; !n);
 
     fun print_point point (pm,dm,sm,n) = case !point of
