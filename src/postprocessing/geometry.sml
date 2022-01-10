@@ -53,6 +53,26 @@ struct
                       | NextRect of rect_con
                       | MoveRect of rect_con * line_con;
     
+    fun map_deep_state_p (f as (fp,_,_)) p = case !p of
+            NONE => fp p
+          | (SOME(Move (p1,d1,s1))) => (map_deep_state_p f p1; map_deep_state_d f d1; map_deep_state_s f s1; fp p)
+          | (SOME(PCopy (p1))) => (map_deep_state_p f p1; fp p)
+    and map_deep_state_d (f as (_,fd,_)) d = case !d of
+            NONE => fd d
+          | (SOME(Direction (p1,p2))) => (map_deep_state_p f p1; map_deep_state_p f p2; fd d)
+          | (SOME(RDir (d1,v1))) => (map_deep_state_d f d1; fd d)
+          | (SOME(Right (d1))) => (map_deep_state_d f d1; fd d)
+          | (SOME(DCopy (d1))) => (map_deep_state_d f d1; fd d)
+    and map_deep_state_s (f as (_,_,fs)) s = case !s of
+            NONE => fs s
+          | (SOME(Distance (p1,p2))) => (map_deep_state_p f p1; map_deep_state_p f p2; fs s)
+          | (SOME(Times (s1,s2))) => (map_deep_state_s f s1; map_deep_state_s f s2; fs s)
+          | (SOME(Divide (s1,s2))) => (map_deep_state_s f s1; map_deep_state_s f s2; fs s)
+          | (SOME(Value (x))) => fs s
+          | (SOME(SCopy (s1))) => fs s
+          | (SOME(Dot (d1, d2))) => (map_deep_state_d f d1; map_deep_state_d f d2; fs s);
+
+    
     fun map_points_l (fp,fs) (RootLine (x,y)) = RootLine(fp x, fp y)
       | map_points_l f (ResolveLine (x,y)) = ResolveLine(map_points_l f x, map_points_l f y)
       | map_points_l f (Concat (x,y)) = Concat(map_points_l f x, map_points_l f y)
@@ -85,6 +105,8 @@ struct
     fun map_points f (LineCon x) = LineCon(map_points_l f x)
       | map_points f (AngleCon x) = AngleCon(map_points_a f x)
       | map_points f (RectCon x) = RectCon(map_points_r f x);
+    
+    fun map_deep_points f x = map_points (map_deep_state_p f, map_deep_state_s f) x;
 
     fun mk_leaf_line () = LineCon(RootLine(ref NONE, ref NONE));
     fun mk_leaf_angle () = AngleCon(RootAngle(ref NONE, ref NONE, ref NONE));
@@ -616,4 +638,14 @@ struct
     val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_point (ref(SOME(z))) printer_config));
     val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_constraint z printer_config));
     val _ = PolyML.addPrettyPrinter (fn x => fn y => fn z => PolyML.PrettyString (print_construction z printer_config));
+
+    fun point_index x = 
+      let val pm = #1 printer_config;
+          val n = #4 printer_config;
+      in 
+        (case List.find (fn (x,y) => x = x) (!pm) of 
+            NONE => (pm := (x,(inc n))::(!pm); !n) 
+          | SOME(x,y) => y
+        )
+      end
 end

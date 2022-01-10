@@ -5,8 +5,8 @@ import "postprocessing.geometry_prover";
 
 signature POSTPROCESING = 
 sig 
-    val postprocess : State.T Seq.seq -> int -> unit;
-    val postprocess_state : State.T -> unit;
+    val postprocess : State.T Seq.seq -> int -> int -> unit;
+    val postprocess_state : int -> State.T -> unit;
 end
 
 structure Postprocessing : POSTPROCESING = 
@@ -66,7 +66,7 @@ struct
 
     exception NotFullyTransfered;
 
-    fun postprocess_state state = 
+    fun postprocess_state lim2 state = 
         let val result_construction : Construction.construction = 
                 case Composition.resultingConstructions (State.patternCompOf state) of 
                     [x] => x 
@@ -86,12 +86,12 @@ struct
                 in
                     ()
                 end;
-            val _ = if fully_transfered then (Seq.chop 500 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
+            val _ = if fully_transfered then (Seq.chop lim2 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
             val _ = if fully_transfered then (PolyML.print "================================================================"; ()) else ();
             val points_map = "";
         in ()
         end handle NotFullyTransfered => ();
 
-    fun postprocess states limit = (PolyML.print (Seq.chop limit (Seq.map postprocess_state states)); ());
+    fun postprocess states limit lim2 = (PolyML.print (Seq.chop limit (Seq.map (postprocess_state lim2) states)); ());
 
 end

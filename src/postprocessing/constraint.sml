@@ -300,7 +300,10 @@ struct
     
     (*FROM GEOMETRY*)
 
-    fun step_to_direction ((0, [], DRBetween(x,y)), s) = (ref o SOME o Geometry.Direction) (x,y)
+    fun step_to_direction ((0, [], DRBetween(x,y)), s) = if Geometry.point_index x < Geometry.point_index y then
+                (ref o SOME o Geometry.Direction) (x,y)
+            else
+                (ref o SOME o Geometry.Right o ref o SOME o Geometry.Right o ref o SOME o Geometry.Direction) (y,x)
       | step_to_direction ((0, [], DRUnknown(x)), s) = x
       | step_to_direction ((0, (v::vs), d), s) = (ref o SOME o Geometry.RDir) (step_to_direction ((0,vs,d),s), v)
       | step_to_direction ((n, vs, d), s) = (ref o SOME o Geometry.Right) (step_to_direction ((n-1, vs, d), s));
@@ -443,6 +446,7 @@ struct
                     ()
               | set_step_if_free  _ = ();
             val _ = Multiset.pick_map set_step_if_free xs;
+            val _ = Multiset.pick_map (fn (y,ys) => if Multiset.all (fn z => same_step_direction y z = NO) ys then raise Refuted else ()) xs;
             val _ = if is_some (singular_direction p) then raise Refuted else ();
             val start = ref NONE;
         in

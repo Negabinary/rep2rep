@@ -16,25 +16,43 @@ grammar equationM:equationG =
          | [C] -> C
          | [90] -> ninety
 
-comment opoeo:equationM = open A + B close = 1
 
-input opoeo:equationM = open A * B close = 1
+input additionCommutes:equationM = A + B = B + A
+comment
+    sourceConstruction additionCommutes
+    targetTypeSystem geometry
+    goal ([t12:t13:equality],[t':value]) :: repeq
+    output test2
+    limit 100
+    postprocess 40
+comment 0-1-0
 
+input multiplicationCommutes:equationM = A * B = B * A
+comment
+     sourceConstruction multiplicationCommutes
+     targetTypeSystem geometry
+     goal ([t25:t26:equality],[t':value]) :: repeq
+     output test2
+     limit 100
+     postprocess 100
+comment 0-0-0
 
-comment opoeo:equationG =
-     t11:equality <- equality [t8:expr <- brackets[t2:open, t6:test:expr <- infixOp[t3:A, t4:plus, t5:B], t7:close], t9:equals, t10:one]
+input additionAssociates:equationM = open A + B close + C = A + open B + C close
+transfer
+     sourceConstruction additionAssociates
+     targetTypeSystem geometry
+     goal ([t60:t61:equality],[t':value]) :: repeq
+     output test2
+     limit 100
+     postprocess 5
+comment 1-1-0
 
-comment additionDistributes:equationM = A + B = B + A
-comment 26:27
 
 comment additionDistributes:equationM = open A + B close + C = A + open C + B close
 comment 48:49
 
-input additionDistributes:equationM = open A + B close * C = A * C + B * C
+comment additionDistributes:equationM = open A + B close * C = A * C + B * C
 comment 46:47
-
-comment additionDistributes:equationM = open A + B close + C = A + open B + C close
-comment 48:49
 
 comment additionDistributes:equationM = open A * B close = open B * A close
 comment 36:37
@@ -48,12 +66,16 @@ comment 35:36
 comment additionDistributes:equationM = sin A * sin A + cos A * cos A = 1
 comment 42:43
 
-transfer
-    sourceConstruction additionDistributes
-    targetTypeSystem geometry
-    goal ([t46:t47:equality],[t':value]) :: repeq
-    output test2
-    limit 100
+input tanIdentity:equationM = sin A / cos A  = tan A
+comment 31:32 
+
+input sinTest:equationM = sin A + sin B = sin B + sin A
+comment 38:39
 
 comment
-    postprocess geometryPP
+    sourceConstruction tanIdentity
+    targetTypeSystem geometry
+    goal ([t31:t32:equality],[t':value]) :: repeq
+    output test2
+    limit 100
+    postprocess 100

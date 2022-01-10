@@ -44,7 +44,7 @@ struct
             val constraints = (if debug then PolyML.print else (fn x => x)) (Path.get_circle_constraints circle);
         in 
             constraints
-        end handle Path.ZeroPath => ("ZeroPath1"; []))
+        end handle Path.ZeroPath => (if debug then PolyML.print "ZeroPath1" else ""; []))
     | use_positive_constraint (DC(d1, d2)) = 
         (let val _ = (if debug then PolyML.print else (fn x => x)) "Direction constraint";
             val _ = (if debug then PolyML.print else (fn x => x)) (DC(d1, d2));
@@ -57,7 +57,7 @@ struct
             val constraints = (if debug then PolyML.print else (fn x => x)) (Path.get_direction_constraints (path_1, path_2));
         in 
             constraints
-        end handle Path.ZeroPath => (PolyML.print "ZeroPath2"; []))
+        end handle Path.ZeroPath => (if debug then PolyML.print "ZeroPath2" else ""; []))
     | use_positive_constraint (SC(s1,s2)) = 
         (let val _ = (if debug then PolyML.print else (fn x => x)) "Distance constraint";
             val _ = (if debug then PolyML.print else (fn x => x)) (SC(s1, s2));
@@ -69,7 +69,7 @@ struct
             val constraints = (if debug then PolyML.print else (fn x => x))(Path.get_distance_constraints (path_1, path_2) (ref NONE));
         in 
             constraints
-        end handle Path.ZeroPath => (PolyML.print "ZeroPath3"; []));
+        end handle Path.ZeroPath => (if debug then PolyML.print "ZeroPath3" else ""; []));
     (*
     YES => means the conjunction is proven and equivalent to []
     MAYBE(x : c) => means the conjunction is true if the possibly simpler conjunction x is true
@@ -142,13 +142,13 @@ struct
                 else
                     point
                 end handle ZeroPath => raise Falsifiable;
-            fun iter (disj,prev) = case (PolyML.print "t1"; Geometry.map_points (shorten_point, fn x => x) (#root st); PolyML.print "t2"; (resolve_disjunction (#2 prev) disj, prev)) of
+            fun iter (disj,prev) = case (Geometry.map_points (shorten_point, fn x => x) (#root st); (resolve_disjunction (#2 prev) disj, prev)) of
                 (NO, _) => raise Falsifiable
               | (YES, x) => x
               | (MAYBE(cs', fs', us', cd'),(cs, fs, us, cd)) => (cs'@cs, fs'@fs, us'@us, cd' orelse cd)
             val (new_constraints, new_falsifiers, new_unknowables, changed) = 
                     List.foldr iter ([], falsifiers, unknowables, false) constraints;
-            val _ = (PolyML.print "t1"; Geometry.map_points (shorten_point, fn x => x) (#root st); PolyML.print "t2"); 
+            val _ = (Geometry.map_points (shorten_point, fn x => x) (#root st)); 
             val (changed, new_constraints_2, new_unknowables_2) = if not changed andalso !assignment_flag then 
                     (assignment_flag := false; (true, List.map (fn x => [[Y(x)]]) unknowables @ new_constraints, []))
                 else 
