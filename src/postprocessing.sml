@@ -74,7 +74,7 @@ struct
             val (keep_tokens, replacements, hints, fully_transfered) = parse_relations (State.goalsOf state);
             val _ = PolyML.print fully_transfered;
             val _ = if not fully_transfered then raise NotFullyTransfered else ();
-            val instantiated = Instantiation.instantiate result_construction keep_tokens replacements;
+            val instantiated = Instantiation.instantiate keep_tokens replacements result_construction;
             val _ = PolyML.print "Made it here!";
             fun prove_instance instance = 
                 let val _ = PolyML.print instance;
