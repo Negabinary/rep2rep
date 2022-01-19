@@ -14,7 +14,7 @@ struct
 
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
-    val debug = true;
+    val debug = false;
 
     type state = {
         falsifiers : constraint list,
@@ -40,6 +40,7 @@ struct
             val _ = (if debug then PolyML.print else (fn x => x)) (PC(p1, p2));
             val start = ref NONE;
             val circle = Path.path_between p1 p2;
+            val _ = (if debug then PolyML.print else (fn x => x)) "debug";
             val _ = (if debug then PolyML.print else (fn x => x)) (PC(start, Path.path_to_points circle start));
             val constraints = (if debug then PolyML.print else (fn x => x)) (Path.get_circle_constraints circle);
         in 
@@ -50,10 +51,11 @@ struct
             val _ = (if debug then PolyML.print else (fn x => x)) (DC(d1, d2));
             val dist = ref NONE; val start = ref NONE;
             val path_1 = Path.distance_direction_to_path (dist, d1);
-            val _ = (if debug then PolyML.print else (fn x => x)) "ttt";
             val _ = (if debug then PolyML.print else (fn x => x)) (PC(start, Path.path_to_points path_1 start));
+            val _ = (if debug then PolyML.print else (fn x => x)) (DC(d1, d2));
             val path_2 = Path.distance_direction_to_path (dist, d2);
             val _ = (if debug then PolyML.print else (fn x => x)) (PC(start, Path.path_to_points path_2 start));
+            val _ = (if debug then PolyML.print else (fn x => x)) (DC(d1, d2));
             val constraints = (if debug then PolyML.print else (fn x => x)) (Path.get_direction_constraints (path_1, path_2));
         in 
             constraints
@@ -162,7 +164,7 @@ struct
             val _ = List.map (fn x => if Path.does_hold x then raise Falsifiable else ()) new_falsifiers;
         in
             if changed then resolve_cdc next_state (n - 1) else next_state
-        end;
+        end handle Path.ZeroPath => raise Falsifiable;
     
     fun can_build construction = 
         let val state = resolve_cdc (state_from_construction construction) 20;

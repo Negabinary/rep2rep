@@ -75,9 +75,12 @@ struct
             val _ = PolyML.print fully_transfered;
             val _ = if not fully_transfered then raise NotFullyTransfered else ();
             val instantiated = Instantiation.instantiate result_construction keep_tokens replacements;
+            val _ = PolyML.print "Made it here!";
             fun prove_instance instance = 
-                let val printer_config = (ref [], ref [], ref [], ref 0)
+                let val _ = PolyML.print instance;
+                    val printer_config = (ref [], ref [], ref [], ref 0)
                     val _ = PolyML.print instance;
+                    val _ = Path.reset_time ()
                     val _ = case GeometryProver.can_build instance of
                         NONE => (PolyML.print "REFUTED"; ())
                       | SOME(x,[]) => (PolyML.print x; PolyML.print "PROVEN!!!!"; ())
@@ -85,7 +88,8 @@ struct
                     val _ = PolyML.print "----------------------------------------------------------------";
                 in
                     ()
-                end;
+                end
+                handle Path.Timeout => (PolyML.print "TIMEOUT"; PolyML.print "----------------------------------------------------------------"; ());
             val _ = if fully_transfered then (Seq.chop lim2 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
             val _ = if fully_transfered then (PolyML.print "================================================================"; ()) else ();
             val points_map = "";
