@@ -106,6 +106,11 @@ struct
               | "rect" => rect_sequence
               | "angle" => angle_sequence
               | x => raise InstantiationException ("Unexpected type for isomorphism: " ^ x);
+            fun id_sequence_for token = case Type.nameOfType (CSpace.typeOfToken token) of
+                "line" => Seq.single (LineIso(fn x => x))
+              | "rect" => Seq.single (RectIso(fn x => x))
+              | "angle" => Seq.single (AngleIso(fn x => x))
+              | x => raise InstantiationException ("Unexpected type for isomorphism: " ^ x);
             fun make_input variable token = case CSpace.typeOfToken token of
                 "line" => 
                     let val start = ref NONE;
@@ -143,11 +148,12 @@ struct
                                 | NONE => Geometry.mk_leaf (CSpace.typeOfToken token)
                       )
                 );
-            fun mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) (Construction.Reference(token)) = raise InstantiationException "Expected input construction to be a tree!"
-              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) (Construction.Source(token)) = Seq.map (fn x => apply_iso x (geom_from_source token)) (sequence_for token)
-              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) (Construction.TCPair({token=token, constructor=constructor}, children)) = 
-                  let val root_seq = sequence_for token;
-                      val child_seqs = List.map (Seq.map geom_to_iso_hack o mkseq keep_tokens replacements) children;
+            fun mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) _ (Construction.Reference(token)) = raise InstantiationException "Expected input construction to be a tree!"
+              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) true (Construction.Source(token)) = Seq.single (geom_from_source token)
+              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) false (Construction.Source(token)) = Seq.map (fn x => apply_iso x (geom_from_source token)) (sequence_for token)
+              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) skip_iso (Construction.TCPair({token=token, constructor=constructor}, children)) = 
+                  let val root_seq = if skip_iso then id_sequence_for token else sequence_for token;
+                      val child_seqs = List.map (Seq.map geom_to_iso_hack o mkseq keep_tokens replacements false) children;
                       val mult_seq = multiply_sequences (root_seq :: child_seqs);
                       fun build_con (r::xs : isomorphism list) = apply_iso r (case (CSpace.nameOfConstructor constructor, List.map iso_to_geom_hack xs) of 
                             ("concat", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.LineCon(Geometry.Concat(l1,l2))
@@ -179,8 +185,8 @@ struct
                     Seq.map build_con mult_seq
                   end;
             val Construction.TCPair(_, [lhs, rhs]) = construction;
-            val lhseq = mkseq keep_tokens replacements lhs;
-            val rhseq = mkseq keep_tokens replacements rhs;
+            val lhseq = mkseq keep_tokens replacements true lhs;
+            val rhseq = mkseq keep_tokens replacements true rhs;
             val rhisos = sequence_for (Construction.constructOf rhs);
       in
         Seq.map (fn [rh,rt,l] => Geometry.resolve (iso_to_geom_hack l) (apply_iso rh (iso_to_geom_hack rt)) | _ => raise InstantiationException "Error") (multiply_sequences [rhisos, Seq.map geom_to_iso_hack rhseq, Seq.map geom_to_iso_hack lhseq])
