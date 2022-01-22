@@ -181,6 +181,7 @@ struct
                           | ("resolveLine", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.LineCon(Geometry.ResolveLine(l1, l2))
                           | ("resolveAngle", [Geometry.AngleCon(a1), Geometry.AngleCon(a2)]) => Geometry.AngleCon(Geometry.ResolveAngle(a1,a2))
                           | ("resolveArea", [Geometry.RectCon(r1), Geometry.RectCon(r2)]) => Geometry.RectCon(Geometry.ResolveRect(r1,r2))
+                          | ("pythag", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.RectCon(Geometry.Pythag(l1,l2))
                           | (x,y) => raise InstantiationException ("unexpected constructor '" ^ x ^ "'' in instantiation")
                           )
                         | build_con [] = raise InstantiationException ("Error: construction without root");
@@ -262,6 +263,10 @@ struct
                           | ("oppositeangle", [Geometry.AngleCon(a1)]) => Geometry.AngleCon(Geometry.OppositeAngle(a1))
                           | ("nextRect", [Geometry.RectCon(r1)]) => Geometry.RectCon(Geometry.NextRect(r1))
                           | ("moveRect", [Geometry.RectCon(r1), Geometry.LineCon(l2)]) => Geometry.RectCon(Geometry.MoveRect(r1, l2))
+                          | ("resolveLine", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.LineCon(Geometry.ResolveLine(l1, l2))
+                          | ("resolveAngle", [Geometry.AngleCon(a1), Geometry.AngleCon(a2)]) => Geometry.AngleCon(Geometry.ResolveAngle(a1, a2))
+                          | ("resolveArea", [Geometry.RectCon(r1), Geometry.RectCon(r2)]) => Geometry.RectCon(Geometry.ResolveRect(r1, r2))
+                          | ("pythag", [Geometry.LineCon(l1), Geometry.LineCon(l2)]) => Geometry.RectCon(Geometry.Pythag(l1,l2))
                           | (x,y) => raise InstantiationException ("unexpected constructor '" ^ x ^ "'' in instantiation")
                     )
                       | build (Construction.Source(token)) = (

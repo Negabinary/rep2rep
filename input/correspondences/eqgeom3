@@ -171,3 +171,13 @@ correspondence tanangle:(equationG,geometryG) =
               ([],[lU:line]) :: unitlength
     constructRel ([t:expr],[l:line]) :: length
     strength 1.0
+
+correspondence pythag:(equationG,geometryG) =
+    source t:expr <- infixOp[t1:expr <- infixOp[t2:expr, t3:times, t4:expr], t9:plus, t5:expr <- infixOp[t6:expr, t7:times, t8:expr]]
+    target a:rect <- pythag[l1:line <- resolveLine[l2:line, l3:line], l4:line <- resolveLine[l5:line,l6:line]]
+    tokenRels ([t2:expr],[l2:line]) :: length,
+              ([t4:expr],[l3:line]) :: length,
+              ([t6:expr],[l5:line]) :: length,
+              ([t8:expr],[l6:line]) :: length
+    constructRel ([t:expr],[a:rect]) :: area
+    strength 1.0

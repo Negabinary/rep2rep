@@ -7,6 +7,7 @@ signature POSTPROCESING =
 sig 
     val postprocess : State.T Seq.seq -> int -> int -> unit;
     val postprocess_state : int -> State.T -> unit;
+    val test : unit -> unit;
 end
 
 structure Postprocessing : POSTPROCESING = 
@@ -56,7 +57,7 @@ struct
                         ) 
                         keep_tokens
                     );
-            val fully_transfered = List.all (fn x => String.size x = 1) variables andalso not repeq
+            val fully_transfered = List.all (fn x => String.size x = 1 orelse x = "one") variables andalso not repeq
         in
             (keep_tokens, replacements, hints, fully_transfered)
         end;
@@ -65,6 +66,21 @@ struct
     val _ = PolyML.line_length 1000000;
 
     exception NotFullyTransfered;
+
+    fun prove_instance instance = 
+        let val _ = PolyML.print instance;
+            val printer_config = (ref [], ref [], ref [], ref 0)
+            val _ = PolyML.print instance;
+            val _ = Path.reset_time ()
+            val _ = case GeometryProver.can_build instance of
+                NONE => (PolyML.print "REFUTED"; ())
+                | SOME(x,[]) => (PolyML.print x; PolyML.print "PROVEN!!!!"; ())
+                | SOME(x,c) => (PolyML.print x; PolyML.print c; PolyML.print "POSSIBLE"; ())
+            val _ = PolyML.print "----------------------------------------------------------------";
+        in
+            ()
+        end
+        handle Path.Timeout => (PolyML.print "TIMEOUT"; PolyML.print "----------------------------------------------------------------"; ());
 
     fun postprocess_state lim2 state = 
         let val result_construction : Construction.construction = 
@@ -75,21 +91,6 @@ struct
             val _ = PolyML.print fully_transfered;
             val _ = if not fully_transfered then raise NotFullyTransfered else ();
             val instantiated = Instantiation.instantiate keep_tokens replacements result_construction;
-            val _ = PolyML.print "Made it here!";
-            fun prove_instance instance = 
-                let val _ = PolyML.print instance;
-                    val printer_config = (ref [], ref [], ref [], ref 0)
-                    val _ = PolyML.print instance;
-                    val _ = Path.reset_time ()
-                    val _ = case GeometryProver.can_build instance of
-                        NONE => (PolyML.print "REFUTED"; ())
-                      | SOME(x,[]) => (PolyML.print x; PolyML.print "PROVEN!!!!"; ())
-                      | SOME(x,c) => (PolyML.print x; PolyML.print c; PolyML.print "POSSIBLE"; ())
-                    val _ = PolyML.print "----------------------------------------------------------------";
-                in
-                    ()
-                end
-                handle Path.Timeout => (PolyML.print "TIMEOUT"; PolyML.print "----------------------------------------------------------------"; ());
             val _ = if fully_transfered then (Seq.chop lim2 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
             val _ = if fully_transfered then (PolyML.print "================================================================"; ()) else ();
             val points_map = "";
@@ -97,5 +98,64 @@ struct
         end handle NotFullyTransfered => ();
 
     fun postprocess states limit lim2 = (PolyML.print (Seq.chop limit (Seq.map (postprocess_state lim2) states)); ());
+    
+    (*TODO!! FIX INSTANTIATION BREAKING IDENTIFICATION!!!*)
+
+    fun test () = 
+    let val p1 = ref NONE;
+        val p2 = ref NONE;
+        val p4 = ref NONE;
+        val p10 = ref NONE;
+    in
+        prove_instance (
+            Geometry.RectCon (
+                Geometry.ResolveRect (
+                    Geometry.Pythag (
+                        Geometry.ResolveLine (
+                            Geometry.Cosine(
+                                Geometry.RootLine(
+                                    p1, p2
+                                ),
+                                Geometry.RootAngle(
+                                    p2, p1, p4
+                                )
+                            ),
+                            Geometry.Cosine(
+                                Geometry.RootLine(
+                                    p1,p2
+                                ),
+                                Geometry.RootAngle(
+                                    p2, p1, p4
+                                )
+                            )
+                        ),
+                        Geometry.ResolveLine (
+                            Geometry.Sine(
+                                Geometry.RootLine(
+                                    p1, p2
+                                ),
+                                Geometry.RootAngle(
+                                    p2, p1, p4
+                                )
+                            ),
+                            Geometry.Sine(
+                                Geometry.RootLine(
+                                    p1,p2
+                                ),
+                                Geometry.RootAngle(
+                                    p2, p1, p4
+                                )
+                            )
+                        )
+                    ),
+                    Geometry.MKRect(
+                        Geometry.RootLine(p1,p2),
+                        Geometry.RootLine(p1,p10)
+                    )
+                )
+            )
+        )
+    end
+
 
 end

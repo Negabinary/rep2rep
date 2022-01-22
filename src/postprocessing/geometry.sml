@@ -51,7 +51,8 @@ struct
                       | JoinRect of rect_con * rect_con
                       | SubRect of rect_con * rect_con
                       | NextRect of rect_con
-                      | MoveRect of rect_con * line_con;
+                      | MoveRect of rect_con * line_con
+                      | Pythag of line_con * line_con;
     
     fun map_deep_state_p (f as (fp,_,_)) p = case !p of
             NONE => fp p
@@ -98,7 +99,8 @@ struct
       | map_points_r f (JoinRect (x,y)) = JoinRect (map_points_r f x, map_points_r f y)
       | map_points_r f (SubRect (x,y)) = SubRect (map_points_r f x, map_points_r f y)
       | map_points_r f (NextRect (x)) = NextRect (map_points_r f x)
-      | map_points_r f (MoveRect (x,y)) = MoveRect (map_points_r f x, map_points_l f y);
+      | map_points_r f (MoveRect (x,y)) = MoveRect (map_points_r f x, map_points_l f y)
+      | map_points_r f (Pythag (x,y)) = Pythag (map_points_l f x, map_points_l f y);
     
     datatype construction = LineCon of line_con | AngleCon of angle_con | RectCon of rect_con;
 
@@ -249,6 +251,7 @@ struct
       | get_rect_start (SubRect(a, b)) = get_rect_start a
       | get_rect_start (NextRect(a)) = get_rect_end a
       | get_rect_start (MoveRect(a,b)) = (ref o SOME o Move) (get_rect_start a, dirof b, disof b)
+      | get_rect_start (Pythag(a,b)) = get_line_start a
     
     and get_rect_end (RootRect(a, b, c)) = b
       | get_rect_end (ResolveRect(a, b)) = get_rect_end a
@@ -257,6 +260,7 @@ struct
       | get_rect_end (SubRect(a, b)) = get_rect_start b
       | get_rect_end (NextRect(a)) = (ref o SOME o Move) (get_rect_end a, (ref o SOME o Right o ref o SOME o Direction) (get_rect_start a, get_rect_end a), get_rect_width a)
       | get_rect_end (MoveRect(a,b)) = (ref o SOME o Move) (get_rect_end a, dirof b, disof b)
+      | get_rect_end (Pythag(a,b)) = get_line_end b
     
     and get_rect_width (RootRect(a, b, c)) = c
       | get_rect_width (ResolveRect(a, b)) = get_rect_width a
@@ -269,7 +273,8 @@ struct
       | get_rect_width (JoinRect(a, b)) = get_rect_width a
       | get_rect_width (SubRect(a, b)) = get_rect_width a
       | get_rect_width (NextRect(a)) = (ref o SOME o Distance) (get_rect_start a, get_rect_end a)
-      | get_rect_width (MoveRect(a, b)) = get_rect_width a;
+      | get_rect_width (MoveRect(a, b)) = get_rect_width a
+      | get_rect_width (Pythag(a,b)) = (ref o SOME o Distance) (get_line_start a, get_line_end b);
 
     datatype constraint = PC of point_con option ref * point_con option ref
                         | DC of direction_con option ref * direction_con option ref
@@ -464,6 +469,14 @@ struct
                 [
                     PC(get_rect_start a, get_line_start l)
                 ], []
+            )
+      | Pythag(l1,l2) => mc
+            (mc (get_line_constraints l1) (get_line_constraints l2))
+            (
+                [
+                    PC(get_line_end l1, get_line_start l2),
+                    DC(dirof l2, (ref o SOME o Right) (dirof l1))
+                ], []
             );
     
     fun get_constraints object = case object of
@@ -628,7 +641,8 @@ struct
       | print_rect (JoinRect(a,b)) z = "JoinRect(" ^ (print_rect a z) ^ ", " ^ (print_rect b z) ^ ")"
       | print_rect (SubRect(a,b)) z = "SubRect(" ^ (print_rect a z) ^ ", " ^ (print_rect b z) ^ ")"
       | print_rect (NextRect(r)) z = "NextRect(" ^ (print_rect r z) ^ ")"
-      | print_rect (MoveRect(r, l)) z = "MoveRect(" ^ (print_rect r z) ^ "," ^ (print_line l z) ^ ")";
+      | print_rect (MoveRect(r, l)) z = "MoveRect(" ^ (print_rect r z) ^ "," ^ (print_line l z) ^ ")"
+      | print_rect (Pythag(a,b)) z = "Pythag(" ^ (print_line a z) ^ ", " ^ (print_line b z) ^ ")";
     
     fun print_construction (LineCon x) z = print_line x z
       | print_construction (AngleCon x) z = print_angle x z

@@ -35,4 +35,6 @@ conSpec geometryG:geometry =
     oppositeangle : [angle] -> angle,
 
     nextRect : [rect] -> rect,
-    moveRect : [rect, line] -> rect
+    moveRect : [rect, line] -> rect,
+
+    pythag : [line,line] -> rect

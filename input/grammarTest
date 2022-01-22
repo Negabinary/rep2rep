@@ -28,7 +28,7 @@ comment
 comment 0-1-0
 
 input multiplicationCommutes:equationM = A * B = B * A
-transfer
+comment
      sourceConstruction multiplicationCommutes
      targetTypeSystem geometry
      goal ([t25:t26:equality],[t':value]) :: repeq
@@ -55,7 +55,30 @@ comment
     output test2
     limit 100
     postprocess 25000
-comment 1-0-0
+comment 0-0-0
+
+input trivial:equationM = A + B = C
+comment
+     sourceConstruction trivial
+     targetTypeSystem geometry
+     goal ([t124:t125:equality],[t':value]) :: repeq
+     output test2
+     limit 100
+     postprocess 25000
+comment 0-0-0
+
+input trigonometry:equationM = sin A * sin A + cos A * cos A = 1 * 1
+transfer
+     sourceConstruction trigonometry
+     targetTypeSystem geometry
+     goal ([t135:t136:equality],[t':value]) :: repeq
+     output test2
+     limit 2000
+     postprocess 2
+comment
+
+
+comment =================================================================
 
 input tanIdentity:equationM = sin A / cos A  = tan A
 comment
