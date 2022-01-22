@@ -483,49 +483,6 @@ struct
         LineCon(x) => get_line_constraints(x)
       | AngleCon(x) => get_angle_constraints(x)
       | RectCon(x) => get_rect_constraints(x);
-
-    (*
-    (*sufficient but not necessary*)
-    fun same_point (p1, p2) = case (!p1, !p2) of
-        (NONE, NONE) => p1 = p2
-      | (SOME(Move(x1,y1,z1)),SOME(Move(x2,y2,z2))) => 
-            same_point (x1,x2) andalso same_direction (y1,y2) andalso same_distance (z1,z2)
-      | (SOME(PCopy(x1)), _) =>
-            same_point (x1, p2)
-      | (_, SOME(PCopy(x2))) =>
-            same_point (p1, x2)
-      | _ => false
-    and same_direction (d1, d2) = case (!d1, !d2) of
-        (NONE, NONE) => d1 = d2
-      | (SOME(DCopy(x1)), _) =>
-            same_direction (x1,d2)
-      | (_, SOME(DCopy(x2))) =>
-            same_direction (d1, x2)
-      | (SOME(Direction(x1,y1)), SOME(Direction(x2,y2))) =>
-            same_point(x1, x2) andalso same_point (y1, y2)
-      | (SOME(RDir(x,y)),SOME(RDir(x1,y2))) =>
-            y = y2 andalso same_direction (x,x1)
-      | (SOME(Right(x)),SOME(Right(y))) =>
-            same_direction (x,y)
-      | _ => false
-    and same_distance (s1, s2) = case (!s1, !s2) of
-        (NONE, NONE) => s1 = s2
-      | (SOME(SCopy(x1)), _) =>
-            same_distance (x1,s2)
-      | (_,SOME(SCopy(x))) =>
-            same_distance (s1, x)
-      | (SOME(Distance(x1,y1)),SOME(Distance(x2,y2))) =>
-            same_point (x1,x2) andalso same_point (y1,y2)
-      | (SOME(Times(x1,y1)),SOME(Times(x2,y2))) =>
-            same_distance (x1,x2) andalso same_distance (y1,y2)
-      | (SOME(Divide(x1,y1)),SOME(Divide(x2,y2))) =>
-            same_distance (x1,x2) andalso same_distance (y1,y2)
-      | (SOME(Value(x)),SOME(Value(y))) =>
-            x = y
-      | _ => false;
-
-    val (sp, sd, ss) = (same_point, same_direction, same_distance);
-    *)
     
 
     fun point_contains_check check const = case !const of
