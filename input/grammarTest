@@ -28,7 +28,7 @@ comment
 comment 0-1-0
 
 input multiplicationCommutes:equationM = A * B = B * A
-comment
+transfer
      sourceConstruction multiplicationCommutes
      targetTypeSystem geometry
      goal ([t25:t26:equality],[t':value]) :: repeq
@@ -67,14 +67,14 @@ comment
      postprocess 25000
 comment 0-0-0
 
-input trigonometry:equationM = sin A * sin A + cos A * cos A = 1 * 1
-transfer
+input trigonometry:equationM = cos A * cos A + sin A * sin A = 1 * 1
+comment
      sourceConstruction trigonometry
      targetTypeSystem geometry
      goal ([t135:t136:equality],[t':value]) :: repeq
      output test2
      limit 2000
-     postprocess 2
+     postprocess 2000
 comment
 
 
