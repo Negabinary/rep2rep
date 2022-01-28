@@ -1,0 +1,106 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://Drawer.gd" type="Script" id=2]
+[ext_resource path="res://Parameters.gd" type="Script" id=3]
+
+[node name="ColorRect" type="ColorRect"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.0509804, 0.0745098, 0.129412, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSplitContainer" type="VSplitContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextEdit" type="LineEdit" parent="VSplitContainer"]
+margin_right = 1004.0
+margin_bottom = 24.0
+
+[node name="Control" type="ColorRect" parent="VSplitContainer"]
+margin_top = 36.0
+margin_right = 1004.0
+margin_bottom = 580.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.97
+color = Color( 0.0509804, 0.0745098, 0.129412, 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HSplitContainer" type="HSplitContainer" parent="VSplitContainer/Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="VSplitContainer/Control/HSplitContainer"]
+margin_right = 194.0
+margin_bottom = 544.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color( 0.552941, 0.537255, 0.65098, 1 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VSplitContainer/Control/HSplitContainer/ColorRect"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Variables" type="VBoxContainer" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
+margin_right = 174.0
+script = ExtResource( 3 )
+
+[node name="HSeparator" type="HSeparator" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
+margin_top = 4.0
+margin_right = 174.0
+margin_bottom = 8.0
+
+[node name="Control" type="Control" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
+margin_top = 12.0
+margin_right = 174.0
+margin_bottom = 520.0
+size_flags_vertical = 3
+
+[node name="Parameters" type="VBoxContainer" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
+margin_top = 524.0
+margin_right = 174.0
+margin_bottom = 524.0
+script = ExtResource( 3 )
+
+[node name="ColorRect2" type="ColorRect" parent="VSplitContainer/Control/HSplitContainer"]
+margin_left = 206.0
+margin_right = 1004.0
+margin_bottom = 544.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+
+[node name="Drawer" type="Control" parent="VSplitContainer/Control/HSplitContainer/ColorRect2"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 5
+size_flags_vertical = 5
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="text_entered" from="VSplitContainer/TextEdit" to="VSplitContainer/Control" method="_on_TextEdit_text_entered"]

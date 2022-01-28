@@ -15,7 +15,10 @@ struct
     exception PostProcessingException of string;
     exception UnresolvableGeometryTypes;
 
-    fun variable_name_of token = Type.nameOfType (CSpace.typeOfToken token);
+    fun variable_name_of token = case Type.nameOfType (CSpace.typeOfToken token) of
+        "ninety" => "9"
+      | "one" => "1"
+      | x => x;
 
     structure StringKeys = 
     struct
@@ -41,6 +44,7 @@ struct
                   | ([x],[y],"area") => (add_identification (variable_name_of x) "area" y; (hints, repeq))
                   | ([x],[y],"angle") => (add_identification (variable_name_of x) "angle" y; (hints, repeq))
                   | ([],[y],"unitlength") => (add_identification "1" "length" y; (hints, repeq))
+                  | ([],[y],"ninety") => (add_identification "9" "angle" y; (hints, repeq))
                   | (_,_,"repeq") => (hints, true)
                   | (_,_,r) => raise PostProcessingException ("Unexpected relation '" ^ r ^ "'' in structure transfer result");
             val (hints, repeq) = List.foldr iteration ([], false) relations;

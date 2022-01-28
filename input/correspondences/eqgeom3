@@ -141,10 +141,10 @@ correspondence angleSubtraction:(equationG,geometryG) =
     constructRel ([t:expr],[a:angle]) :: angle
     strength 1.0
 
-correspondence ninetyangle:(equationG,geometryG) =
+comment ninetyangle:(equationG,geometryG) =
     source t:ninety
     target a:angle
-    tokenRels ([],[a:angle]) :: perpendicular
+    tokenRels ([],[a:angle]) :: ninety
     constructRel ([t:ninety],[a:angle]) :: angle
     strength 1.0
 
