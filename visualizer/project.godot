@@ -1,0 +1,157 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Control",
+"class": "Angle",
+"language": "GDScript",
+"path": "res://geometry/angle/angle.gd"
+}, {
+"base": "Direction",
+"class": "DBetween",
+"language": "GDScript",
+"path": "res://geometry/direction/between.gd"
+}, {
+"base": "Direction",
+"class": "DValue",
+"language": "GDScript",
+"path": "res://geometry/direction/dvalue.gd"
+}, {
+"base": "Object",
+"class": "Direction",
+"language": "GDScript",
+"path": "res://geometry/direction/direction.gd"
+}, {
+"base": "Object",
+"class": "Distance",
+"language": "GDScript",
+"path": "res://geometry/distance/distance.gd"
+}, {
+"base": "Distance",
+"class": "Divide",
+"language": "GDScript",
+"path": "res://geometry/distance/times.gd"
+}, {
+"base": "Distance",
+"class": "Dot",
+"language": "GDScript",
+"path": "res://geometry/distance/dot.gd"
+}, {
+"base": "Control",
+"class": "Drawer",
+"language": "GDScript",
+"path": "res://Drawer.gd"
+}, {
+"base": "Control",
+"class": "Line",
+"language": "GDScript",
+"path": "res://geometry/line/line.gd"
+}, {
+"base": "Point",
+"class": "MovablePoint",
+"language": "GDScript",
+"path": "res://geometry/point/movable_point.gd"
+}, {
+"base": "Point",
+"class": "Move",
+"language": "GDScript",
+"path": "res://geometry/point/move.gd"
+}, {
+"base": "Control",
+"class": "Point",
+"language": "GDScript",
+"path": "res://geometry/point/point.gd"
+}, {
+"base": "Direction",
+"class": "RDir",
+"language": "GDScript",
+"path": "res://geometry/direction/rdir.gd"
+}, {
+"base": "Control",
+"class": "Rect",
+"language": "GDScript",
+"path": "res://geometry/rect/rect.gd"
+}, {
+"base": "Direction",
+"class": "Right",
+"language": "GDScript",
+"path": "res://geometry/direction/right.gd"
+}, {
+"base": "Distance",
+"class": "SBetween",
+"language": "GDScript",
+"path": "res://geometry/distance/sbetween.gd"
+}, {
+"base": "Distance",
+"class": "SValue",
+"language": "GDScript",
+"path": "res://geometry/distance/value.gd"
+}, {
+"base": "Distance",
+"class": "Times",
+"language": "GDScript",
+"path": "res://geometry/distance/divide.gd"
+}, {
+"base": "Object",
+"class": "Value",
+"language": "GDScript",
+"path": "res://geometry/value/value.gd"
+} ]
+_global_script_class_icons={
+"Angle": "",
+"DBetween": "",
+"DValue": "",
+"Direction": "",
+"Distance": "",
+"Divide": "",
+"Dot": "",
+"Drawer": "",
+"Line": "",
+"MovablePoint": "",
+"Move": "",
+"Point": "",
+"RDir": "",
+"Rect": "",
+"Right": "",
+"SBetween": "",
+"SValue": "",
+"Times": "",
+"Value": ""
+}
+
+[application]
+
+config/name="Visualizer"
+run/main_scene="res://Main.tscn"
+config/icon="res://icon.png"
+
+[input]
+
+left={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+right={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":2,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+quality/driver/driver_name="GLES2"
+vram_compression/import_etc=true
+vram_compression/import_etc2=false
+environment/default_environment="res://default_env.tres"
