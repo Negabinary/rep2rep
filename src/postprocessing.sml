@@ -6,7 +6,10 @@ import "postprocessing.geometry_prover";
 signature POSTPROCESING = 
 sig 
     val postprocess : State.T Seq.seq -> int -> int -> unit;
-    val postprocess_state : int -> State.T -> unit;
+    (*val postprocess_state : int -> State.T -> unit;
+    val generate_isomorphic : int -> Construction.construction -> Geometry.construction Seq.seq;*)
+    val is_fully_transfered : State.T -> bool;
+    val get_diagrams : State.T -> GeometryProver.proof_answer Seq.seq;
     val test : unit -> unit;
 end
 
@@ -73,8 +76,6 @@ struct
 
     fun prove_instance instance = 
         let val _ = PolyML.print instance;
-            val printer_config = (ref [], ref [], ref [], ref 0)
-            val _ = PolyML.print instance;
             val _ = Path.reset_time ()
             val _ = case GeometryProver.can_build instance of
                 NONE => (PolyML.print "REFUTED"; ())
@@ -87,7 +88,8 @@ struct
         handle Path.Timeout => (PolyML.print "TIMEOUT"; PolyML.print "----------------------------------------------------------------"; ());
 
     fun postprocess_state lim2 state = 
-        let val result_construction : Construction.construction = 
+        let (*val _ = PolyML.print state;*)
+            val result_construction : Construction.construction = 
                 case Composition.resultingConstructions (State.patternCompOf state) of 
                     [x] => x 
                     | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
@@ -95,13 +97,27 @@ struct
             val _ = PolyML.print fully_transfered;
             val _ = if not fully_transfered then raise NotFullyTransfered else ();
             val instantiated = Instantiation.instantiate keep_tokens replacements result_construction;
-            val _ = if fully_transfered then (Seq.chop lim2 (Seq.map (fn x => (prove_instance x)) instantiated) ; ()) else () ;
-            val _ = if fully_transfered then (PolyML.print "================================================================"; ()) else ();
+            val _ = (Seq.chop lim2 (Seq.map (fn x => (prove_instance x)) instantiated) ; ());
+            val _ = (PolyML.print "================================================================"; ());
             val points_map = "";
         in ()
         end handle NotFullyTransfered => ();
 
     fun postprocess states limit lim2 = (PolyML.print (Seq.chop limit (Seq.map (postprocess_state lim2) states)); ());
+
+    fun is_fully_transfered state = #4 (parse_relations (State.goalsOf state));
+
+    fun get_diagrams state = 
+        let val result_construction : Construction.construction = 
+                case Composition.resultingConstructions (State.patternCompOf state) of 
+                    [x] => x 
+                    | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
+            val (keep_tokens, replacements, hints, fully_transfered) = parse_relations (State.goalsOf state);
+            val _ = if not fully_transfered then raise NotFullyTransfered else ();
+            val instantiated = Instantiation.instantiate keep_tokens replacements result_construction;
+            val proof_answers = Seq.map GeometryProver.attempt_proof instantiated;
+        in proof_answers
+        end
     
     (*TODO!! FIX INSTANTIATION BREAKING IDENTIFICATION!!!*)
 

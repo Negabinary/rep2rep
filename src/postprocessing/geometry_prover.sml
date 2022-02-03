@@ -6,6 +6,10 @@ sig
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
     val can_build : Geometry.construction -> (Geometry.construction * Geometry.pos_neg_constraint list list list) option;
+
+    datatype proof_answer = Proven of Geometry.construction | Refuted | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list | Timeout;
+
+    val attempt_proof : Geometry.construction -> proof_answer;
 end
 
 structure GeometryProver : GEOMETRY_PROVER = 
@@ -173,5 +177,20 @@ struct
         end
         handle
             Falsifiable => NONE;
+    
+    datatype proof_answer = Proven of Geometry.construction | Refuted | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list | Timeout;
+    
+    fun attempt_proof construction = 
+        let val _ = Path.reset_time ();
+            val state = resolve_cdc (state_from_construction construction) 20;
+            val open_constraints = (#constraints state) @ List.map (fn x => [[X(x)]]) (#unknowables state) @ List.map (fn x => [[N(x)]]) (List.filter (fn x => not (Path.does_not_hold x)) (#falsifiers state));
+        in
+            if open_constraints = [] then
+                Proven(#root state)
+            else
+                Possible(#root state, open_constraints)
+        end
+        handle Path.Timeout => Timeout
+             | Falsifiable => Refuted;
 
 end

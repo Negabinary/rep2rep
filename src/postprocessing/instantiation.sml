@@ -188,10 +188,13 @@ struct
             val lhseq = mkseq keep_tokens replacements true lhs;
             val rhseq = mkseq keep_tokens replacements true rhs;
             val rhisos = sequence_for (Construction.constructOf rhs);
-            val replace_map_point = ref [];
-            val replace_map_distance = ref [];
-            fun get_replacement_for replace_map x = case List.find (fn (x1,_) => x = x1) (!replace_map) of (SOME (_,y)) => y | NONE => (let val n = ref NONE; val _ = (replace_map := (x, n) :: !replace_map); in n end);
-            val replace_all = Geometry.map_points (get_replacement_for replace_map_point, get_replacement_for replace_map_distance);
+            fun replace_all geom = 
+                let val replace_map_point = ref [];
+                    val replace_map_distance = ref [];
+                    fun get_replacement_for replace_map x = case List.find (fn (x1,_) => x = x1) (!replace_map) of (SOME (_,y)) => y | NONE => (let val n = ref NONE; val _ = (replace_map := (x, n) :: !replace_map); in n end);
+                in
+                  Geometry.map_points (get_replacement_for replace_map_point, get_replacement_for replace_map_distance) geom
+                end;
       in
         Seq.map ((replace_all) o (fn [rh,rt,l] => Geometry.resolve (iso_to_geom_hack l) (apply_iso rh (iso_to_geom_hack rt)) | _ => raise InstantiationException "Error")) (multiply_sequences [rhisos, Seq.map geom_to_iso_hack rhseq, Seq.map geom_to_iso_hack lhseq])
       end

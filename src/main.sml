@@ -4,6 +4,7 @@ use "src/util/rep2replib.sml";
 import "util.logging";
 import "latex.latex";
 import "oruga.document";
+import "evaluation.evaluation";
 
 (* To see a full trace of the algorithm, we enable logging.
    If this seems too 'noisy', you can use `Logging.disable ()`.
