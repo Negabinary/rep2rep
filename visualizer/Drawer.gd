@@ -187,6 +187,16 @@ func generate(tree:Dictionary):
 			add_child(other_line)
 			add_child(line)
 			return line
+		"Pythag":
+			var l1 = generate(tree.children[0])
+			var l2 = generate(tree.children[1])
+			var sq = Rect.new(
+				l1.get_line_start(),
+				l2.get_line_end(),
+				SBetween.new(l1.get_line_start(), l2.get_line_end())
+			)
+			add_child(sq)
+			return sq
 		"Tangent":
 			var one = generate(tree.children[0])
 			var angle = generate(tree.children[1])
