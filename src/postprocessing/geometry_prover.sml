@@ -138,7 +138,7 @@ struct
       | resolve_disjunction falsifiers xs = check_if_disjunction_proven falsifiers xs;
 
     fun resolve_cdc st n = 
-        let val constraints = #constraints st;
+        let val constraints = (if debug then PolyML.print else (fn x => x)) (#constraints st);
             val falsifiers = #falsifiers st;
             val unknowables = #unknowables st;
             fun shorten_point point = 

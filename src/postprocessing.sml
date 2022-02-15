@@ -10,7 +10,7 @@ sig
     val generate_isomorphic : int -> Construction.construction -> Geometry.construction Seq.seq;*)
     val is_fully_transfered : State.T -> bool;
     val get_diagrams : State.T -> GeometryProver.proof_answer Seq.seq;
-    val test : unit -> unit;
+    val angel_5 : unit -> unit;
 end
 
 structure Postprocessing : POSTPROCESING = 
@@ -121,11 +121,13 @@ struct
     
     (*TODO!! FIX INSTANTIATION BREAKING IDENTIFICATION!!!*)
 
-    fun test () = 
+    fun angel_5 () = 
     let val p1 = ref NONE;
+        val d1 = ref NONE;
+        val p1e = ref (SOME(Geometry.Move(p1, d1, ref (SOME(Geometry.Value("1"))))));
         val p2 = ref NONE;
-        val p4 = ref NONE;
-        val p10 = ref NONE;
+        val p2f = ref NONE;
+        val p2t = ref (SOME(Geometry.Move(p2, ref (SOME(Geometry.RDir(ref (SOME(Geometry.Direction(p2, p2f))), "A"))), ref NONE)));
     in
         prove_instance (
             Geometry.RectCon (
@@ -134,43 +136,43 @@ struct
                         Geometry.ResolveLine (
                             Geometry.Cosine(
                                 Geometry.RootLine(
-                                    p1, p2
+                                    p1, p1e
                                 ),
                                 Geometry.RootAngle(
-                                    p2, p1, p4
+                                    p2f, p2, p2t
                                 )
                             ),
                             Geometry.Cosine(
                                 Geometry.RootLine(
-                                    p1,p2
+                                    p1,p1e
                                 ),
                                 Geometry.RootAngle(
-                                    p2, p1, p4
+                                    p2f, p2, p2t
                                 )
                             )
                         ),
                         Geometry.ResolveLine (
                             Geometry.Sine(
                                 Geometry.RootLine(
-                                    p1, p2
+                                    p1, p1e
                                 ),
                                 Geometry.RootAngle(
-                                    p2, p1, p4
+                                    p2f, p2, p2t
                                 )
                             ),
                             Geometry.Sine(
                                 Geometry.RootLine(
-                                    p1,p2
+                                    p1, p1e
                                 ),
                                 Geometry.RootAngle(
-                                    p2, p1, p4
+                                    p2f, p2, p2t
                                 )
                             )
                         )
                     ),
                     Geometry.MKRect(
-                        Geometry.RootLine(p1,p2),
-                        Geometry.RootLine(p1,p10)
+                        Geometry.RootLine(p1, p1e),
+                        Geometry.Rotate(Geometry.RootLine(p1, p1e), Geometry.RootAngle(ref NONE, ref NONE, ref NONE))
                     )
                 )
             )

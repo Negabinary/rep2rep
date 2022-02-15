@@ -25,7 +25,7 @@ comment
     goal ([t12:t13:equality],[t':value]) :: repeq
     output test2
     limit 100
-    postprocess 4000
+    postprocess 200
 comment 1-1-0
 
 input multiplicationCommutes:equationM = A * B = B * A
@@ -39,7 +39,7 @@ comment
 comment 1-0-0
 
 input additionAssociates:equationM = open A + B close + C = A + open B + C close
-comment
+transfer
      sourceConstruction additionAssociates
      targetTypeSystem geometry
      goal ([t60:t61:equality],[t':value]) :: repeq
@@ -49,7 +49,7 @@ comment
 comment 1-1-0
 
 input additionDistributes:equationM = open A + B close * C = A * C + B * C
-transfer
+comment
     sourceConstruction additionDistributes
     targetTypeSystem geometry
     goal ([t93:t94:equality],[t':value]) :: repeq
@@ -75,32 +75,19 @@ comment
      goal ([t135:t136:equality],[t':value]) :: repeq
      output test2
      limit 2000
-     postprocess 2000
+     postprocess 20000
 comment
 
-
-comment =================================================================
 
 input cosSin:equationM = sin A = cos open 90 - A close
 comment
     sourceConstruction cosSin
     targetTypeSystem geometry
-    goal ([t115:t116:equality],[t':value]) :: repeq
+    goal ([t157:t158:equality],[t':value]) :: repeq
     output test2
     limit 100
     postprocess 25000
 comment 0-0-0
-
-input trivial:equationM = A + B = C
-comment
-     sourceConstruction trivial
-     targetTypeSystem geometry
-     goal ([t124:t125:equality],[t':value]) :: repeq
-     output test2
-     limit 100
-     postprocess 25000
-comment 0-0-0
-
 
 
 
