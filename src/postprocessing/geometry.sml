@@ -397,9 +397,9 @@ struct
             (mc (get_angle_constraints a) (get_angle_constraints b))
             (
                 [
-                    PC(get_angle_middle a, get_angle_middle b), PC(get_angle_end a, get_angle_end b),
-                    PC(get_angle_start a, get_angle_start b)
-                ], []
+                    PC(get_angle_middle a, get_angle_middle b), 
+                    PC(get_angle_end a, get_angle_end b)
+                ], [PC(get_angle_start a, get_angle_start b)]
             )
       | ReverseAngle(a) => get_angle_constraints a
       | MoveAngle(a,l) => mc
