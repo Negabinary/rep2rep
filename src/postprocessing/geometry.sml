@@ -137,7 +137,7 @@ struct
       | get_line_start (Rotate(l,a)) = get_line_start l
       | get_line_start (Sine(l,a)) = (ref o SOME o Move) (
             get_line_start l, 
-            (ref o SOME o Direction) (get_angle_middle a, get_angle_start a),
+            (ref o SOME o Direction) (get_angle_middle a, get_angle_end a),
             (ref o SOME o Times) (
                 (ref o SOME o Dot) (
                     (ref o SOME o Direction) (get_angle_middle a, get_angle_start a), 
