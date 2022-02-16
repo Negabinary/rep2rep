@@ -233,6 +233,12 @@ func generate(tree:Dictionary):
 			var a = Angle.new(a1.get_angle_start(), a1.get_angle_middle(), a2.get_angle_end())
 			add_child(a)
 			return a
+		"SubAngle":
+			var a1 = generate(tree.children[0])
+			var a2 = generate(tree.children[1])
+			var a = Angle.new(a1.get_angle_start(), a1.get_angle_middle(), a2.get_angle_start())
+			add_child(a)
+			return a
 		"ReverseAngle":
 			var a1 = generate(tree.children[0])
 			var a = Angle.new(a1.get_angle_end(), a1.get_angle_middle(), a1.get_angle_start())
