@@ -454,9 +454,10 @@ struct
     
     fun get_circle_constraints (p as Path(xs)) = 
         let val _ = if p = empty_path then raise Proven [[]] else ();
-            fun set_step_if_free (((0,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
-                if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso x2 = y1) then
-                    try_set_point x1 (path_to_points (Path(other_steps)) y1)
+            fun set_step_if_free (((n,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
+                if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso y1 = x2) then
+                    (try_set_point x1 (path_to_points (turn_path ((4 - n) mod 4) (Path other_steps)) y1);
+                    try_set_point y1 (path_to_points (turn_path ((6 - n) mod 4) (Path other_steps)) x1))
                 else
                     ()
               | set_step_if_free  _ = ();
