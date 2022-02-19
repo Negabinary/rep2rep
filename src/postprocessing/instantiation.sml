@@ -131,7 +131,7 @@ struct
                     let val center = ref NONE;
                         val from = ref NONE;
                         val dir_1 = ref (SOME(Geometry.Direction(center, from)));
-                        val dir_2 = ref (SOME(Geometry.RDir(dir_1, variable)));
+                        val dir_2 = if variable = "9" then ref (SOME(Geometry.Right(dir_1))) else ref (SOME(Geometry.RDir(dir_1, variable)));
                         val p_to = ref (SOME(Geometry.Move(center, dir_2, ref NONE)));
                     in
                         Geometry.AngleCon(Geometry.RootAngle(from, center, p_to))
@@ -140,16 +140,19 @@ struct
             val inputs_geom = List.map (fn (variable, token) => (token, make_input variable token)) keep_tokens;
             fun geom_from_source token = (
                     case List.find (fn (x,y) => x = token) inputs_geom of
-                        SOME((x,y)) => y
+                        SOME((x,y)) => Seq.single y
                       | NONE => (
                             case List.find (fn (t1,t2) => t1 = token) replacements of
-                                  SOME((t1,t2)) => geom_from_source t2
-                                | NONE => Geometry.mk_leaf (CSpace.typeOfToken token)
+                                  SOME((t1,t2)) => Seq.map (fn x => apply_iso x ((Seq.hd o geom_from_source) t2)) (sequence_for token)
+                                | NONE => raise (InstantiationException "Unexpected leaf in construction") (* Geometry.mk_leaf (CSpace.typeOfToken token) *)
                       )
                 );
-            fun mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) _ (Construction.Reference(token)) = raise InstantiationException "Expected input construction to be a tree!"
-              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) true (Construction.Source(token)) = Seq.single (geom_from_source token)
-              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) false (Construction.Source(token)) = Seq.map (fn x => apply_iso x (geom_from_source token)) (sequence_for token)
+            fun mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) _ (Construction.Reference(token)) = 
+                    raise InstantiationException "Expected input construction to be a tree!"
+              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) true (Construction.Source(token)) = 
+                    Seq.single ((Seq.hd o geom_from_source) token)
+              | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) false (Construction.Source(token)) = 
+                    geom_from_source token
               | mkseq (keep_tokens:(string * CSpace.token) list) (replacements:(CSpace.token * CSpace.token) list) skip_iso (Construction.TCPair({token=token, constructor=constructor}, children)) = 
                   let val root_seq = if skip_iso then id_sequence_for token else sequence_for token;
                       val child_seqs = List.map (Seq.map geom_to_iso_hack o mkseq keep_tokens replacements false) children;
@@ -190,10 +193,12 @@ struct
             val rhisos = sequence_for (Construction.constructOf rhs);
             fun replace_all geom = 
                 let val replace_map_point = ref [];
+                    val replace_map_direction = ref [];
                     val replace_map_distance = ref [];
                     fun get_replacement_for replace_map x = case List.find (fn (x1,_) => x = x1) (!replace_map) of (SOME (_,y)) => y | NONE => (let val n = ref NONE; val _ = (replace_map := (x, n) :: !replace_map); in n end);
+                    val replacers = (get_replacement_for replace_map_point, get_replacement_for replace_map_direction, get_replacement_for replace_map_distance);
                 in
-                  Geometry.map_points (get_replacement_for replace_map_point, get_replacement_for replace_map_distance) geom
+                  Geometry.map_points (Geometry.map_leaves_p replacers, Geometry.map_leaves_s replacers) geom
                 end;
       in
         Seq.map ((replace_all) o (fn [rh,rt,l] => Geometry.resolve (iso_to_geom_hack l) (apply_iso rh (iso_to_geom_hack rt)) | _ => raise InstantiationException "Error")) (multiply_sequences [rhisos, Seq.map geom_to_iso_hack rhseq, Seq.map geom_to_iso_hack lhseq])

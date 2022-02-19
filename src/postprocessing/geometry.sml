@@ -73,6 +73,24 @@ struct
           | (SOME(SCopy (s1))) => fs s
           | (SOME(Dot (d1, d2))) => (map_deep_state_d f d1; map_deep_state_d f d2; fs s);
 
+    fun map_leaves_p (f as (fp,_,_)) p = case !p of
+            NONE => fp p
+          | (SOME(Move (p1,d1,s1))) => (ref o SOME) (Move(map_leaves_p f p1, map_leaves_d f d1, map_leaves_s f s1))
+          | (SOME(PCopy (p1))) => (ref o SOME) (PCopy (map_leaves_p f p1))
+    and map_leaves_d (f as (_,fd,_)) d = case !d of
+            NONE => fd d
+          | (SOME(Direction (p1,p2))) => (ref o SOME) (Direction (map_leaves_p f p1, map_leaves_p f p2))
+          | (SOME(RDir (d1,v1))) => (ref o SOME) (RDir (map_leaves_d f d1,v1))
+          | (SOME(Right (d1))) => (ref o SOME) (Right (map_leaves_d f d1))
+          | (SOME(DCopy (d1))) => (ref o SOME) (DCopy (map_leaves_d f d1))
+    and map_leaves_s (f as (_,_,fs)) s = case !s of
+            NONE => fs s
+          | (SOME(Distance (p1,p2))) => (ref o SOME) (Distance (map_leaves_p f p1,map_leaves_p f p2))
+          | (SOME(Times (s1,s2))) => (ref o SOME) (Times (map_leaves_s f s1, map_leaves_s f s2))
+          | (SOME(Divide (s1,s2))) => (ref o SOME) (Divide (map_leaves_s f s1, map_leaves_s f s2))
+          | (SOME(Value (x))) => (ref o SOME) (Value (x))
+          | (SOME(SCopy (s1))) => (ref o SOME) (SCopy (map_leaves_s f s1))
+          | (SOME(Dot (d1, d2))) => (ref o SOME) (Dot (map_leaves_d f d1, map_leaves_d f d2));
     
     fun map_points_l (fp,fs) (RootLine (x,y)) = RootLine(fp x, fp y)
       | map_points_l f (ResolveLine (x,y)) = ResolveLine(map_points_l f x, map_points_l f y)
