@@ -394,10 +394,8 @@ struct
                 (ref o SOME o Geometry.Distance) (start_point, end_point)
             end
       | step_to_distance (d,([SRTermDot(p1,p2)],[])) = 
-            let val sp_1 = ref NONE;
-                val direction_1 = (ref o SOME o Geometry.Direction) (sp_1, path_to_points p1 sp_1);
-                val sp_2 = ref NONE;
-                val direction_2 = (ref o SOME o Geometry.Direction) (sp_2, path_to_points p2 sp_2);
+            let val direction_1 = path_to_direction p1;
+                val direction_2 = path_to_direction p2;
             in
                 (ref o SOME o Geometry.Dot) (direction_1, direction_2)
             end
@@ -408,9 +406,8 @@ struct
       | step_to_distance (d, (xs, ys)) = (ref o SOME o Geometry.Divide) (
             step_to_distance (d, (xs, [])),
             step_to_distance (d, (ys, []))
-        );
-    
-    fun path_to_direction (Path(x)) = (case (singular_direction(Path(x))) of
+        )
+    and path_to_direction (Path(x)) = (case (singular_direction(Path(x))) of
             NONE => let val start = ref NONE; in (ref o SOME o Geometry.Direction) (start, (path_to_points (normalise_distance (Path x)) start)) end
           | SOME(step) => step_to_direction step
     );
