@@ -326,15 +326,15 @@ struct
       | SOME(Geometry.Move(x,y,z)) => let val (start_point, return_path) = point_to_path(x) in (start_point, combine_path (distance_direction_to_path(z,y)) return_path) end
     )
     and distance_direction_to_path (dist, dir) = case !dir of
-        NONE => Path(Multiset.map (fn x => ((0, Multiset.empty, DRUnknown dir), x)) (rep_distances dist))
+        NONE => (Path(Multiset.map (fn x => ((0, Multiset.empty, DRUnknown dir), x)) (rep_distances dist)) handle ZeroPath => Path([]))
       | SOME(Geometry.Direction(x,y)) =>
-            let val path = path_between x y;
+            (let val path = path_between x y;
                 val path_length = distance_of path;
             in
                 case (singular_direction path) of
                 NONE => combine_paths (List.map (fn x => multiply_path (divide_path path path_length) x) (rep_distances dist))
               | SOME(d,_) => combine_paths (List.map (fn x => Path([(d, x)]) ) (rep_distances dist))
-            end
+            end handle ZeroPath => Path([]))
       | SOME(Geometry.Right(x)) => right_path (distance_direction_to_path(dist,x))
       | SOME(Geometry.RDir(x,v)) => rdir_path (distance_direction_to_path(dist,x)) v
       | SOME(Geometry.DCopy(x)) => distance_direction_to_path(dist,x)
@@ -381,7 +381,7 @@ struct
     fun path_to_points (Path([])) start_point = start_point
       | path_to_points (Path(step::steps)) start_point =
             let val end_point = path_to_points (Path(steps)) start_point;
-            in (ref o SOME o Geometry.Move) (end_point, step_to_direction step, step_to_distance step)
+            in (ref o SOME o Geometry.Move) (end_point, step_to_direction step, step_to_distance step) handle ZeroPath => start_point
             end
     and step_to_distance (d,([],[])) = (ref o SOME o Geometry.Divide) ((fn x => (x,x)) (ref NONE)) (*(PolyML.print(d); raise PathError ("unexpected distance"))*)
       | step_to_distance (d,([SRTermBetween(x,y)],[])) = (ref o SOME o Geometry.Distance) (x,y)
@@ -463,7 +463,7 @@ struct
               | set_step_if_free  _ = ();
             val _ = Multiset.pick_map set_step_if_free xs;
             val _ = Multiset.pick_map (fn (y,ys) => if Multiset.all (fn z => same_step_direction y z = NO) ys then raise Refuted else ()) xs;
-            val _ = if is_some (singular_direction p) then raise Refuted else ();
+            val _ = if is_some (singular_direction p) then raise Refuted else () handle ZeroPath => raise Proven [[]];
             val start = ref NONE;
         in
             [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
