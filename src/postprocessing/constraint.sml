@@ -146,6 +146,10 @@ struct
     val debug = false;
 
     datatype tvl = YES | NO | MAYBE;
+
+    fun tvl_not YES = NO
+      | tvl_not MAYBE = MAYBE
+      | tvl_not NO = YES
     
     fun tvl_and NO _ = NO
       | tvl_and _ NO = NO
@@ -164,6 +168,11 @@ struct
       | tvl_xnor _ _ = MAYBE;
     
     fun definite f x y = f x y = YES;
+
+    fun tvl_any [] = NO
+      | tvl_any (NO::l) = tvl_any l
+      | tvl_any (MAYBE::l) = if tvl_any l = YES then YES else MAYBE
+      | tvl_any (YES::l) = YES;
 
     exception ZeroPath;
     exception PathError of string;
@@ -310,6 +319,18 @@ struct
                 (SRTermPath (divide_path p (fnum, fdenom)) :: fnum, fdenom)
             end;
     
+    (*MORE CHECKS*)
+
+    fun perpendicular p1 p2 = tvl_or (same_path_direction (right_path p1) p2) (same_path_direction p1 (right_path p2))
+    fun zero_length_sr_term (SRTermBetween (x, y)) = MAYBE (*Could use falsifiers here but that would get a bit complicated*)
+      | zero_length_sr_term (SRTermUnknown x) = NO
+      | zero_length_sr_term (SRTermValue x) = NO
+      | zero_length_sr_term (SRTermPath p) = zero_length_path p
+      | zero_length_sr_term (SRTermDot (p1, p2)) = tvl_not (perpendicular p1 p2)
+    and zero_length_step (_, (l,_)) = tvl_any (List.map zero_length_sr_term l)
+    and zero_length_path (Path([])) = YES
+      | zero_length_path (Path([x])) = zero_length_step x
+      | zero_length_path (p) = MAYBE;
     
     (*FROM GEOMETRY*)
 
@@ -387,12 +408,7 @@ struct
       | step_to_distance (d,([SRTermBetween(x,y)],[])) = (ref o SOME o Geometry.Distance) (x,y)
       | step_to_distance (d,([SRTermUnknown(z)],[])) = z
       | step_to_distance (d,([SRTermValue(s)],[])) = (ref o SOME o Geometry.Value) s
-      | step_to_distance (d,([SRTermPath(p)],[])) =
-            let val start_point = ref NONE;
-                val end_point = path_to_points p start_point;
-            in
-                (ref o SOME o Geometry.Distance) (start_point, end_point)
-            end
+      | step_to_distance (d,([SRTermPath(p)],[])) = path_to_distance p
       | step_to_distance (d,([SRTermDot(p1,p2)],[])) = 
             let val direction_1 = path_to_direction p1;
                 val direction_2 = path_to_direction p2;
@@ -410,7 +426,13 @@ struct
     and path_to_direction (Path(x)) = (case (singular_direction(Path(x))) of
             NONE => let val start = ref NONE; in (ref o SOME o Geometry.Direction) (start, (path_to_points (normalise_distance (Path x)) start)) end
           | SOME(step) => step_to_direction step
-    );
+    )
+    and path_to_distance p = 
+            let val start_point = ref NONE;
+                val end_point = path_to_points p start_point;
+            in
+                (ref o SOME o Geometry.Distance) (start_point, end_point)
+            end;
 
 
     (*CONSTRAINTS*)
@@ -451,19 +473,42 @@ struct
                     direction := (SOME o Geometry.DCopy) (new_value);
                     raise Proven [[]]
                 );
+    fun try_set_point_and_distance point new_point_value distance new_distance_value = 
+            if Geometry.point_contains_check point new_point_value orelse Geometry.distance_contains_check distance new_distance_value then
+                ()
+            else
+                (
+                    (if debug then PolyML.print else (fn x => x)) ("Set1 >> ", Geometry.PC(point, new_point_value));
+                    (if debug then PolyML.print else (fn x => x)) ("Set2 >> ", Geometry.SC(distance, new_distance_value));
+                    Geometry.af ();
+                    point := (SOME o Geometry.PCopy) (new_point_value);
+                    distance := (SOME o Geometry.SCopy) (new_distance_value);
+                    raise Proven [[]]
+                )
     
     fun get_circle_constraints (p as Path(xs)) = 
-        let val _ = if p = empty_path then raise Proven [[]] else ();
+        let val _ = if zero_length_path p = YES then raise Proven [[]] else ();
+            val _ = if is_some (singular_direction p) andalso zero_length_path p = NO then raise Refuted else () handle ZeroPath => raise Proven [[]];
             fun set_step_if_free (((n,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
                 if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso y1 = x2) then
                     (try_set_point x1 (path_to_points (turn_path ((4 - n) mod 4) (Path other_steps)) y1);
                     try_set_point y1 (path_to_points (turn_path ((6 - n) mod 4) (Path other_steps)) x1))
                 else
                     ()
-              | set_step_if_free  _ = ();
+              | set_step_if_free (((n,[],DRBetween(x1, y1)),([SRTermUnknown(z)],[])), other_steps) =
+                (
+                    try_set_point_and_distance
+                        x1 (* = *) (
+                            (ref o SOME o Geometry.Move) (y1, path_to_direction (turn_path ((4 - n) mod 4) (Path other_steps)), ref NONE)
+                        )
+                        z (* = *) (
+                            path_to_distance (Path other_steps)
+                        )
+                        handle ZeroPath => raise Refuted
+                )
+              | set_step_if_free _ = (); (*TODO: ADD MORE CASES*)
             val _ = Multiset.pick_map set_step_if_free xs;
-            val _ = Multiset.pick_map (fn (y,ys) => if Multiset.all (fn z => same_step_direction y z = NO) ys then raise Refuted else ()) xs;
-            val _ = if is_some (singular_direction p) then raise Refuted else () handle ZeroPath => raise Proven [[]];
+            val _ = Multiset.pick_map (fn (y,ys) => if same_path_direction (Path [y]) (Path ys) = NO andalso (zero_length_step y) = NO then (PolyML.print ""; raise Refuted) else ()) xs;
             val start = ref NONE;
         in
             [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
