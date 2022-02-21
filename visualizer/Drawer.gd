@@ -134,7 +134,6 @@ func generate(tree:Dictionary):
 			return angle
 		"Sine":
 			var one = generate(tree.children[0])
-			one.color = Color(1,0,1,1)
 			var angle = generate(tree.children[1])
 			var dot = Dot.new(
 					DBetween.new(angle.get_angle_middle(), angle.get_angle_start()),
@@ -156,8 +155,6 @@ func generate(tree:Dictionary):
 				one.get_line_start(),
 				middle_point
 			)
-			other_line.color = Color(0,1,1,1)
-			line.color = Color(1,1,0,1)
 			add_child(other_line)
 			add_child(line)
 			return line
