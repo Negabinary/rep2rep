@@ -133,7 +133,7 @@ struct
     MAYBE(c-d-c, falsifiables, unprovables, changed) => means that after resolution the disjunction looks like the c-d-c
     NO => means that a contradiction arose during resolution
     *)
-    fun resolve_disjunction falsifiers [] = raise Falsifiable
+    fun resolve_disjunction falsifiers [] = (if debug then PolyML.print "Falsifiable:: Empty disjunction" else "()"; raise Falsifiable)
       | resolve_disjunction falsifiers [x] = MAYBE(make_conjunction_true falsifiers x)
       | resolve_disjunction falsifiers xs = check_if_disjunction_proven falsifiers xs;
 
@@ -147,9 +147,9 @@ struct
                     (point := (SOME o PCopy) (Path.path_to_points path start); point)
                 else
                     point
-                end handle ZeroPath => raise Falsifiable;
+                end handle ZeroPath => (if debug then PolyML.print "Falsifiable:: ZeroPath in shortening" else "()"; raise Falsifiable);
             fun iter (disj,prev) = case (Geometry.map_points (shorten_point, fn x => x) (#root st); (resolve_disjunction (#2 prev) disj, prev)) of
-                (NO, _) => raise Falsifiable
+                (NO, _) => (if debug then PolyML.print "Falsifiable:: NO" else "()"; raise Falsifiable)
               | (YES, x) => x
               | (MAYBE(cs', fs', us', cd'),(cs, fs, us, cd)) => (cs'@cs, fs'@fs, us'@us, cd' orelse cd)
             val (new_constraints, new_falsifiers, new_unknowables, changed) = 
@@ -168,7 +168,7 @@ struct
             val _ = List.map (fn x => if Path.does_hold x then raise Falsifiable else ()) new_falsifiers;
         in
             if changed then resolve_cdc next_state (n - 1) else next_state
-        end handle Path.ZeroPath => raise Falsifiable;
+        end handle ZeroPath => (if debug then PolyML.print "Falsifiable:: ZeroPath somewhere" else ""; raise Falsifiable);
     
     fun can_build construction = 
         let val state = resolve_cdc (state_from_construction construction) 20;
