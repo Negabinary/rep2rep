@@ -183,7 +183,8 @@ struct
                    | SRTermUnknown of Geometry.distance_con option ref
                    | SRTermValue of string
                    | SRTermPath of path
-                   | SRTermDot of path * path;
+                   | SRTermDot of path * path
+                   | SRTermSDot of int * string Multiset.multiset * string Multiset.multiset;
 
     val empty_path = Path(Multiset.empty)
 
@@ -226,6 +227,7 @@ struct
                 (tvl_xnor
                     (same_path_direction x1 y2)
                     (same_path_direction y1 x2))
+      | same_distance_term (SRTermSDot(a1,b1,c1)) (SRTermSDot(a2,b2,c2)) = if a1 = a1 andalso b1 = b2 andalso c1 = c2 then YES else NO
       | same_distance_term (SRTermValue(v1)) (SRTermValue(v2)) = if v1 = v2 then YES else NO
       | same_distance_term _ _ = MAYBE
     and same_path_distance (Path(steps_1)) (Path(steps_2)) = 
@@ -278,6 +280,11 @@ struct
             SOME((a,b,c),s) else NONE
       | singular_direction (Path([])) = raise ZeroPath;
     
+    fun common_rotation_terms (Path([])) = raise ZeroPath
+      | common_rotation_terms (Path((((nn, vv, dd), ss)::xs))) = Multiset.fold 
+            (fn (((x,y,z),w),(hx,hy)) => (Int.min (x, hx), Multiset.intersect (fn p => fn q => p = q) y hy)) 
+            (nn, vv) 
+            xs;
 
     (*OPERATIONS*)
 
@@ -307,7 +314,10 @@ struct
     fun divide_path (Path(x)) y = Path(Multiset.map (fn (d,s) => (d, divide_distance s y)) x);
     fun right_path (Path(x)) = Path(Multiset.map (fn step => turn_step 1 step) x);
     fun turn_path n (Path(x)) = Path(Multiset.map (fn step => turn_step n step) x);
+    fun unturn_path n p = turn_path (4-n) p;
     fun rdir_path (Path(x)) v = Path(Multiset.map (fn ((x,y,z),s) => ((x, cons v y, z), s)) x);
+    fun unrdir_step vs ((a,b,c),d) = ((a, Multiset.subtract (fn x => fn y => x = y) vs b,c),d)
+    fun unrdir_path (Path xs) vs = Path (Multiset.map (unrdir_step vs) xs);
 
     fun opposite_step_direction step1 = same_step_direction (reverse_step step1);
 
@@ -327,6 +337,7 @@ struct
       | zero_length_sr_term (SRTermValue x) = NO
       | zero_length_sr_term (SRTermPath p) = zero_length_path p
       | zero_length_sr_term (SRTermDot (p1, p2)) = tvl_not (perpendicular p1 p2)
+      | zero_length_sr_term (SRTermSDot (a,b,c)) = if (a mod 2) = 0 orelse b = [] orelse c = [] then NO else YES
     and zero_length_step (_, (l,_)) = tvl_any (List.map zero_length_sr_term l)
     and zero_length_path (Path([])) = YES
       | zero_length_path (Path([x])) = zero_length_step x
@@ -368,10 +379,16 @@ struct
                 combine_path (reverse_path path_a) path_b 
             else 
                 combine_path (combine_path (reverse_path path_a) path_b) (
-                    Path(Multiset.single (
-                        (0, Multiset.empty, DRBetween (start_a,start_b)),
-                        ([SRTermBetween (start_a,start_b)],[])
-                    ))
+                    Path(
+                        Multiset.single (
+                            if Geometry.point_index start_a < Geometry.point_index start_b then 
+                                ((0, Multiset.empty, DRBetween (start_a,start_b)),
+                                ([SRTermBetween (start_a,start_b)],[]))
+                            else
+                                ((2, Multiset.empty, DRBetween (start_a,start_b)),
+                                ([SRTermBetween (start_b,start_a)],[]))
+                        )
+                    )
                 )
         end  
     and rep_distances dist = case !dist of
@@ -393,8 +410,23 @@ struct
             end
       | SOME(Geometry.Value(s)) => [([SRTermValue s],[])]
       | SOME(Geometry.SCopy(x)) => rep_distances x
-      | SOME(Geometry.Dot(x,y)) => [([SRTermDot(distance_direction_to_path (ref NONE, x), distance_direction_to_path (ref NONE, y))],[])]
-    ;
+      | SOME(Geometry.Dot(x,y)) => 
+            let val p1 = distance_direction_to_path (ref NONE, x);
+                val p2 = distance_direction_to_path (ref NONE, y);
+                val (dhcf1r, dhcf1v) = common_rotation_terms p1;
+                val (dhcf2r, dhcf2v) = common_rotation_terms p2;
+                val common_variables = Multiset.intersect (fn x => fn y => x = y) dhcf1v dhcf2v;
+                val rotated_p1 = unturn_path dhcf1r (unrdir_path p1 common_variables);
+                val rotated_p2 = unturn_path dhcf2r (unrdir_path p2 common_variables);
+            in
+                case (singular_direction rotated_p1, singular_direction rotated_p2) of
+                    (SOME((a1,b1,c1),_), SOME((a2,b2,c2),_)) => 
+                        if definite same_step_direction ((0,[],c1),(SRTermUnknown o ref) NONE) ((0,[],c2), (SRTermUnknown o ref) NONE) then 
+                            [([SRTermSDot(a2-a1 mod 4, b2, b1)],[])] 
+                        else 
+                            [([SRTermDot(p1, p2)],[])]
+                    | _ => [([SRTermDot(p1, p2)],[])]
+            end;
 
 
     (*TO GEOMETRY*)
@@ -414,6 +446,15 @@ struct
                 val direction_2 = path_to_direction p2;
             in
                 (ref o SOME o Geometry.Dot) (direction_1, direction_2)
+            end
+      | step_to_distance (d,([SRTermSDot(a,b,c)],[])) = 
+            let fun repeat 0 f x = x
+                  | repeat n f x = f (repeat (n-1) f x);
+                val basic_direction = ref NONE;
+                val direction_from = Multiset.fold (fn (v,g) => (ref o SOME o Geometry.RDir) (g, v)) basic_direction c;
+                val direction_to = Multiset.fold (fn (v,g) => (ref o SOME o Geometry.RDir) (g,v)) (repeat a (ref o SOME o Geometry.Right) basic_direction) b;
+            in
+                (ref o SOME o Geometry.Dot) (direction_from, direction_to)
             end
       | step_to_distance (d, (x::xs,[])) = (ref o SOME o Geometry.Times) (
             step_to_distance (d, ([x],[])),
