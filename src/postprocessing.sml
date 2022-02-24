@@ -106,7 +106,6 @@ struct
                     [x] => x 
                     | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
             val (keep_tokens, replacements, hints, fully_transfered) = parse_relations (State.goalsOf state);
-            val _ = PolyML.print fully_transfered;
             val _ = if not fully_transfered then raise NotFullyTransfered else ();
             val instantiated = Instantiation.instantiate keep_tokens replacements result_construction;
             val _ = (Seq.chop lim2 (Seq.map (fn x => (prove_instance x)) instantiated) ; ());
