@@ -9,6 +9,7 @@ sig
     val cons : 'a -> 'a multiset -> 'a multiset;
     val collide : ('a -> 'a -> bool) -> 'a multiset -> 'a multiset -> 'a multiset;
     val map : ('a -> 'b) -> 'a multiset -> 'b multiset;
+    val flatmap : ('a -> 'b multiset) -> 'a multiset -> 'b multiset;
     val pick : ('a -> bool) -> 'a multiset -> 'a option * 'a multiset;
     val pick_option : ('a -> 'b option) -> 'a multiset -> 'b option * 'a multiset;
     val pick_map : (('a * 'a multiset -> 'b) -> 'a multiset -> 'b multiset);
@@ -35,6 +36,7 @@ struct
     fun append x y = x @ y;
     fun cons x y = x :: y;
     val map = List.map;
+    val flatmap = List.flatmap;
     fun pick p [] = (NONE, [])
       | pick p (x::xs) = 
             if p x then
@@ -280,6 +282,10 @@ struct
             SOME((a,b,c),s) else NONE
       | singular_direction (Path([])) = raise ZeroPath;
     
+    fun singular_direction_anchor (Path([])) = true
+      | singular_direction_anchor (Path(((a,b,c),s)::xs)) = 
+            Multiset.all (fn ((a1,b1,c1),_) => c1 = c) xs;
+    
     fun common_rotation_terms (Path([])) = raise ZeroPath
       | common_rotation_terms (Path((((nn, vv, dd), ss)::xs))) = Multiset.fold 
             (fn (((x,y,z),w),(hx,hy)) => (Int.min (x, hx), Multiset.intersect (fn p => fn q => p = q) y hy)) 
@@ -288,8 +294,7 @@ struct
 
     (*OPERATIONS*)
 
-    fun turn_step n ((x, y, DRBetween(z1,z2)), s) = ((n + x) mod 4) |> (fn x' => if x' > 1 then ((x' - 2, y, DRBetween(z2,z1)), s) else ((x', y, DRBetween(z1,z2)), s))
-      | turn_step n ((x, y, DRUnknown(z)), s) = (((n + x) mod 4, y, DRUnknown(z)), s);
+    fun turn_step n ((x, y, z), s) = (((n + x) mod 4, y, z), s);
     fun reverse_step step = turn_step 2 step;
     fun reverse_path (Path(x)) = Path(Multiset.map reverse_step x);
     fun combine_path (Path(x)) (Path(y)) = 
@@ -314,10 +319,12 @@ struct
     fun divide_path (Path(x)) y = Path(Multiset.map (fn (d,s) => (d, divide_distance s y)) x);
     fun right_path (Path(x)) = Path(Multiset.map (fn step => turn_step 1 step) x);
     fun turn_path n (Path(x)) = Path(Multiset.map (fn step => turn_step n step) x);
-    fun unturn_path n p = turn_path (4-n) p;
+    fun unturn_path n p = turn_path (4-n mod 4) p;
     fun rdir_path (Path(x)) v = Path(Multiset.map (fn ((x,y,z),s) => ((x, cons v y, z), s)) x);
     fun unrdir_step vs ((a,b,c),d) = ((a, Multiset.subtract (fn x => fn y => x = y) vs b,c),d)
     fun unrdir_path (Path xs) vs = Path (Multiset.map (unrdir_step vs) xs);
+    fun flatten (Path []) = Path []
+      | flatten (Path (x::xs)) = raise (PathError "Patherror")
 
     fun opposite_step_direction step1 = same_step_direction (reverse_step step1);
 
@@ -385,7 +392,7 @@ struct
                                 ((0, Multiset.empty, DRBetween (start_a,start_b)),
                                 ([SRTermBetween (start_a,start_b)],[]))
                             else
-                                ((2, Multiset.empty, DRBetween (start_a,start_b)),
+                                ((2, Multiset.empty, DRBetween (start_b,start_a)),
                                 ([SRTermBetween (start_b,start_a)],[]))
                         )
                     )
@@ -414,18 +421,29 @@ struct
             let val p1 = distance_direction_to_path (ref NONE, x);
                 val p2 = distance_direction_to_path (ref NONE, y);
                 val (dhcf1r, dhcf1v) = common_rotation_terms p1;
-                val (dhcf2r, dhcf2v) = common_rotation_terms p2;
+                val (_, dhcf2v) = common_rotation_terms p2;
                 val common_variables = Multiset.intersect (fn x => fn y => x = y) dhcf1v dhcf2v;
                 val rotated_p1 = unturn_path dhcf1r (unrdir_path p1 common_variables);
-                val rotated_p2 = unturn_path dhcf2r (unrdir_path p2 common_variables);
+                val rotated_p2 = unturn_path dhcf1r (unrdir_path p2 common_variables);
             in
                 case (singular_direction rotated_p1, singular_direction rotated_p2) of
                     (SOME((a1,b1,c1),_), SOME((a2,b2,c2),_)) => 
-                        if definite same_step_direction ((0,[],c1),(SRTermUnknown o ref) NONE) ((0,[],c2), (SRTermUnknown o ref) NONE) then 
-                            [([SRTermSDot(a2-a1 mod 4, b2, b1)],[])] 
+                        if definite same_step_direction ((0,[],c1),(SRTermUnknown o ref) NONE) ((0,[],c2), (SRTermUnknown o ref) NONE) then
+                            if a2-a1 mod 4 = 3 then
+                                let val d1 = ref NONE;
+                                in
+                                    [([
+                                        SRTermPath(Path([
+                                            ((0, b1, DRUnknown d1),([],[])),
+                                            ((2, b2, DRUnknown d1),([],[]))
+                                        ]))
+                                    ],[])]
+                                end
+                            else
+                                [([SRTermSDot(a2-a1 mod 4, b2, b1)],[])]
                         else 
-                            [([SRTermDot(p1, p2)],[])]
-                    | _ => [([SRTermDot(p1, p2)],[])]
+                            [([SRTermDot(rotated_p1, rotated_p2)],[])]
+                    | _ => [([SRTermDot(rotated_p1, rotated_p2)],[])]
             end;
 
 
