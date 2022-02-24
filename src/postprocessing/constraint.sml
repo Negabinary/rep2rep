@@ -549,7 +549,7 @@ struct
                 )
               | set_step_if_free _ = (); (*TODO: ADD MORE CASES*)
             val _ = Multiset.pick_map set_step_if_free xs;
-            val _ = Multiset.pick_map (fn (y,ys) => if same_path_direction (Path [y]) (Path ys) = NO andalso (zero_length_step y) = NO then (PolyML.print ""; raise Refuted) else ()) xs;
+            val _ = Multiset.pick_map (fn (y,ys) => if same_path_direction (reverse_path (Path [y])) (Path ys) = NO andalso (zero_length_step y) = NO then (PolyML.print ""; raise Refuted) else ()) xs;
             val start = ref NONE;
         in
             [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
