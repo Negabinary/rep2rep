@@ -77,10 +77,22 @@ struct
     fun prove_instance instance = 
         let val _ = PolyML.print instance;
             val _ = Path.reset_time ()
+            val f = Geometry.create_map ();
+            fun check_numerically [] = true
+              | check_numerically (Geometry.Y(c)::xs) = if Geometry.check_constraint f c then check_numerically xs else false
+              | check_numerically (Geometry.X(c)::xs) = if Geometry.check_constraint f c then check_numerically xs else false
+              | check_numerically (Geometry.N(c)::xs) = if Geometry.check_constraint f c then false else check_numerically xs;
+            fun check_numerically_dc [] = false
+              | check_numerically_dc (x::xs) = if check_numerically x then true else check_numerically_dc xs;
+            fun check_numerically_cdc [] = true
+              | check_numerically_cdc (x::xs) = if check_numerically_dc x then check_numerically_cdc xs else false;
             val _ = case GeometryProver.can_build instance of
                 NONE => (PolyML.print "REFUTED"; ())
                 | SOME(x,[]) => (PolyML.print x; PolyML.print "PROVEN!!!!"; ())
-                | SOME(x,c) => (PolyML.print x; PolyML.print c; PolyML.print "POSSIBLE"; ())
+                | SOME(x,c) => if check_numerically_cdc c then
+                        (PolyML.print x; PolyML.print c; PolyML.print "PROBABLE"; ())
+                    else
+                        (PolyML.print x; PolyML.print c; PolyML.print "POSSIBLE"; ())
             val _ = PolyML.print "----------------------------------------------------------------";
         in
             ()

@@ -637,4 +637,90 @@ struct
           | SOME(x,y) => y
         )
       end
+    
+    val sin = Math.sin;
+    val cos = Math.cos;
+    val atan2 = Math.atan2;
+    fun mag a b = Math.sqrt (a * a + b * b);
+    val pi = Math.pi;
+    fun cadd x = if x < 0.0 then x + pi * 2.0 else x;
+
+    fun hp x y z = case !z of SOME u => x y u | NONE => (y (print_point z printer_config ^ "_x"), y (print_point z printer_config ^ "_y"));
+    fun hd x y z = case !z of SOME u => x y u | NONE => y (print_direction z printer_config);
+    fun hs x y z = case !z of SOME u => x y u | NONE => y (print_distance z printer_config);
+    fun numeric_point f (Move(a,b,c)) = 
+            let val (nax, nay) = hp numeric_point f (a);
+                val nb = hd numeric_direction f (b);
+                val nc = hs numeric_distance f (c);
+            in
+                (nc * cos nb + nax, nc * sin nb + nay)
+            end
+      | numeric_point f (PCopy(p)) = hp numeric_point f (p)
+    and numeric_direction f (Direction(a,b)) =
+            let val (nax, nay) = hp numeric_point f (a)
+                val (nbx, nby) = hp numeric_point f (b)
+            in
+                atan2 (nby - nay, nbx - nax)
+            end
+      | numeric_direction f (RDir(a,v)) = cadd (hd numeric_direction f (a) - (f v))
+      | numeric_direction f (Right(a)) = cadd (hd numeric_direction f (a) - pi / 2.0)
+      | numeric_direction f (DCopy(a)) = hd numeric_direction f (a)
+    and numeric_distance f (Distance(a,b)) = 
+            let val (nax, nay) = hp numeric_point f (a)
+                val (nbx, nby) = hp numeric_point f (b)
+            in
+                mag (nby - nay) (nbx - nax)
+            end
+      | numeric_distance f (Times (a,b)) = hs numeric_distance f (a) * hs numeric_distance f (b)
+      | numeric_distance f (Divide (a,b)) = hs numeric_distance f (a) / hs numeric_distance f (b)
+      | numeric_distance f (Value (v)) = f v
+      | numeric_distance f (SCopy (a)) = hs numeric_distance f (a)
+      | numeric_distance f (Dot (a,b)) = cos (hd numeric_direction f (a) - hd numeric_direction f (b));
+
+    fun create_map () =
+        let val map = ref [];
+            val counter = ref 0.0;
+            fun nextval () = (counter := !counter + 1.0; Math.acos(Real.realMod (10.3421453195583 * cos (2.120351828579879 * !counter + 0.2151231249286498) + 100.0) * 2.0 - 1.0));
+        in
+            (fn v => 
+              case List.find (fn (x,y) => x = v) (!map) of 
+                  SOME (_,z) => z 
+                | NONE => 
+                    let val n = nextval () in 
+                        map := ((v,n)::(!map)) ; n 
+                    end
+            )
+        end
+
+    fun check_constraint map (PC(a,b)) = 
+        let val (x1,y1) = hp numeric_point map a;
+            val (x2,y2) = hp numeric_point map b;
+            val _ = PolyML.print ("PC",(x1,y1),(x2,y2));
+        in
+            Real.abs (x2 - x1) + Real.abs (y2 - y1) < 0.00000001
+        end
+      | check_constraint map (DC(a,b)) = 
+        let val v1 = hd numeric_direction map a;
+            val v2 = hd numeric_direction map b;
+            val _ = PolyML.print ("DC",v1,v2);
+        in
+            Real.abs (v2 - v1) < 0.00000001
+        end
+      | check_constraint map (SC(a,b)) = 
+        let val v1 = hs numeric_distance map a;
+            val v2 = hs numeric_distance map b;
+            val _ = PolyML.print ("SC",v1,v2);
+        in
+            Real.abs (v2 - v1) < 0.00000001
+        end
+
+    (*
+      and distance_con = Distance of point_con option ref * point_con option ref
+                       | Times of distance_con option ref * distance_con option ref
+                       | Divide of distance_con option ref * distance_con option ref
+                       | Value of string
+                       | SCopy of distance_con option ref
+                       | Dot of direction_con option ref * direction_con option ref;
+    
+    *)
 end
