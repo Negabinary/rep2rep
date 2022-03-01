@@ -1,21 +1,5 @@
 import correspondences/eqGeom3
 
-grammar equationM:equationG =
-    equality : [v1:expr, =, v2:expr] -> equality[v1:expr, equals, v2:expr],
-    expr : [v1:expr, +, v2:expr] -> infixOp[v1:expr, plus, v2:expr]
-         | [v1:expr, -, v2:expr] -> infixOp[v1:expr, minus, v2:expr],
-    expr : [v1:expr, *, v2:expr] -> infixOp[v1:expr, times, v2:expr]
-         | [v1:expr, /, v2:expr] -> infixOp[v1:expr, divide, v2:expr],
-    expr : [sin, v1:expr] -> app[sin, v1:expr]
-         | [cos, v1:expr] -> app[cos, v1:expr]
-         | [tan, v1:expr] -> app[tan, v1:expr],
-    expr : [open, v1:expr, close] -> brackets[open, v1:expr, close]
-         | [1] -> one
-         | [A] -> A
-         | [B] -> B
-         | [C] -> C
-         | [90] -> ninety
-
 comment rect-line-angle
 
 input additionCommutes:equationM = A + B = B + A
@@ -25,7 +9,7 @@ comment
     goal ([t12:t13:equality],[t':value]) :: repeq
     output test2
     limit 100
-    postprocess 200
+    postprocess 100
 comment 1-1-0
 
 input multiplicationCommutes:equationM = A * B = B * A
@@ -39,17 +23,17 @@ comment
 comment 1-0-0
 
 input additionAssociates:equationM = open A + B close + C = A + open B + C close
-transfer
+comment
      sourceConstruction additionAssociates
      targetTypeSystem geometry
      goal ([t60:t61:equality],[t':value]) :: repeq
      output test2
      limit 100
-     postprocess 5
+     postprocess 100
 comment 1-1-0
 
 input additionDistributes:equationM = open A + B close * C = A * C + B * C
-comment
+transfer
     sourceConstruction additionDistributes
     targetTypeSystem geometry
     goal ([t93:t94:equality],[t':value]) :: repeq

@@ -23,4 +23,19 @@ conSpec equationG:equation =
     equality : [expr, equals, expr] -> equality,
     app : [fun, expr] -> expr,
     brackets : [open, expr, close] -> expr
-    
+
+grammar equationM:equationG =
+    equality : [v1:expr, =, v2:expr] -> equality[v1:expr, equals, v2:expr],
+    expr : [v1:expr, +, v2:expr] -> infixOp[v1:expr, plus, v2:expr]
+         | [v1:expr, -, v2:expr] -> infixOp[v1:expr, minus, v2:expr],
+    expr : [v1:expr, *, v2:expr] -> infixOp[v1:expr, times, v2:expr]
+         | [v1:expr, /, v2:expr] -> infixOp[v1:expr, divide, v2:expr],
+    expr : [sin, v1:expr] -> app[sin, v1:expr]
+         | [cos, v1:expr] -> app[cos, v1:expr]
+         | [tan, v1:expr] -> app[tan, v1:expr],
+    expr : [open, v1:expr, close] -> brackets[open, v1:expr, close]
+         | [1] -> one
+         | [A] -> A
+         | [B] -> B
+         | [C] -> C
+         | [90] -> ninety
