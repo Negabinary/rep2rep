@@ -1,7 +1,7 @@
 import "oruga.parser";
 import "latex.latex";
 import "oruga.grammar";
-import "postprocessing";
+import "postprocessing.postprocessing";
 
 signature DOCUMENT =
 sig
@@ -533,10 +533,18 @@ struct
       val _ = print ("\nApplying structure transfer to "^ #name constructionRecord ^ "...");
       val startTime = Time.now();
       val results = Transfer.masterTransfer iterative unistructured targetPattern KB sourceTypeSystem targetTypeSystem construction goal;
+      fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
       val _ = case getPostprocessing C of
                 NONE => ()
-              | (SOME n) => (Postprocessing.postprocess results limit n);
-      val _ = PolyML.print (getPostprocessing C)
+              | (SOME n) =>  
+                  let val _ = PolyML.print "================================================================";
+                      val full_transfers = Seq.filter (fn x => Postprocessing.is_fully_transfered x handle Postprocessing.UnresolvableGeometryTypes => false) results;
+                      val (ideas, _) = Seq.chop limit full_transfers;
+                      val _ = print (PolyML.makestring (List.length ideas) ^ " full transfers.\n")
+                      val _ = List.map (Postprocessing.postprocess limit pp_output) ideas;
+                  in
+                      ()
+                  end
       val nres = length (Seq.list_of results);
       val (listOfResults,_) = Seq.chop limit results;
       val endTime = Time.now();

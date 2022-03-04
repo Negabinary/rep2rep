@@ -16,12 +16,12 @@ struct
 
     fun evaluate_idea idea = 
         let val _ = print "--------------------------------------------------------------------\n"
-            val (diagrams, _) = Seq.chop limit (Postprocessing.get_diagrams idea);
-            val refuted = count (fn x => x = GeometryProver.Refuted) diagrams;
-            val timeout = count (fn x => x = GeometryProver.Timeout) diagrams;
-            val proven = List.filterOption (List.map (fn x => case x of GeometryProver.Proven x => SOME x | _ => NONE) diagrams);
-            val probable = List.filterOption (List.map (fn x => case x of GeometryProver.Probable x => SOME x | _ => NONE) diagrams);
-            val possible = List.filterOption (List.map (fn x => case x of GeometryProver.Possible x => SOME x | _ => NONE) diagrams);
+            val pp_result = Postprocessing.postprocess_silent limit idea;
+            val refuted = Postprocessing.refuted_count pp_result;
+            val timeout = Postprocessing.timeout_count pp_result;
+            val proven = Postprocessing.proven_results pp_result;
+            val probable = Postprocessing.probable_results pp_result;
+            val possible = Postprocessing.possible_results pp_result;
             val _ = print (
                 "Refuted: " ^ Int.toString refuted 
                 ^ "; Timeout: " ^ Int.toString timeout

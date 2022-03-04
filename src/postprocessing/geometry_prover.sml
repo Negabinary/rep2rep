@@ -13,7 +13,9 @@ sig
                           | Probable of Geometry.construction * Geometry.pos_neg_constraint list list list 
                           | Timeout;
 
-    val attempt_proof : Geometry.construction -> proof_answer;
+    val print_proof_answer : proof_answer -> string;
+
+    val attempt_proof : (proof_answer -> unit) -> Geometry.construction -> proof_answer;
 
     val check_numerically_cdc : Geometry.pos_neg_constraint list list list -> bool;
 end
@@ -197,19 +199,27 @@ struct
     
     datatype proof_answer = Proven of Geometry.construction | Refuted | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list | Probable of Geometry.construction * Geometry.pos_neg_constraint list list list | Timeout;
     
-    fun attempt_proof construction = 
+    fun attempt_proof output construction = 
         let val _ = Path.reset_time ();
             val state = resolve_cdc (state_from_construction construction) 20;
             val open_constraints = (#constraints state) @ List.map (fn x => [[X(x)]]) (#unknowables state) @ List.map (fn x => [[N(x)]]) (List.filter (fn x => not (Path.does_not_hold x)) (#falsifiers state));
+            val result = 
+                if open_constraints = [] then
+                    Proven(#root state)
+                else if check_numerically_cdc (#constraints state) then
+                    Probable(#root state, open_constraints)
+                else
+                    Possible(#root state, open_constraints)
         in
-            if open_constraints = [] then
-                Proven(#root state)
-            else if check_numerically_cdc (#constraints state) then
-                Probable(#root state, open_constraints)
-            else
-                Possible(#root state, open_constraints)
+            (output result; result)
         end
-        handle Path.Timeout => Timeout
-             | Falsifiable => Refuted;
+        handle Path.Timeout => (output Timeout; Timeout)
+             | Falsifiable => (output Refuted; Refuted);
+    
+    fun print_proof_answer Refuted = "REFUTED\n"
+      | print_proof_answer Timeout = "TIMEOUT\n"
+      | print_proof_answer (Proven c) = "PROVEN!!!\n" ^ PolyML.makestring c ^ "\n"
+      | print_proof_answer (Probable (c,d)) = "PROBABLE\n" ^ PolyML.makestring c ^ "\n" ^ (String.concat (List.map (fn x => PolyML.makestring x ^ "\n") d)) ^ "\n"
+      | print_proof_answer (Possible (c,d)) = "POSSIBLE\n" ^ PolyML.makestring c ^ "\n" ^ (String.concat (List.map (fn x => PolyML.makestring x ^ "\n") d)) ^ "\n";
 
 end

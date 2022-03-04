@@ -33,7 +33,7 @@ comment
 comment 1-1-0
 
 input additionDistributes:equationM = open A + B close * C = A * C + B * C
-transfer
+comment
     sourceConstruction additionDistributes
     targetTypeSystem geometry
     goal ([t93:t94:equality],[t':value]) :: repeq
