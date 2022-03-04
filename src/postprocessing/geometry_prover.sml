@@ -7,9 +7,15 @@ sig
 
     val can_build : Geometry.construction -> (Geometry.construction * Geometry.pos_neg_constraint list list list) option;
 
-    datatype proof_answer = Proven of Geometry.construction | Refuted | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list | Timeout;
+    datatype proof_answer = Proven of Geometry.construction 
+                          | Refuted 
+                          | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list 
+                          | Probable of Geometry.construction * Geometry.pos_neg_constraint list list list 
+                          | Timeout;
 
     val attempt_proof : Geometry.construction -> proof_answer;
+
+    val check_numerically_cdc : Geometry.pos_neg_constraint list list list -> bool;
 end
 
 structure GeometryProver : GEOMETRY_PROVER = 
@@ -19,6 +25,17 @@ struct
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
     val debug = false;
+
+    val f = Geometry.create_map ();
+
+    fun check_numerically [] = true
+        | check_numerically (Geometry.Y(c)::xs) = if Geometry.check_constraint f c then check_numerically xs else false
+        | check_numerically (Geometry.X(c)::xs) = if Geometry.check_constraint f c then check_numerically xs else false
+        | check_numerically (Geometry.N(c)::xs) = if Geometry.check_constraint f c then false else check_numerically xs;
+    fun check_numerically_dc [] = false
+        | check_numerically_dc (x::xs) = if check_numerically x then true else check_numerically_dc xs;
+    fun check_numerically_cdc [] = true
+        | check_numerically_cdc (x::xs) = if check_numerically_dc x then check_numerically_cdc xs else false;
 
     type state = {
         falsifiers : constraint list,
@@ -178,7 +195,7 @@ struct
         handle
             Falsifiable => NONE;
     
-    datatype proof_answer = Proven of Geometry.construction | Refuted | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list | Timeout;
+    datatype proof_answer = Proven of Geometry.construction | Refuted | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list | Probable of Geometry.construction * Geometry.pos_neg_constraint list list list | Timeout;
     
     fun attempt_proof construction = 
         let val _ = Path.reset_time ();
@@ -187,6 +204,8 @@ struct
         in
             if open_constraints = [] then
                 Proven(#root state)
+            else if check_numerically_cdc (#constraints state) then
+                Probable(#root state, open_constraints)
             else
                 Possible(#root state, open_constraints)
         end

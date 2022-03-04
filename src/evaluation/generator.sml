@@ -4,6 +4,7 @@ sig
     val check_equality : Construction.construction -> bool;
     val test : unit -> unit;
     val pdf_constructions : unit -> unit;
+    val print_equation : Construction.construction -> string;
 end
 
 structure Generator:GENERATOR =
@@ -14,6 +15,7 @@ struct
     val equation_document = Document.read "equation";
     val equation_type_system = Document.findTypeSystemWithName equation_document "equation";
     val equation_construction_space = Document.findConSpecWithName equation_document "equationG";
+    val equation_grammar = Document.findGrammarWithName equation_document "equationM";
     fun leaf_of_string x = Construction.Source (CSpace.makeToken (unique_name ()) (Type.typeOfString x));
     fun leaves () = Seq.map leaf_of_string (Seq.of_list ["A","B","C","D","E","one","ninety"]);
     fun bin_ops () = Seq.map leaf_of_string (Seq.of_list ["plus","minus","times","divide"]);
@@ -53,6 +55,12 @@ struct
 
     fun deg2rad x = x / 180.0 * Math.pi;
 
+    exception NumericZero;
+    val epsilon = 0.00000001;
+    val big = 1000000000.0
+    fun cz x = if x < epsilon then raise NumericZero else x;
+    fun cb x = if Real.abs x > big then raise NumericZero else x;
+
     fun calculate (a,b,c,d,e) (Construction.Source (_, "A")) = a
       | calculate (a,b,c,d,e) (Construction.Source (_, "B")) = b
       | calculate (a,b,c,d,e) (Construction.Source (_, "C")) = c
@@ -63,27 +71,34 @@ struct
       | calculate v (Construction.TCPair ({constructor=constructor, ...}, c)) = (case (CSpace.nameOfConstructor constructor, c) of
             ("infixOp", [x, Construction.Source y, z]) => (case ((Type.nameOfType o CSpace.typeOfToken) y) of
                 "plus" => calculate v x + calculate v z
-              | "minus" => calculate v x - calculate v z
+              | "minus" => cz (calculate v x - calculate v z)
               | "times" => calculate v x * calculate v z
               | "divide" => calculate v x / calculate v z
               | _ => raise (CalculationException "5"))
           | ("app", [Construction.Source x, y]) => (case ((Type.nameOfType o CSpace.typeOfToken) x) of
-                "sin" => Math.sin (deg2rad (calculate v y))
-              | "cos" => Math.cos (deg2rad (calculate v y))
-              | "tan" => Math.tan (deg2rad (calculate v y))
+                "sin" => cz (Math.sin (deg2rad (calculate v y)))
+              | "cos" => cz (Math.cos (deg2rad (calculate v y)))
+              | "tan" => cb (cz (Math.tan (deg2rad (calculate v y))))
               | _ => raise (CalculationException "4"))
           | ("brackets", [x,y,z]) => calculate v y
           | _ => raise (CalculationException "3"))
       | calculate v _ = raise (CalculationException "2");
     
+    exception EquationPrinterException of string;
+
+    fun join delim string_list = List.foldr (fn (x,y) => x ^ delim ^ y) "" string_list;
+    fun print_equation (Construction.TCPair (_, children)) = "[" ^ join " " (List.map print_equation children) ^ "]"
+      | print_equation (Construction.Source t) = Type.nameOfType (CSpace.typeOfToken t)
+      | print_equation _ = raise (EquationPrinterException "References (non-tree constructions) are not supported.");
+    
     fun same_real (x,y) = Real.abs (1.0 - (x / y)) < 0.00000001;
 
     val test_values = (4.914389147, 8.499798154, 69.78328681, 24.20897737, 23.89088144);
 
-    fun check_equality (Construction.TCPair (_,[x,y,z])) = same_real (calculate test_values x, calculate test_values z)
+    fun check_equality (Construction.TCPair (_,[x,y,z])) = (same_real (calculate test_values x, calculate test_values z) handle NumericZero => false)
       | check_equality _ = raise (CalculationException "1");
     
-    fun test () = (Seq.chop 10000000 (Seq.map (fn x =>(PolyML.print (Construction.toString (x)), PolyML.print(check_equality x))) (equations 3));());
+    fun test () = (Seq.chop 10000000 (Seq.map (fn x =>(PolyML.print (print_equation x), PolyML.print(check_equality x))) (equations 3));());
 
     fun pdf_constructions () = (Seq.chop 10 (Seq.map (print o Latex.construction (0.0,0.0)) (Seq.filter check_equality (equations 3))); ());
 end

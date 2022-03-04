@@ -11,6 +11,7 @@ sig
     val is_fully_transfered : State.T -> bool;
     val get_diagrams : State.T -> GeometryProver.proof_answer Seq.seq;
     val angel_5 : unit -> unit;
+    exception UnresolvableGeometryTypes;
 end
 
 structure Postprocessing : POSTPROCESING = 
@@ -35,7 +36,7 @@ struct
         let val identifications = StringDict.empty ();
             fun add_identification name kind value = 
                 let val (prev_kind, _) = StringDict.update identifications name (fn (k,z) => (k, value :: z));
-                    val _ = if kind <> prev_kind then raise PostProcessingException "Trying to resolve tokens of different type" else ();
+                    val _ = if kind <> prev_kind then (raise UnresolvableGeometryTypes) else ();
                 in ()
                 end
                 handle
@@ -78,18 +79,10 @@ struct
         let val _ = PolyML.print instance;
             val _ = Path.reset_time ()
             val f = Geometry.create_map ();
-            fun check_numerically [] = true
-              | check_numerically (Geometry.Y(c)::xs) = if Geometry.check_constraint f c then check_numerically xs else false
-              | check_numerically (Geometry.X(c)::xs) = if Geometry.check_constraint f c then check_numerically xs else false
-              | check_numerically (Geometry.N(c)::xs) = if Geometry.check_constraint f c then false else check_numerically xs;
-            fun check_numerically_dc [] = false
-              | check_numerically_dc (x::xs) = if check_numerically x then true else check_numerically_dc xs;
-            fun check_numerically_cdc [] = true
-              | check_numerically_cdc (x::xs) = if check_numerically_dc x then check_numerically_cdc xs else false;
             val _ = case GeometryProver.can_build instance of
                 NONE => (PolyML.print "REFUTED"; ())
                 | SOME(x,[]) => (PolyML.print x; PolyML.print "PROVEN!!!!"; ())
-                | SOME(x,c) => if check_numerically_cdc c then
+                | SOME(x,c) => if GeometryProver.check_numerically_cdc c then
                         (PolyML.print x; PolyML.print c; PolyML.print "PROBABLE"; ())
                     else
                         (PolyML.print x; PolyML.print c; PolyML.print "POSSIBLE"; ())

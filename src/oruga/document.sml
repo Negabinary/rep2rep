@@ -18,6 +18,7 @@ sig
   val findConSpecWithName : documentContent -> string -> CSpace.conSpec
   val findConstructionWithName : documentContent -> string -> {name : string, conSpec : string, construction : Construction.construction}
   val findCorrespondenceWithName : documentContent -> string -> Correspondence.corr
+  val findGrammarWithName : documentContent -> string -> Grammar.grammar
 
 end;
 
