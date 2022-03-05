@@ -25,6 +25,11 @@ sig
 
     exception PostProcessingException of string;
     exception UnresolvableGeometryTypes;
+
+    val print_summary : postprocessing_result -> unit;
+    val print_proven : postprocessing_result -> unit;
+    val print_possible : postprocessing_result -> unit;
+    val print_probable : postprocessing_result -> unit;
 end
 
 structure Postprocessing : POSTPROCESING = 
@@ -94,6 +99,16 @@ struct
     exception NotFullyTransfered;
 
     fun is_fully_transfered state = #4 (parse_relations (State.goalsOf state));
+
+    fun minlim_maxlim p 0 0 sequence = []
+      | minlim_maxlim p 0 maxlim sequence = 
+            (case Seq.pull sequence of
+                NONE => []
+              | SOME(x,xq) => if p x then [x] else let val xs = minlim_maxlim p 0 (maxlim - 1) xq; in x::xs end)
+      | minlim_maxlim p minlim maxlim sequence = 
+            (case Seq.pull sequence of
+                NONE => []
+              | SOME(x,xq) => let val xs = minlim_maxlim p (minlim-1) (if p x then 0 else maxlim) xq; in x::xs end);
     
     fun postprocess limit output state = 
         let val result_construction =
@@ -102,8 +117,9 @@ struct
                     | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
             val (keep_tokens, replacements, hints, fully_transfered) = parse_relations (State.goalsOf state);
             val _ = if not fully_transfered then raise NotFullyTransfered else ();
-            val instantiated = #1 (Seq.chop limit (Instantiation.instantiate keep_tokens replacements result_construction));
-            val proof_answers = List.map (GeometryProver.attempt_proof output) instantiated;
+            val instantiated = Instantiation.instantiate keep_tokens replacements result_construction
+            val proof_answer_seq = Seq.map (GeometryProver.attempt_proof output) instantiated;
+            val proof_answers = minlim_maxlim (fn x => case x of (GeometryProver.Proven x) => true | _ => false) limit 600 proof_answer_seq;
         in
             proof_answers
         end
@@ -113,5 +129,24 @@ struct
     fun proven_results diagrams = List.filterOption (List.map (fn x => case x of GeometryProver.Proven x => SOME x | _ => NONE) diagrams);
     fun probable_results diagrams = List.filterOption (List.map (fn x => case x of GeometryProver.Probable x => SOME x | _ => NONE) diagrams);
     fun possible_results diagrams = List.filterOption (List.map (fn x => case x of GeometryProver.Possible x => SOME x | _ => NONE) diagrams);
-
+    fun print_summary diagrams =
+        let val refuted = refuted_count diagrams;
+            val timeout = timeout_count diagrams;
+            val proven = proven_results diagrams;
+            val probable = probable_results diagrams;
+            val possible = possible_results diagrams;
+            val _ = print (
+                "Refuted: " ^ Int.toString refuted 
+                ^ "; Timeout: " ^ Int.toString timeout
+                ^ "; Proven: " ^ Int.toString (List.length proven)
+                ^ "; Probable: " ^ Int.toString (List.length probable)
+                ^ "; Possible: " ^ Int.toString (List.length possible)
+                ^ "\n"
+            )
+        in
+            ()
+        end
+    fun print_proven diagrams = (List.map (fn x => GeometryProver.print_proof_answer (GeometryProver.Proven x)) (proven_results diagrams); ());
+    fun print_probable diagrams = (List.map (fn x => GeometryProver.print_proof_answer (GeometryProver.Probable x)) (probable_results diagrams); ());
+    fun print_possible diagrams = (List.map (fn x => GeometryProver.print_proof_answer (GeometryProver.Possible x)) (possible_results diagrams); ());
 end

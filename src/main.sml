@@ -5,6 +5,7 @@ import "util.logging";
 import "latex.latex";
 import "oruga.document";
 import "evaluation.evaluation";
+import "evaluation.cfs";
 
 (* To see a full trace of the algorithm, we enable logging.
    If this seems too 'noisy', you can use `Logging.disable ()`.

@@ -17,37 +17,12 @@ struct
     fun evaluate_idea idea = 
         let val _ = print "--------------------------------------------------------------------\n"
             val pp_result = Postprocessing.postprocess_silent limit idea;
-            val refuted = Postprocessing.refuted_count pp_result;
-            val timeout = Postprocessing.timeout_count pp_result;
-            val proven = Postprocessing.proven_results pp_result;
-            val probable = Postprocessing.probable_results pp_result;
-            val possible = Postprocessing.possible_results pp_result;
-            val _ = print (
-                "Refuted: " ^ Int.toString refuted 
-                ^ "; Timeout: " ^ Int.toString timeout
-                ^ "; Proven: " ^ Int.toString (List.length proven)
-                ^ "; Probable: " ^ Int.toString (List.length probable)
-                ^ "; Possible: " ^ Int.toString (List.length possible)
-                ^ "\n"
-            )
-            val _ = List.map (fn x => (
-                print "Proven:\n";
-                print (PolyML.makestring x ^ "\n")
-            )) proven;
-            val _ = List.map (fn (c,r) => (
-                print "Probable:\n";
-                print (PolyML.makestring c ^ "\n");
-                print "if\n";
-                print (PolyML.makestring r ^ "\n")
-            )) probable;
-            val _ = List.map (fn (c,r) => (
-                print "Possible:\n";
-                print (PolyML.makestring c ^ "\n");
-                print "if\n";
-                print (PolyML.makestring r ^ "\n")
-            )) possible;
+            val _ = Postprocessing.print_summary pp_result;
+            val _ = Postprocessing.print_proven pp_result;
+            val _ = Postprocessing.print_probable pp_result;
+            val _ = Postprocessing.print_possible pp_result;
         in
-            (refuted, timeout, proven, probable, possible)
+            ()
         end
 
 
