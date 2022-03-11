@@ -541,7 +541,7 @@ struct
                       val full_transfers = Seq.filter (fn x => Postprocessing.is_fully_transfered x handle Postprocessing.UnresolvableGeometryTypes => false) results;
                       val (ideas, _) = Seq.chop limit full_transfers;
                       val _ = print (PolyML.makestring (List.length ideas) ^ " full transfers.\n")
-                      val _ = List.map (Postprocessing.postprocess limit pp_output) ideas;
+                      val _ = List.map (Postprocessing.postprocess (limit, 0) pp_output) ideas;
                   in
                       ()
                   end

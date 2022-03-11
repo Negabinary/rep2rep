@@ -188,8 +188,8 @@ func generate(tree:Dictionary):
 			var l1 = generate(tree.children[0])
 			var l2 = generate(tree.children[1])
 			var sq = Rect.new(
-				l1.get_line_start(),
 				l2.get_line_end(),
+				l1.get_line_start(),
 				SBetween.new(l1.get_line_start(), l2.get_line_end())
 			)
 			add_child(sq)
@@ -243,7 +243,7 @@ func generate(tree:Dictionary):
 			return a
 		"ResolveRect":
 			var rect = generate(tree.children[0])
-			rect.color = Color(0,1,0,0.5)
+			rect.color = Color(0,0,0,0.5)
 			generate(tree.children[1]).color = Color(1,0,0,0.5)
 			return rect
 		"MKRect":
@@ -329,6 +329,11 @@ func generate(tree:Dictionary):
 		"Value":
 			return SValue.new(
 				generate(tree.children[0])
+			)
+		"Dot":
+			return Dot.new(
+				generate(tree.children[0]),
+				generate(tree.children[1])
 			)
 		var other:
 			if other in map:

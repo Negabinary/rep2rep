@@ -10,13 +10,14 @@ struct
 
     val idea_limit = 100
     val limit = 50;
+    val ulimit = 50;
     val pp_limit = 50;
 
     fun count p = List.foldr (fn (x,y) => if p x then y + 1 else y) 0;
 
     fun evaluate_idea idea = 
         let val _ = print "--------------------------------------------------------------------\n"
-            val pp_result = Postprocessing.postprocess_silent limit idea;
+            val pp_result = Postprocessing.postprocess_silent (limit, ulimit) idea;
             val _ = Postprocessing.print_summary pp_result;
             val _ = Postprocessing.print_proven pp_result;
             val _ = Postprocessing.print_probable pp_result;

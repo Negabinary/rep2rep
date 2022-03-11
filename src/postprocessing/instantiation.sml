@@ -23,35 +23,38 @@ struct
 
     val line_sequence = Seq.of_list [
         LineIso(fn cons => cons),
-        LineIso(fn cons => Geometry.Reverse (cons)),
-        LineIso(fn cons => Geometry.Rotate (cons, Geometry.RootAngle(ref NONE, ref NONE, ref NONE))),
+        (* LineIso(fn cons => Geometry.Reverse (cons)), *)
+        LineIso(fn cons => Geometry.Rotate (cons, Geometry.RootAngle(ref NONE, ref NONE, ref NONE)))
+        (* ,
         LineIso(fn cons => Geometry.Reverse (Geometry.Rotate (cons, Geometry.RootAngle(ref NONE, ref NONE, ref NONE)))),
         LineIso(fn cons => Geometry.MoveLine (cons, Geometry.RootLine(ref NONE, ref NONE))),
-        LineIso(fn cons => Geometry.Reverse (Geometry.MoveLine (cons, Geometry.RootLine(ref NONE, ref NONE))))
-        (*TODO: Complete sequence*)
+        LineIso(fn cons => Geometry.Reverse (Geometry.MoveLine (cons, Geometry.RootLine(ref NONE, ref NONE)))) *)
+        (* TODO: Complete sequence *)
     ];
 
     val angle_sequence = Seq.of_list [
-        AngleIso(fn cons => cons),
+        AngleIso(fn cons => cons) 
+        (* ,
         AngleIso(fn cons => Geometry.ReverseAngle (cons)),
-        AngleIso(fn cons => Geometry.MoveAngle (cons, Geometry.RootLine(ref NONE, ref NONE))),
         AngleIso(fn cons => Geometry.OppositeAngle (cons)),
+        AngleIso(fn cons => Geometry.MoveAngle (cons, Geometry.RootLine(ref NONE, ref NONE))),
         AngleIso(fn cons => (Geometry.ReverseAngle o Geometry.MoveAngle) (cons, Geometry.RootLine(ref NONE, ref NONE))),
         AngleIso(fn cons => (Geometry.ReverseAngle o Geometry.OppositeAngle) (cons)),
         AngleIso(fn cons => (Geometry.OppositeAngle o Geometry.MoveAngle) (cons, Geometry.RootLine(ref NONE, ref NONE))),
-        AngleIso(fn cons => (Geometry.ReverseAngle o Geometry.OppositeAngle o Geometry.MoveAngle) (cons, Geometry.RootLine(ref NONE, ref NONE)))
+        AngleIso(fn cons => (Geometry.ReverseAngle o Geometry.OppositeAngle o Geometry.MoveAngle) (cons, Geometry.RootLine(ref NONE, ref NONE))) *)
         (*TODO: Complete sequence*)
     ]
 
     val rect_sequence = Seq.of_list [
-        RectIso(fn cons => cons),
+        RectIso(fn cons => cons)
+        (* ,
         RectIso(fn cons => Geometry.NextRect (cons)),
         RectIso(fn cons => (Geometry.NextRect o Geometry.NextRect) (cons)),
         RectIso(fn cons => (Geometry.NextRect o Geometry.NextRect o Geometry.NextRect) (cons)),
         RectIso(fn cons => Geometry.MoveRect (cons, Geometry.RootLine(ref NONE, ref NONE))),
         RectIso(fn cons => (Geometry.NextRect o Geometry.MoveRect) (cons, Geometry.RootLine(ref NONE, ref NONE))),
         RectIso(fn cons => (Geometry.NextRect o Geometry.NextRect o Geometry.MoveRect) (cons, Geometry.RootLine(ref NONE, ref NONE))),
-        RectIso(fn cons => (Geometry.NextRect o Geometry.NextRect o Geometry.NextRect o Geometry.MoveRect) (cons, Geometry.RootLine(ref NONE, ref NONE)))
+        RectIso(fn cons => (Geometry.NextRect o Geometry.NextRect o Geometry.NextRect o Geometry.MoveRect) (cons, Geometry.RootLine(ref NONE, ref NONE))) *)
     ]
 
     fun geom_to_iso_hack (Geometry.LineCon x) = LineIso(fn _ => x)

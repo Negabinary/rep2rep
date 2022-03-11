@@ -27,6 +27,7 @@ struct
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
     val debug = false;
+    val debug_map = Geometry.create_map ();
 
     val f = Geometry.create_map ();
 
@@ -157,7 +158,13 @@ struct
       | resolve_disjunction falsifiers xs = check_if_disjunction_proven falsifiers xs;
 
     fun resolve_cdc st n = 
-        let val constraints = (if debug then PolyML.print else (fn x => x)) (#constraints st);
+        let val constraints = (#constraints st);
+            fun unwrap_constraint (Y x) = x | unwrap_constraint (X x) = x | unwrap_constraint (N x) = x;
+            val _ = 
+                if debug then
+                    (List.map (List.map (List.map (fn x => (PolyML.print x; PolyML.print (Geometry.check_constraint debug_map (unwrap_constraint x)))))) (#constraints st); ())
+                else
+                    ();
             val falsifiers = #falsifiers st;
             val unknowables = #unknowables st;
             fun shorten_point point = 
@@ -206,10 +213,10 @@ struct
             val result = 
                 if open_constraints = [] then
                     Proven(#root state)
-                else if check_numerically_cdc (#constraints state) then
-                    Probable(#root state, open_constraints)
+                else if check_numerically_cdc (open_constraints) then
+                    (Probable(#root state, open_constraints))
                 else
-                    Possible(#root state, open_constraints)
+                    (Possible(#root state, open_constraints))
         in
             (output result; result)
         end

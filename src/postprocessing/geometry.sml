@@ -269,7 +269,7 @@ struct
       | get_rect_start (SubRect(a, b)) = get_rect_start a
       | get_rect_start (NextRect(a)) = get_rect_end a
       | get_rect_start (MoveRect(a,b)) = (ref o SOME o Move) (get_rect_start a, dirof b, disof b)
-      | get_rect_start (Pythag(a,b)) = get_line_start a
+      | get_rect_start (Pythag(a,b)) = get_line_end b
     
     and get_rect_end (RootRect(a, b, c)) = b
       | get_rect_end (ResolveRect(a, b)) = get_rect_end a
@@ -278,7 +278,7 @@ struct
       | get_rect_end (SubRect(a, b)) = get_rect_start b
       | get_rect_end (NextRect(a)) = (ref o SOME o Move) (get_rect_end a, (ref o SOME o Right o ref o SOME o Direction) (get_rect_start a, get_rect_end a), get_rect_width a)
       | get_rect_end (MoveRect(a,b)) = (ref o SOME o Move) (get_rect_end a, dirof b, disof b)
-      | get_rect_end (Pythag(a,b)) = get_line_end b
+      | get_rect_end (Pythag(a,b)) = get_line_start a
     
     and get_rect_width (RootRect(a, b, c)) = c
       | get_rect_width (ResolveRect(a, b)) = get_rect_width a
@@ -493,7 +493,7 @@ struct
             (
                 [
                     PC(get_line_end l1, get_line_start l2),
-                    DC(dirof l2, (ref o SOME o Right) (dirof l1))
+                    DC((ref o SOME o Right) (dirof l2), (dirof l1))
                 ], []
             );
     
@@ -700,8 +700,8 @@ struct
             Real.abs (x2 - x1) + Real.abs (y2 - y1) < 0.00000001
         end
       | check_constraint map (DC(a,b)) = 
-        let val v1 = hd numeric_direction map a;
-            val v2 = hd numeric_direction map b;
+        let val v1 = cadd (Real.rem (hd numeric_direction map a, 2.0*pi));
+            val v2 = cadd (Real.rem (hd numeric_direction map b, 2.0*pi));
             val _ = PolyML.print ("DC",v1,v2);
         in
             Real.abs (v2 - v1) < 0.00000001

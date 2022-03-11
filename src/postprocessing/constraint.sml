@@ -10,9 +10,10 @@ sig
     val collide : ('a -> 'a -> bool) -> 'a multiset -> 'a multiset -> 'a multiset;
     val map : ('a -> 'b) -> 'a multiset -> 'b multiset;
     val flatmap : ('a -> 'b multiset) -> 'a multiset -> 'b multiset;
+    val flat : 'a multiset multiset -> 'a multiset;
     val pick : ('a -> bool) -> 'a multiset -> 'a option * 'a multiset;
     val pick_option : ('a -> 'b option) -> 'a multiset -> 'b option * 'a multiset;
-    val pick_map : (('a * 'a multiset -> 'b) -> 'a multiset -> 'b multiset);
+    val pick_map : ('a * 'a multiset -> 'b) -> 'a multiset -> 'b multiset;
     val eq : ('a -> 'a -> bool) -> 'a multiset -> 'a multiset -> bool;
     val fold : (('a * 'b) -> 'b) -> 'b -> 'a list -> 'b;
     val intersect : ('a -> 'a -> bool) -> 'a list -> 'a list -> 'a list;
@@ -37,6 +38,8 @@ struct
     fun cons x y = x :: y;
     val map = List.map;
     val flatmap = List.flatmap;
+    fun flat [] = []
+      | flat (x::xs) = x @ (flat xs);
     fun pick p [] = (NONE, [])
       | pick p (x::xs) = 
             if p x then
@@ -62,6 +65,7 @@ struct
             (NONE,_) => collide p xs (x::ys)
           | (SOME(y),nys) => collide p xs nys
       )
+    
     val fold = List.foldr;
     fun count p [] = 0
       | count p (x::xs) = if p x then (count p xs) + 1 else count p xs;
@@ -297,12 +301,6 @@ struct
     fun turn_step n ((x, y, z), s) = (((n + x) mod 4, y, z), s);
     fun reverse_step step = turn_step 2 step;
     fun reverse_path (Path(x)) = Path(Multiset.map reverse_step x);
-    fun combine_path (Path(x)) (Path(y)) = 
-        let fun check_cancel a b = (same_step (reverse_step a) b) = YES;
-        in 
-            Path(Multiset.collide check_cancel x y)
-        end;
-    fun combine_paths l = List.foldr (fn (x,y) => combine_path x y) (Path []) l;
     fun multiply_distance (x1,y1) (x2,y2) = 
             let val (uncancelled_num, uncancelled_denom) = (Multiset.append x1 x2, Multiset.append y1 y2)
                 val intersection = Multiset.intersect (definite same_distance_term) uncancelled_num uncancelled_denom
@@ -315,8 +313,10 @@ struct
             in
                 (Multiset.subtract (definite same_distance_term) intersection uncancelled_num, Multiset.subtract (definite same_distance_term) intersection uncancelled_denom)
             end;
-    fun multiply_path (Path(x)) y = Path(Multiset.map (fn (d,s) => (d, multiply_distance s y)) x);
-    fun divide_path (Path(x)) y = Path(Multiset.map (fn (d,s) => (d, divide_distance s y)) x);
+    fun multiply_step y (d,s) = (d, multiply_distance s y);
+    fun multiply_path (Path(x)) y = Path(Multiset.map (multiply_step y) x);
+    fun divide_step y (d,s) = (d, divide_distance s y);
+    fun divide_path (Path(x)) y = Path(Multiset.map (divide_step y) x);
     fun right_path (Path(x)) = Path(Multiset.map (fn step => turn_step 1 step) x);
     fun turn_path n (Path(x)) = Path(Multiset.map (fn step => turn_step n step) x);
     fun unturn_path n p = turn_path (4-n mod 4) p;
@@ -325,6 +325,47 @@ struct
     fun unrdir_path (Path xs) vs = Path (Multiset.map (unrdir_step vs) xs);
     fun flatten (Path []) = Path []
       | flatten (Path (x::xs)) = raise (PathError "Patherror")
+    fun owrap f NONE = NONE | owrap f (SOME x) = SOME (f x)
+    fun try_snap_step ((_,_,DRUnknown _), _) _ = NONE
+      | try_snap_step _ ((_,_,DRUnknown _), _) = NONE
+      | try_snap_step (x as ((0,[],DRBetween(a,b)),_)) (y as ((0,[],DRBetween(c,d)),_)) = 
+        if b = c orelse a = d then
+            let val nx = divide_step ([SRTermBetween(a,b)],[]) x;
+                val ny = divide_step ([SRTermBetween(c,d)],[]) y;
+                val nxd = case ny of ((a,b,c),d) => d
+                val same_distance = same_step_distance nx ny = YES;
+            in
+                if same_distance then
+                    if b = c then
+                        SOME((0,[],DRBetween(a,d)), multiply_distance ([SRTermBetween(a,d)],[]) nxd)
+                    else
+                        SOME((0,[],DRBetween(c,b)), multiply_distance ([SRTermBetween(c,b)],[]) nxd)
+                else
+                    NONE
+            end
+        else
+            NONE
+      | try_snap_step ((1,[],a),b) ((1,[],c),d) = owrap (turn_step 1) (try_snap_step ((0,[],a),b) ((0,[],c),d))
+      | try_snap_step ((1,[],a),b) ((0,[],c),d) = NONE
+      | try_snap_step ((0,[],a),b) ((1,[],c),d) = NONE
+      | try_snap_step ((x,[],DRBetween(a,b)),c) d = try_snap_step ((x-2,[],DRBetween(b,a)),c) d
+      | try_snap_step d ((x,[],DRBetween(a,b)),c) = try_snap_step d ((x-2,[],DRBetween(b,a)),c)
+      | try_snap_step ((a,b,c),d) ((e,f,g),h) = if Multiset.eq (fn x => fn y => x = y) b f then owrap (fn ((i,j,k),l) => ((i,append b j,k),l)) (try_snap_step ((a,[],c),d) ((e,[],g),h)) else NONE;
+    fun combine_path (Path(x)) (Path(y)) = 
+        let fun check_cancel a b = (same_step (reverse_step a) b) = YES;
+            val cancelled = Multiset.collide check_cancel x y;
+            exception Snap of (
+                ((int * string  Multiset.multiset * dir_rep) * (dis_term Multiset.multiset * dis_term Multiset.multiset)) 
+                * ((int * string  Multiset.multiset * dir_rep) * (dis_term Multiset.multiset * dis_term Multiset.multiset)) 
+                * ((int * string  Multiset.multiset * dir_rep) * (dis_term Multiset.multiset * dis_term Multiset.multiset))
+            );
+            fun snap_all l = ((Multiset.map (fn (x,y) => owrap (fn z => raise (Snap (x,y,z))) (try_snap_step x y)) (Multiset.flat (Multiset.pairings cancelled cancelled));l)
+                                handle Snap(a,b,c) => snap_all (Multiset.cons c (Multiset.remove (fn x => x = b) (Multiset.remove (fn x => x = a) l))))
+            val snapped = snap_all cancelled;
+        in 
+            Path(snapped)
+        end;
+    fun combine_paths l = List.foldr (fn (x,y) => combine_path x y) (Path []) l;
 
     fun opposite_step_direction step1 = same_step_direction (reverse_step step1);
 

@@ -14,8 +14,8 @@ sig
     type constraints;
 
     val is_fully_transfered : State.T -> bool;
-    val postprocess : int -> (GeometryProver.proof_answer -> unit) -> State.T -> postprocessing_result;
-    val postprocess_silent : int -> State.T -> postprocessing_result;
+    val postprocess : int * int -> (GeometryProver.proof_answer -> unit) -> State.T -> postprocessing_result;
+    val postprocess_silent : int * int -> State.T -> postprocessing_result;
 
     val refuted_count : postprocessing_result -> int;
     val timeout_count : postprocessing_result -> int;
@@ -110,7 +110,7 @@ struct
                 NONE => []
               | SOME(x,xq) => let val xs = minlim_maxlim p (minlim-1) (if p x then 0 else maxlim) xq; in x::xs end);
     
-    fun postprocess limit output state = 
+    fun postprocess (lim1,lim2) output state = 
         let val result_construction =
                 case Composition.resultingConstructions (State.patternCompOf state) of
                     [x] => x
@@ -119,7 +119,7 @@ struct
             val _ = if not fully_transfered then raise NotFullyTransfered else ();
             val instantiated = Instantiation.instantiate keep_tokens replacements result_construction
             val proof_answer_seq = Seq.map (GeometryProver.attempt_proof output) instantiated;
-            val proof_answers = minlim_maxlim (fn x => case x of (GeometryProver.Proven x) => true | _ => false) limit 600 proof_answer_seq;
+            val proof_answers = minlim_maxlim (fn x => case x of (GeometryProver.Proven x) => true | _ => false) lim1 lim2 proof_answer_seq;
         in
             proof_answers
         end
@@ -146,7 +146,7 @@ struct
         in
             ()
         end
-    fun print_proven diagrams = (List.map (fn x => GeometryProver.print_proof_answer (GeometryProver.Proven x)) (proven_results diagrams); ());
-    fun print_probable diagrams = (List.map (fn x => GeometryProver.print_proof_answer (GeometryProver.Probable x)) (probable_results diagrams); ());
-    fun print_possible diagrams = (List.map (fn x => GeometryProver.print_proof_answer (GeometryProver.Possible x)) (possible_results diagrams); ());
+    fun print_proven diagrams = (List.map (fn x => (print o GeometryProver.print_proof_answer) (GeometryProver.Proven x)) (proven_results diagrams); ());
+    fun print_probable diagrams = (List.map (fn x => (print o GeometryProver.print_proof_answer) (GeometryProver.Probable x)) (probable_results diagrams); ());
+    fun print_possible diagrams = (List.map (fn x => (print o GeometryProver.print_proof_answer) (GeometryProver.Possible x)) (possible_results diagrams); ());
 end
