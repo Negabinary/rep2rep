@@ -50,10 +50,10 @@ struct
 
     fun summary_test_all () =
         let val inputs = [
-                (* ("additionCommutes","t12","t13:equality"),
-                ("additionAssociates","t25","t26:equality"), *)
-                (* ("additionDistributes","t60","t61:equality"), *)
-                (* ("cosSin","t93","t94:equality"), *)
+                ("additionCommutes","t12","t13:equality"),
+                ("additionAssociates","t25","t26:equality"),
+                ("additionDistributes","t60","t61:equality"),
+                ("cosSin","t93","t94:equality"),
                 ("trigonometry","t124","t125:equality")
             ];
             val _ = List.map summary_test inputs;
