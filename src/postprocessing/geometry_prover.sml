@@ -227,6 +227,6 @@ struct
       | print_proof_answer Timeout = "TIMEOUT\n"
       | print_proof_answer (Proven c) = "PROVEN!!!\n" ^ PolyML.makestring c ^ "\n"
       | print_proof_answer (Probable (c,d)) = "PROBABLE\n" ^ PolyML.makestring c ^ "\n" ^ (String.concat (List.map (fn x => PolyML.makestring x ^ "\n") d)) ^ "\n"
-      | print_proof_answer (Possible (c,d)) = "POSSIBLE\n" ^ PolyML.makestring c ^ "\n" ^ (String.concat (List.map (fn x => PolyML.makestring x ^ "\n") d)) ^ "\n";
+      | print_proof_answer (Possible (c,d)) = "POSSIBLE\n" ^ PolyML.makestring c ^ "\n" ^ (String.concat (List.map (fn x => PolyML.makestring x ^ " : " ^ (if check_numerically_dc x then "likely" else "unknown") ^ "\n") d)) ^ "\n";
 
 end

@@ -34,11 +34,14 @@ struct
             val _ = print (PolyML.makestring (List.length ideas) ^ " full transfers.\n")
             (* val _ = List.map (print o get_idea_latex) ideas; *)
             fun loop x = 
-                let val _ = (print o get_idea_latex) x;
-                    val pp_result = Postprocessing.postprocess_silent (50,400) x;
+                let 
+                    (* val _ = (print o get_idea_latex) x; *)
+                    fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
+                    val pp_result = (Postprocessing.postprocess (50,100) (fn x => ())) x;
                     val _ = Postprocessing.print_summary pp_result;
                     val _ = Postprocessing.print_proven pp_result;
                     val _ = Postprocessing.print_probable pp_result;
+                    (* val _ = Postprocessing.print_possible pp_result; *)
                 in
                     ()
                 end

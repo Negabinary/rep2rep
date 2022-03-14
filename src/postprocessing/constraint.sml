@@ -361,7 +361,7 @@ struct
             );
             fun snap_all l = ((Multiset.map (fn (x,y) => owrap (fn z => raise (Snap (x,y,z))) (try_snap_step x y)) (Multiset.flat (Multiset.pairings cancelled cancelled));l)
                                 handle Snap(a,b,c) => snap_all (Multiset.cons c (Multiset.remove (fn x => x = b) (Multiset.remove (fn x => x = a) l))))
-            val snapped = snap_all cancelled;
+            val snapped = (*snap_all*) cancelled;
         in 
             Path(snapped)
         end;
@@ -390,6 +390,10 @@ struct
     and zero_length_path (Path([])) = YES
       | zero_length_path (Path([x])) = zero_length_step x
       | zero_length_path (p) = MAYBE;
+    
+    fun same_path p1 p2 = case (zero_length_path p1, zero_length_path p2) of
+        (YES, YES) => YES
+      | _ => tvl_and (same_path_direction p1 p2) (same_path_distance p1 p2);
     
     (*FROM GEOMETRY*)
 
@@ -486,6 +490,17 @@ struct
                             [([SRTermDot(rotated_p1, rotated_p2)],[])]
                     | _ => [([SRTermDot(rotated_p1, rotated_p2)],[])]
             end;
+    
+    fun dedenom_loop loop =
+        let fun dedenom_loop_rec (Path []) = (Path ([]), [])
+              | dedenom_loop_rec (Path ((a,(n,d))::xs)) =
+                    let val (Path steps, ds) = dedenom_loop_rec (divide_path (Path(xs)) ([],d)) in
+                        (Path (divide_step ([],ds) (a,(n,[]))::steps), d@ds)
+                    end
+            val (p, _) = dedenom_loop_rec loop;
+        in
+            p
+        end;
 
 
     (*TO GEOMETRY*)
@@ -573,6 +588,15 @@ struct
                     direction := (SOME o Geometry.DCopy) (new_value);
                     raise Proven [[]]
                 );
+    fun try_set_distance distance new_value = if Geometry.distance_contains_check distance new_value then
+                ()
+            else
+                (   
+                    (if debug then PolyML.print else (fn x => x)) ("Set >> ", Geometry.SC(distance, new_value));
+                    Geometry.af (); 
+                    distance := (SOME o Geometry.SCopy) (new_value);
+                    raise Proven [[]]
+                );
     fun try_set_point_and_distance point new_point_value distance new_distance_value = 
             if Geometry.point_contains_check point new_point_value orelse Geometry.distance_contains_check distance new_distance_value then
                 ()
@@ -586,8 +610,9 @@ struct
                     raise Proven [[]]
                 )
     
-    fun get_circle_constraints (p as Path(xs)) = 
-        let val _ = if zero_length_path p = YES then raise Proven [[]] else ();
+    fun get_circle_constraints q = 
+        let val (p as Path(xs)) = dedenom_loop q;
+            val _ = if zero_length_path p = YES then raise Proven [[]] else ();
             val _ = if is_some (singular_direction p) andalso zero_length_path p = NO then raise Refuted else () handle ZeroPath => raise Proven [[]];
             fun set_step_if_free (((n,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
                 if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso y1 = x2) then
@@ -608,7 +633,7 @@ struct
                 )
               | set_step_if_free _ = (); (*TODO: ADD MORE CASES*)
             val _ = Multiset.pick_map set_step_if_free xs;
-            val _ = Multiset.pick_map (fn (y,ys) => if same_path_direction (reverse_path (Path [y])) (Path ys) = NO andalso (zero_length_step y) = NO then (raise Refuted) else ()) xs;
+            val _ = Multiset.pick_map (fn (y, ys) => if same_path (reverse_path (Path [y])) (Path ys) = NO then (raise Refuted) else ()) xs;
             val start = ref NONE;
         in
             [[Geometry.X(Geometry.PC(start, path_to_points (Path(xs)) start))]] 
@@ -621,60 +646,52 @@ struct
                       | _ => ();
             val distance_2 = distance_of path_2;
             val unitpath = divide_path path_1 distance_2;
-        in
-            case unitpath of
-                (Path([])) => raise ZeroPath
-              | (p as Path([(dir,(n,d))])) => 
-                    if Multiset.all (fn x => case x of (SRTermValue x) => true | _ => false) n andalso Multiset.all (fn x => case x of (SRTermValue x) => true | _ => false) d then
+            val _ = case unitpath of
+                        (p as Path([(dir,(n,d))])) => (
+                    if Multiset.all (fn x => case x of (SRTermValue x) => true | _ => false) (n @ d) then
                         raise Refuted
                     else
-              
-                (
-                    case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) n of
-                        (SOME(s),ss) => 
-                            let val new_step = ((0,[],DRUnknown (ref NONE)),(d,ss));
-                                val new_dist = step_to_distance new_step;
-                            in if Geometry.distance_contains_check s new_dist then 
-                                let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
-                            else
-                                ((if debug then PolyML.print else (fn x => x)) (Geometry.SC(s, new_dist)); Geometry.af (); s := (SOME o Geometry.SCopy) new_dist; [[]])
-                            end
-                      | (NONE,_) => 
-                    case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) d of
-                        (SOME(s),ss) =>
-                            let val new_step = ((0,[],DRUnknown (ref NONE)),(n,ss));
-                                val new_dist = step_to_distance new_step;
-                                val _ = (if debug then PolyML.print else (fn x => x)) ("new_dist >> ", Geometry.SC(s, new_dist));
-                            in if Geometry.distance_contains_check s new_dist then 
-                                let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
-                            else
-                                ((if debug then PolyML.print else (fn x => x)) (Geometry.SC(s, new_dist)); Geometry.af (); s := (SOME o Geometry.SCopy) new_dist; [[]])
-                            end
-                      | (NONE,_) =>
-                    let val dist = ref NONE in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ((SRTermUnknown dist)::n, d))))]] end
-                )
-              | (p) => let val dist = ref NONE; val dir = (0, [], DRUnknown(ref NONE)); in [[Geometry.X(Geometry.SC(dist, step_to_distance(dir, ([SRTermPath p],[]))))]] end
+                        let val _ = case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) n of
+                                        (SOME(s),ss) => try_set_distance s (step_to_distance ((0,[],DRUnknown (ref NONE)),(d,ss)))
+                                      | _ => ();
+                            val _ = case Multiset.pick_option (fn x => case x of (SRTermUnknown s) => SOME(s) | _ => NONE) d of
+                                        (SOME(s),ss) => try_set_distance s (step_to_distance ((0,[],DRUnknown (ref NONE)),(n,ss)))
+                                      | _ => ();
+                        in
+                            ()
+                        end
+                    )
+                    | _ => ();
+            val start = ref NONE;
+            val direction = ref NONE;
+            
+        in 
+            [[Geometry.X(Geometry.PC(
+                (ref o SOME o Geometry.Move) (start, direction, path_to_distance path_1),
+                (ref o SOME o Geometry.Move) (start, direction, path_to_distance path_2)
+            ))]]
         end handle (Proven x) => x | Refuted => [];
 
     fun get_direction_constraints ((path_1 as Path(steps_1 as (s1::_))),(path_2 as Path(steps_2 as (s2::_)))) = (
-        let val _ = (if debug then PolyML.print else (fn x => x)) "bp0";
-            val _ = case same_path_direction path_1 path_2 of
+        let val _ = case same_path_direction path_1 path_2 of
                         YES => raise Proven [[]]
                       | NO => raise Refuted
                       | _ => ()
-            val _ = (if debug then PolyML.print else (fn x => x)) "bp1";
             val _ = case (singular_steps_direction steps_1, s1) of
                         (YES, ((a,[],DRUnknown(x)),s)) => try_set_direction x (path_to_direction (turn_path (4-a) path_2))
                       | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 (path_to_points (turn_path (4-a) path_2) p1)
                       | _ => ()
-            val _ = (if debug then PolyML.print else (fn x => x)) "bp2";
             val _ = case (singular_steps_direction steps_2, s2) of
                         (YES, ((a,[],DRUnknown(x)),s)) => try_set_direction x (path_to_direction (turn_path (4-a) path_1))
                       | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 (path_to_points (turn_path (4-a) path_1) p1)
                       | _ => ()
-            val _ = (if debug then PolyML.print else (fn x => x)) "bp3";
+            val start = ref NONE;
+            val distance = ref NONE;
         in
-            [[Geometry.X(Geometry.DC(path_to_direction (path_1) , path_to_direction (path_2)))]]
+            [[Geometry.X(Geometry.PC(
+                (ref o SOME o Geometry.Move) (start, path_to_direction path_1, distance),
+                (ref o SOME o Geometry.Move) (start, path_to_direction path_2, distance)
+            ))]]
         end handle (Proven x) => x | Refuted => [])
       | get_direction_constraints _ = raise ZeroPath;
     

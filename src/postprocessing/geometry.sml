@@ -695,21 +695,21 @@ struct
     fun check_constraint map (PC(a,b)) = 
         let val (x1,y1) = hp numeric_point map a;
             val (x2,y2) = hp numeric_point map b;
-            val _ = PolyML.print ("PC",(x1,y1),(x2,y2));
+            val _ = ("PC",(x1,y1),(x2,y2));
         in
             Real.abs (x2 - x1) + Real.abs (y2 - y1) < 0.00000001
         end
       | check_constraint map (DC(a,b)) = 
         let val v1 = cadd (Real.rem (hd numeric_direction map a, 2.0*pi));
             val v2 = cadd (Real.rem (hd numeric_direction map b, 2.0*pi));
-            val _ = PolyML.print ("DC",v1,v2);
+            val _ = ("DC",v1,v2);
         in
             Real.abs (v2 - v1) < 0.00000001
         end
       | check_constraint map (SC(a,b)) = 
         let val v1 = hs numeric_distance map a;
             val v2 = hs numeric_distance map b;
-            val _ = PolyML.print ("SC",v1,v2);
+            val _ = ("SC",v1,v2);
         in
             Real.abs (v2 - v1) < 0.00000001
         end
