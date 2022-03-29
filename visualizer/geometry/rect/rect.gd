@@ -7,7 +7,7 @@ var start : Point
 var width : Distance
 var end : Point
 
-var color := Color(0.1,0.1,1,0.2)
+var color := Color(0,0,0,0.2)
 
 func _init(start, end, width):
 	self.start = start

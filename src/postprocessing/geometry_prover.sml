@@ -208,6 +208,7 @@ struct
     
     fun attempt_proof output construction = 
         let val _ = Path.reset_time ();
+            val _ = (if debug then PolyML.print else (fn x => x)) construction;
             val state = resolve_cdc (state_from_construction construction) 20;
             val open_constraints = (#constraints state) @ List.map (fn x => [[X(x)]]) (#unknowables state) @ List.map (fn x => [[N(x)]]) (List.filter (fn x => not (Path.does_not_hold x)) (#falsifiers state));
             val result = 

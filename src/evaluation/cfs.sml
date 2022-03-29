@@ -5,6 +5,8 @@ struct
     val sourceTypeSystem = Document.findTypeSystemWithName document "equation";
     val targetTypeSystem = Document.findTypeSystemWithName document "geometry";
 
+    exception TestingException of string;
+
     fun get_ideas output source_construction = 
         let val goal = (
                 [Construction.constructOf source_construction],
@@ -81,6 +83,29 @@ struct
         in
             ()
         end;
+    
+    fun test_string str lims = 
+        let val grammar = Document.findGrammarWithName document "equationM";
+            val tokens = String.tokens (fn x => x = #"\n" orelse x = #" ") str;
+            val source_constructions = Grammar.parse grammar "equality" tokens;
+            val source_construction = case source_constructions of (x::_) => x | _ => raise (TestingException "Could not parse expression.");
+            fun output x = ();
+            val ideas = get_ideas output source_construction;
+            val _ = print (PolyML.makestring (List.length ideas) ^ " full transfers.\n");
+            val _ = List.map (print o get_idea_latex) ideas;
+            fun loop x = 
+                let val pp_result = Postprocessing.postprocess_silent lims x;
+                    val _ = Postprocessing.print_summary pp_result;
+                    val _ = Postprocessing.print_proven pp_result;
+                    val _ = Postprocessing.print_probable pp_result;
+                    (* val _ = Postprocessing.print_possible pp_result; *)
+                in
+                    ()
+                end;
+            val _ = List.map loop ideas;
+        in
+            ()
+        end
 
     fun angel_5 () = 
         let val p1 = ref NONE;

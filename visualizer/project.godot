@@ -29,6 +29,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://geometry/direction/direction.gd"
 }, {
+"base": "Control",
+"class": "DirectionResolve",
+"language": "GDScript",
+"path": "res://geometry/direction/direction_resolve.gd"
+}, {
 "base": "Object",
 "class": "Distance",
 "language": "GDScript",
@@ -68,6 +73,11 @@ _global_script_classes=[ {
 "class": "Point",
 "language": "GDScript",
 "path": "res://geometry/point/point.gd"
+}, {
+"base": "Control",
+"class": "PointResolve",
+"language": "GDScript",
+"path": "res://geometry/point/point_resolve.gd"
 }, {
 "base": "Direction",
 "class": "RDir",
@@ -109,6 +119,7 @@ _global_script_class_icons={
 "DBetween": "",
 "DValue": "",
 "Direction": "",
+"DirectionResolve": "",
 "Distance": "",
 "Divide": "",
 "Dot": "",
@@ -117,6 +128,7 @@ _global_script_class_icons={
 "MovablePoint": "",
 "Move": "",
 "Point": "",
+"PointResolve": "",
 "RDir": "",
 "Rect": "",
 "Right": "",

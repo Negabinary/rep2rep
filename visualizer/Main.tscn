@@ -7,7 +7,7 @@
 [node name="ColorRect" type="ColorRect"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color( 0.0509804, 0.0745098, 0.129412, 1 )
+color = Color( 0, 0, 0, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -51,7 +51,7 @@ margin_right = 194.0
 margin_bottom = 544.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-color = Color( 0.552941, 0.537255, 0.65098, 1 )
+color = Color( 0.215686, 0.215686, 0.215686, 1 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VSplitContainer/Control/HSplitContainer/ColorRect"]
 anchor_right = 1.0
@@ -99,6 +99,14 @@ anchor_bottom = 1.0
 size_flags_horizontal = 5
 size_flags_vertical = 5
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Resolver" type="Control" parent="VSplitContainer/Control/HSplitContainer/ColorRect2"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 __meta__ = {
 "_edit_use_anchors_": false
 }

@@ -378,7 +378,8 @@ struct
                 [
                     PC(get_line_start l, get_line_start lm)
                 ], [
-                    DC(dirof l, dirof lm)
+                    DC(dirof l, dirof lm),
+                    DC(dirof l, (ref o SOME o Right o ref o SOME o Right) (dirof lm))
                 ]
             )
     and get_angle_constraints angle = case angle of
@@ -486,7 +487,24 @@ struct
             (
                 [
                     PC(get_rect_start a, get_line_start l)
-                ], []
+                ], [
+                    DC(
+                      dirof l,
+                      (ref o SOME o Direction) (get_rect_start a, get_rect_end a)
+                    ),
+                    DC(
+                      (ref o SOME o Right) (dirof l),
+                      (ref o SOME o Direction) (get_rect_start a, get_rect_end a)
+                    ),
+                    DC(
+                      (ref o SOME o Right o ref o SOME o Right) (dirof l),
+                      (ref o SOME o Direction) (get_rect_start a, get_rect_end a)
+                    ),
+                    DC(
+                      (ref o SOME o Right o ref o SOME o Right o ref o SOME o Right) (dirof l),
+                      (ref o SOME o Direction) (get_rect_start a, get_rect_end a)
+                    )
+                ]
             )
       | Pythag(l1,l2) => mc
             (mc (get_line_constraints l1) (get_line_constraints l2))
