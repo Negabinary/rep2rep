@@ -28,7 +28,7 @@ struct
 
 
     fun test () = 
-        let val document = Document.read "correspondences/eqgeom3";
+        let val document = Document.read "correspondences/eqgeom";
             val KB = Document.knowledgeOf document;
             val sourceTypeSystem = Document.findTypeSystemWithName document "equation";
             val targetTypeSystem = Document.findTypeSystemWithName document "geometry";

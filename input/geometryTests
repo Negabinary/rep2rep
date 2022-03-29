@@ -1,4 +1,4 @@
-import correspondences/eqGeom3
+import correspondences/eqGeom
 
 comment rect-line-angle
 

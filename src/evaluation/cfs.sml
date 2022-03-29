@@ -1,6 +1,6 @@
 structure CFS =
 struct
-    val document = Document.read "grammarTest";
+    val document = Document.read "geometryTests";
     val KB = Document.knowledgeOf document;
     val sourceTypeSystem = Document.findTypeSystemWithName document "equation";
     val targetTypeSystem = Document.findTypeSystemWithName document "geometry";

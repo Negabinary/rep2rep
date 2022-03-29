@@ -1,23 +1,40 @@
 typeSystem geometry =
-    types _:distance, _:angle, _:line,
-    _:point, _:rect, _:direction, _:area,
-    origin, up, perpendicular, one, value
+    types _:line, _:rect, value, _:angle
     
-    order origin < point,
-          up < direction,
-          perpendicular < angle,
-          one < distance,
-          distance < value,
-          angle < value,
-          area < value
+    order line < value, rect < value, angle < value
 
 conSpec geometryG:geometry = 
-    move : [point, direction, distance] -> point,
-    intersect : [point, direction, point, direction] -> point,
-    rectangle : [point, point, distance] -> rect,
-    rectjoin : [rect, rect] -> rect,
-    measure : [point, point] -> distance,
-    measure_angle : [point, point, point] -> angle,
-    measure_area : [rect] -> area,
-    direction : [point, point] -> direction
-    
+    resolveLine : [line, line] -> line,
+    resolveArea : [rect, rect] -> rect,
+    resolveAngle : [angle, angle] -> angle,
+
+    concat : [line, line] -> line,
+    similarTriangle : [line, line, line] -> line,
+
+    mkrect : [line, line] -> rect,
+    divrect : [rect, line] -> line,
+    joinrect : [rect, rect] -> rect,
+    subrect : [rect, rect] -> rect,
+
+
+
+    sine : [line, angle] -> line,
+    cosine : [line, angle] -> line,
+    tangent : [line, angle] -> line,
+
+    anglebetween : [line, line] -> angle,
+    joinangle : [angle, angle] -> angle,
+    subangle : [angle, angle] -> angle,
+
+    reverseline : [line] -> line,
+    rotateline : [line, angle] -> line,
+    moveline : [line, line] -> line,
+
+    reverseangle : [angle] -> angle,
+    moveangle : [angle] -> angle,
+    oppositeangle : [angle] -> angle,
+
+    nextRect : [rect] -> rect,
+    moveRect : [rect, line] -> rect,
+
+    pythag : [line,line] -> rect
