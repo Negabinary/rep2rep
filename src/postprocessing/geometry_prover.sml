@@ -5,8 +5,6 @@ signature GEOMETRY_PROVER =
 sig
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
-    val can_build : Geometry.construction -> (Geometry.construction * Geometry.pos_neg_constraint list list list) option;
-
     datatype proof_answer = Proven of Geometry.construction 
                           | Refuted 
                           | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list 
@@ -16,18 +14,16 @@ sig
     val print_proof_answer : proof_answer -> string;
 
     val attempt_proof : (proof_answer -> unit) -> Geometry.construction -> proof_answer;
-
-    val check_numerically_cdc : Geometry.pos_neg_constraint list list list -> bool;
 end
 
 structure GeometryProver : GEOMETRY_PROVER = 
 struct
     open Geometry;
 
-    datatype 'a answer = YES | NO | MAYBE of 'a;
-
     val debug = false;
     val debug_map = Geometry.create_map ();
+
+    (*NUMERIC EVALUATION*)
 
     val f = Geometry.create_map ();
 
@@ -39,6 +35,10 @@ struct
         | check_numerically_dc (x::xs) = if check_numerically x then true else check_numerically_dc xs;
     fun check_numerically_cdc [] = true
         | check_numerically_cdc (x::xs) = if check_numerically_dc x then check_numerically_cdc xs else false;
+
+    (*SYMBOLIC PROOF*)
+
+    datatype 'a answer = YES | NO | MAYBE of 'a;
 
     type state = {
         falsifiers : constraint list,
@@ -58,6 +58,7 @@ struct
             }
         end;
     
+    val p = (if debug then PolyML.print else (fn x => x))
 
     fun use_positive_constraint (PC(p1, p2)) = 
         (let val _ = (if debug then PolyML.print else (fn x => x)) "Point constraint";
@@ -101,9 +102,9 @@ struct
     MAYBE(x : c) => means the conjunction is true if the possibly simpler conjunction x is true
     NO => means the conjunction is falsifiable
     *)
-    fun check_if_conjunction_proven falsifiers [] = YES
-      | check_if_conjunction_proven falsifiers (x::xs) = 
-            case (x, check_if_conjunction_proven falsifiers xs) of
+    fun check_if_conjunction_proven [] = YES
+      | check_if_conjunction_proven (x::xs) = 
+            case (x, check_if_conjunction_proven xs) of
                 (Y(a),YES) => if Path.does_hold a then YES else MAYBE([x])
               | (Y(a),MAYBE(cs)) => if Path.does_hold a then MAYBE(cs) else MAYBE(x::cs)
               | (Y(a),NO) => NO
@@ -117,9 +118,9 @@ struct
     (*
     makes a (c-d-c, new falsifiers, and new unprovables, true) from a c and changes references
     *)
-    fun make_conjunction_true falsifiers [] = ([],[],[],true)
-      | make_conjunction_true falsifiers (x::xs) =
-            case (x, make_conjunction_true falsifiers xs) of
+    fun make_conjunction_true [] = ([],[],[],true)
+      | make_conjunction_true (x::xs) =
+            case (x, make_conjunction_true xs) of
                 (Y(a),(p,q,r,_)) => (use_positive_constraint a::p,q,r,true)
               | (X(a),(p,q,r,_)) => (p,q,a::r,true)
               | (N(a),(p,q,r,_)) => (p,a::q,r,true);
@@ -129,8 +130,8 @@ struct
     MAYBE(x) => 
     NO => means the disjunction is falsifiable
     *)
-    fun check_if_disjunction_proven falsifiers disjunction =
-        let val conjunction_statuses = List.map (check_if_conjunction_proven falsifiers) disjunction;
+    fun check_if_disjunction_proven disjunction =
+        let val conjunction_statuses = List.map (check_if_conjunction_proven) disjunction;
         in
             if List.exists (fn x => x = YES) conjunction_statuses then
                 YES
@@ -153,9 +154,9 @@ struct
     MAYBE(c-d-c, falsifiables, unprovables, changed) => means that after resolution the disjunction looks like the c-d-c
     NO => means that a contradiction arose during resolution
     *)
-    fun resolve_disjunction falsifiers [] = (if debug then PolyML.print "Falsifiable:: Empty disjunction" else "()"; raise Falsifiable)
-      | resolve_disjunction falsifiers [x] = MAYBE(make_conjunction_true falsifiers x)
-      | resolve_disjunction falsifiers xs = check_if_disjunction_proven falsifiers xs;
+    fun resolve_disjunction [] = (if debug then PolyML.print "Falsifiable:: Empty disjunction" else "()"; raise Falsifiable)
+      | resolve_disjunction [x] = MAYBE(make_conjunction_true x)
+      | resolve_disjunction xs = check_if_disjunction_proven xs;
 
     fun resolve_cdc st n = 
         let val constraints = (#constraints st);
@@ -174,7 +175,7 @@ struct
                 else
                     point
                 end handle ZeroPath => (if debug then PolyML.print "Falsifiable:: ZeroPath in shortening" else "()"; raise Falsifiable);
-            fun iter (disj,prev) = case (Geometry.map_points (shorten_point, fn x => x) (#root st); (resolve_disjunction (#2 prev) disj, prev)) of
+            fun iter (disj,prev) = case (Geometry.map_points (shorten_point, fn x => x) (#root st); (resolve_disjunction disj, prev)) of
                 (NO, _) => (if debug then PolyML.print "Falsifiable:: NO" else "()"; raise Falsifiable)
               | (YES, x) => x
               | (MAYBE(cs', fs', us', cd'),(cs, fs, us, cd)) => (cs'@cs, fs'@fs, us'@us, cd' orelse cd)
@@ -196,17 +197,9 @@ struct
             if changed then resolve_cdc next_state (n - 1) else next_state
         end handle ZeroPath => (if debug then PolyML.print "Falsifiable:: ZeroPath somewhere" else ""; raise Falsifiable);
     
-    fun can_build construction = 
-        let val state = resolve_cdc (state_from_construction construction) 20;
-        in
-            SOME(#root state, (#constraints state) @ List.map (fn x => [[X(x)]]) (#unknowables state) @ List.map (fn x => [[N(x)]]) (List.filter (fn x => not (Path.does_not_hold x)) (#falsifiers state)))
-        end
-        handle
-            Falsifiable => NONE;
-    
     datatype proof_answer = Proven of Geometry.construction | Refuted | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list | Probable of Geometry.construction * Geometry.pos_neg_constraint list list list | Timeout;
     
-    fun attempt_proof output construction = 
+    fun attempt_proof debug_output construction = 
         let val _ = Path.reset_time ();
             val _ = (if debug then PolyML.print else (fn x => x)) construction;
             val state = resolve_cdc (state_from_construction construction) 20;
@@ -219,10 +212,12 @@ struct
                 else
                     (Possible(#root state, open_constraints))
         in
-            (output result; result)
+            (debug_output result; result)
         end
-        handle Path.Timeout => (output Timeout; Timeout)
-             | Falsifiable => (output Refuted; Refuted);
+        handle Path.Timeout => (debug_output Timeout; Timeout)
+             | Falsifiable => (debug_output Refuted; Refuted);
+
+    (*PRINTING*)
     
     fun print_proof_answer Refuted = "REFUTED\n"
       | print_proof_answer Timeout = "TIMEOUT\n"
