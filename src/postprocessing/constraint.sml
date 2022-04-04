@@ -420,6 +420,7 @@ struct
               | SOME(d,_) => combine_paths (List.map (fn x => Path([(d, x)]) ) (rep_distances dist))
             end handle ZeroPath => Path([]))
       | SOME(Geometry.Right(x)) => right_path (distance_direction_to_path(dist,x))
+      | SOME(Geometry.RDir(x,"9")) => right_path (distance_direction_to_path(dist,x))
       | SOME(Geometry.RDir(x,v)) => rdir_path (distance_direction_to_path(dist,x)) v
       | SOME(Geometry.DCopy(x)) => distance_direction_to_path(dist,x)
     
@@ -679,11 +680,11 @@ struct
                       | _ => ()
             val _ = case (singular_steps_direction steps_1, s1) of
                         (YES, ((a,[],DRUnknown(x)),s)) => try_set_direction x (path_to_direction (turn_path (4-a) path_2))
-                      | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 (path_to_points (turn_path (4-a) path_2) p1)
+                      | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 ((ref o SOME o Geometry.Move) (p1, path_to_direction (turn_path (4-a) path_2), ref NONE))
                       | _ => ()
             val _ = case (singular_steps_direction steps_2, s2) of
                         (YES, ((a,[],DRUnknown(x)),s)) => try_set_direction x (path_to_direction (turn_path (4-a) path_1))
-                      | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 (path_to_points (turn_path (4-a) path_1) p1)
+                      | (YES, ((a,[],DRBetween(p1,p2)),s)) => try_set_point p2 ((ref o SOME o Geometry.Move) (p1, path_to_direction (turn_path (4-a) path_1), ref NONE))
                       | _ => ()
             val start = ref NONE;
             val distance = ref NONE;

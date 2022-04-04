@@ -39,7 +39,7 @@ struct
                 let 
                     (* val _ = (print o get_idea_latex) x; *)
                     fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
-                    val pp_result = (Postprocessing.postprocess (50,100) (fn x => ())) x;
+                    val pp_result = (Postprocessing.postprocess (50,400) (fn x => ())) x;
                     val _ = Postprocessing.print_summary pp_result;
                     val _ = Postprocessing.print_proven pp_result;
                     val _ = Postprocessing.print_probable pp_result;
@@ -98,7 +98,7 @@ struct
                     val _ = Postprocessing.print_summary pp_result;
                     val _ = Postprocessing.print_proven pp_result;
                     val _ = Postprocessing.print_probable pp_result;
-                    (* val _ = Postprocessing.print_possible pp_result; *)
+                    val _ = Postprocessing.print_possible pp_result;
                 in
                     ()
                 end;
@@ -186,6 +186,333 @@ struct
             val map = Geometry.create_map ();
         in
             (Geometry.numeric_direction map lhs, Geometry.numeric_direction map rhs)
+        end;
+
+    
+    fun test_solver () =
+        let open Geometry
+            fun root_line letter = let val s = ref NONE in RootLine(s, (ref o SOME o Move) (s, ref NONE, (ref o SOME o Value) letter)) end;
+            fun root_angle letter = let val s = ref NONE; val t = ref NONE in RootAngle(s, t, (ref o SOME o Move) (t, (ref o SOME o RDir) ((ref o SOME o Direction) (s,t), letter), (ref o SOME o Distance) (s,t))) end;
+            fun root_rect letter = let val s = ref NONE; val t = ref NONE in RootRect(s, t, (ref o SOME o Divide) ((ref o SOME o Value) letter, (ref o SOME o Distance) (s,t))) end;
+            val Al1 = root_line "A";
+            val Bl1 = root_line "B";
+            val Al2 = root_line "A";
+            val Bl2 = root_line "B";
+            val Aa1 = root_angle "A";
+            val Ba1 = root_angle "B";
+            val Ar1 = root_rect "A";
+            val Br1 = root_rect "B";
+            val Al3 = root_line "A";
+            val Bl3 = root_line "B";
+            val Cl3 = root_line "C";
+            val Aa3 = root_angle "A";
+            val Ba3 = root_angle "B";
+            val Ca3 = root_angle "C";
+            val Ar3 = root_rect "A";
+            val Br3 = root_rect "B";
+            val Cr3 = root_rect "C";
+            val Al4 = root_line "A";
+            val Bl4 = root_line "B";
+            val Cl4 = root_line "C";
+            val Ul5 = root_line "1";
+            val Al5 = root_line "A";
+            val Bl5 = root_line "B";
+            val Cl5 = root_line "C";
+            val Ul6 = root_line "1";
+            val Aa6 = root_angle "A";
+            val Na6 = root_angle "9";
+            val Ul7 = root_line "1";
+            val Aa7 = root_angle "A";
+            val Na7 = root_angle "9";
+            val Ul8 = root_line "1";
+            val Aa8 = root_angle "A";
+            val Ul9 = root_line "1";
+            val Aa9 = root_angle "A";
+            val tests = [
+                    ("Commutative-line-1",
+                        LineCon(
+                            ResolveLine(
+                                Concat(
+                                    Al1,
+                                    Bl1
+                                ),
+                                Reverse(
+                                    Concat(
+                                        Reverse(Bl1),
+                                        Reverse(Al1)
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    ("Commutative-line-2",
+                        LineCon(
+                            ResolveLine(
+                                Concat(
+                                    Al2,
+                                    Bl2
+                                ),
+                                MoveLine(
+                                    Concat(
+                                        MoveLine(Bl2, RootLine(ref NONE, ref NONE)),
+                                        MoveLine(Al2, RootLine(ref NONE, ref NONE))
+                                    ),
+                                    RootLine(ref NONE, ref NONE)
+                                )
+                            )
+                        )
+                    ),
+                    ("Commutative-angle",
+                        AngleCon(
+                            ResolveAngle(
+                                JoinAngle(
+                                    Aa1,
+                                    Ba1
+                                ),
+                                ReverseAngle(
+                                    JoinAngle(
+                                        ReverseAngle(
+                                            Ba1
+                                        ),
+                                        ReverseAngle(
+                                            Aa1
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    ("commutative-rect",
+                        RectCon(
+                            ResolveRect(
+                                JoinRect(
+                                    Ar1,
+                                    Br1
+                                ),
+                                NextRect(NextRect(
+                                    JoinRect(
+                                        NextRect(NextRect(Br1)),
+                                        NextRect(NextRect(Ar1))
+                                    )
+                                ))
+                            )
+                        )
+                    ),
+                    ("associative-line",
+                        LineCon(
+                            ResolveLine(
+                                Concat(
+                                    Al3,
+                                    Concat(
+                                        Bl3,
+                                        Cl3
+                                    )
+                                ),
+                                Concat(
+                                    Concat(
+                                        Al3,
+                                        Bl3
+                                    ),
+                                    Cl3
+                                )
+                            )
+                        )
+                    ),
+                    ("associative-angle",
+                        AngleCon(
+                            ResolveAngle(
+                                JoinAngle(
+                                    Aa3,
+                                    JoinAngle(
+                                        Ba3,
+                                        Ca3
+                                    )
+                                ),
+                                JoinAngle(
+                                    JoinAngle(
+                                        Aa3,
+                                        Ba3
+                                    ),
+                                    Ca3
+                                )
+                            )
+                        )
+                    ),
+                    ("associative-rect",
+                        RectCon(
+                            ResolveRect(
+                                JoinRect(
+                                    Ar3,
+                                    JoinRect(
+                                        Br3,
+                                        Cr3
+                                    )
+                                ),
+                                JoinRect(
+                                    JoinRect(
+                                        Ar3,
+                                        Br3
+                                    ),
+                                    Cr3
+                                )
+                            )
+                        )
+                    ),
+                    ("distribution-rect",
+                        RectCon(
+                            ResolveRect(
+                                JoinRect(
+                                    MKRect(
+                                        Al4,
+                                        Cl4
+                                    ),
+                                    MKRect(
+                                        Bl4,
+                                        MoveLine(
+                                            Cl4,
+                                            RootLine(ref NONE, ref NONE)
+                                        )
+                                    )
+                                ),
+                                MKRect(
+                                    Concat(
+                                        Al4, Bl4
+                                    ),
+                                    Cl4
+                                )
+                            )
+                        )
+                    ),
+                    ("distribution-triangles",
+                        LineCon(
+                            ResolveLine(
+                                SimilarTriangle(
+                                    Concat(
+                                        Al5, Bl5
+                                    ),
+                                    Ul5,
+                                    Cl5
+                                ),
+                                Concat(
+                                    SimilarTriangle(
+                                        Al5,
+                                        Ul5,
+                                        Cl5
+                                    ),
+                                    SimilarTriangle(
+                                        MoveLine(
+                                            MoveLine(
+                                                Bl5,
+                                                RootLine(ref NONE, ref NONE)
+                                            ),
+                                            RootLine(ref NONE, ref NONE)
+                                        ),
+                                        MoveLine(Ul5,RootLine(ref NONE, ref NONE)),
+                                        MoveLine(Cl5,RootLine(ref NONE, ref NONE))
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    ("sin-cos-1",
+                        LineCon(
+                            ResolveLine(
+                                Sine(
+                                    Ul6,
+                                    Aa6
+                                ),
+                                MoveLine(
+                                    Cosine(
+                                        Ul6,
+                                        ReverseAngle(
+                                            SubAngle(
+                                                Na6,
+                                                Aa6
+                                            )
+                                        )
+                                    ),
+                                    RootLine(ref NONE, ref NONE)
+                                )
+                            )
+                        )
+                    ),
+                    ("sin-cos-2",
+                        LineCon(
+                            ResolveLine(
+                                Cosine(
+                                    Ul7,
+                                    Aa7
+                                ),
+                                MoveLine(
+                                    Sine(
+                                        Ul7,
+                                        ReverseAngle(
+                                            SubAngle(
+                                                Na7,
+                                                Aa7
+                                            )
+                                        )
+                                    ),
+                                    RootLine(ref NONE, ref NONE)
+                                )
+                            )
+                        )
+                    ),
+                    ("sin-sq-cos-sq",
+                        RectCon(
+                            ResolveRect(
+                                Pythag(
+                                    Reverse(
+                                        Sine(
+                                            Ul8,
+                                            Aa8
+                                        )
+                                    ),
+                                    Reverse(
+                                        Cosine(
+                                            Ul8,
+                                            Aa8
+                                        )
+                                    )
+                                ),
+                                MKRect(
+                                    Ul8,
+                                    Rotate(Ul8, RootAngle(ref NONE, ref NONE, ref NONE))
+                                )
+                            )
+                        )
+                    ),
+                    ("cos-sq-sin-sq",
+                        RectCon(
+                            ResolveRect(
+                                Pythag(
+                                    Cosine(
+                                        Ul8,
+                                        Aa8
+                                    ),
+                                    Sine(
+                                        Ul8,
+                                        Aa8
+                                    )
+                                ),
+                                MKRect(
+                                    Reverse(Ul8),
+                                    Rotate(Reverse(Ul8), RootAngle(ref NONE, ref NONE, ref NONE))
+                                )
+                            )
+                        )
+                    )
+                ]
+            fun run_test (test_name, test) = 
+                let val _ = print (test_name ^ ":-------------------------------------------------------\n");
+                    val _ = PolyML.print test;
+                    val result = GeometryProver.attempt_proof (fn x => ()) (test);
+                in
+                    print (GeometryProver.print_proof_answer result)
+                end;
+            val _ = List.map run_test tests;
+        in
+            ()
         end;
 
 end
