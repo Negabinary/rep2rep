@@ -73,7 +73,7 @@ struct
             val _ = print (PolyML.makestring (List.length ideas) ^ " full transfers.\n");
             val _ = List.map (print o get_idea_latex) ideas;
             fun loop x = 
-                let val pp_result = Postprocessing.postprocess_silent (50,1000) x;
+                let val pp_result = Postprocessing.postprocess_silent (1,1) x;
                     val _ = Postprocessing.print_summary pp_result;
                     val _ = Postprocessing.print_probable pp_result;
                 in
