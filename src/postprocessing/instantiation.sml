@@ -134,47 +134,47 @@ struct
               val seen_roots = ref [];
               fun seen x = List.exists (fn y => y = x) (!seen_roots);
               fun see x = seen_roots := x :: (!seen_roots);
-              fun gen_lists_rec_line (l as RootLine(_,_)) = (if seen (LineCon l) then [Seq.of_list [LineIso(fn cons => cons)]] else (see (LineCon l); [line_sequence]))
-                | gen_lists_rec_line line = (case line of
-                      ResolveLine(l1,l2) => gen_lists_rec_line l1 @ gen_lists_rec_line l2
-                    | Concat(l1,l2) => gen_lists_rec_line l1 @ gen_lists_rec_line l2
-                    | SimilarTriangle(l1,l2,l3) => gen_lists_rec_line l1 @ gen_lists_rec_line l2 @ gen_lists_rec_line l3
-                    | DivRect(r1,l2) => gen_lists_rec_rect r1 @ gen_lists_rec_line l2
-                    | Reverse(l1) => gen_lists_rec_line l1
-                    | Rotate(l1,a2) => gen_lists_rec_line l1 @ gen_lists_rec_angle a2
-                    | Sine(l1,a2) => gen_lists_rec_line l1 @ gen_lists_rec_angle a2
-                    | Cosine(l1,a2) => gen_lists_rec_line l1 @ gen_lists_rec_angle a2
-                    | Tangent(l1,a2) => gen_lists_rec_line l1 @ gen_lists_rec_angle a2
-                    | MoveLine(l1,l2) => gen_lists_rec_line l1 @ gen_lists_rec_line l2
+              fun gen_lists_rec_line supress (l as RootLine(_,_)) = (if seen (LineCon l) orelse supress then [Seq.of_list [LineIso(fn cons => cons)]] else (see (LineCon l); [line_sequence]))
+                | gen_lists_rec_line supress line = (case line of
+                      ResolveLine(l1,l2) => gen_lists_rec_line supress l1 @ gen_lists_rec_line false l2
+                    | Concat(l1,l2) => gen_lists_rec_line supress l1 @ gen_lists_rec_line false l2
+                    | SimilarTriangle(l1,l2,l3) => gen_lists_rec_line supress l1 @ gen_lists_rec_line false l2 @ gen_lists_rec_line false l3
+                    | DivRect(r1,l2) => gen_lists_rec_rect supress r1 @ gen_lists_rec_line false l2
+                    | Reverse(l1) => gen_lists_rec_line supress l1
+                    | Rotate(l1,a2) => gen_lists_rec_line supress l1 @ gen_lists_rec_angle false a2
+                    | Sine(l1,a2) => gen_lists_rec_line supress l1 @ gen_lists_rec_angle false a2
+                    | Cosine(l1,a2) => gen_lists_rec_line supress l1 @ gen_lists_rec_angle false a2
+                    | Tangent(l1,a2) => gen_lists_rec_line supress l1 @ gen_lists_rec_angle false a2
+                    | MoveLine(l1,l2) => gen_lists_rec_line supress l1 @ gen_lists_rec_line false l2
                     | RootLine(_,_) => [] (*Case shouldn't occur*)
-              ) @ [line_sequence]
-              and gen_lists_rec_angle (a as RootAngle(_,_,_)) = (if seen (AngleCon a) then [Seq.of_list [AngleIso(fn cons => cons)]] else (see (AngleCon a); [angle_sequence]))
-                | gen_lists_rec_angle angle = (case angle of
-                      ResolveAngle(a1,a2) => gen_lists_rec_angle a1 @ gen_lists_rec_angle a2
-                    | AngleBetween(l1,l2) => gen_lists_rec_line l1 @ gen_lists_rec_line l2
-                    | JoinAngle(a1,a2) => gen_lists_rec_angle a1 @ gen_lists_rec_angle a2
-                    | SubAngle(a1,a2) => gen_lists_rec_angle a1 @ gen_lists_rec_angle a2
-                    | ReverseAngle(a1) => gen_lists_rec_angle a1
-                    | MoveAngle(a1,l2) => gen_lists_rec_angle a1 @ gen_lists_rec_line l2
-                    | OppositeAngle(a1) => gen_lists_rec_angle a1
+              ) @ (if supress then [Seq.of_list [LineIso(fn x => x)]] else [line_sequence])
+              and gen_lists_rec_angle supress (a as RootAngle(_,_,_)) = (if seen (AngleCon a) orelse supress then [Seq.of_list [AngleIso(fn cons => cons)]] else (see (AngleCon a); [angle_sequence]))
+                | gen_lists_rec_angle supress angle = (case angle of
+                      ResolveAngle(a1,a2) => gen_lists_rec_angle supress a1 @ gen_lists_rec_angle false a2
+                    | AngleBetween(l1,l2) => gen_lists_rec_line supress l1 @ gen_lists_rec_line false l2
+                    | JoinAngle(a1,a2) => gen_lists_rec_angle supress a1 @ gen_lists_rec_angle false a2
+                    | SubAngle(a1,a2) => gen_lists_rec_angle supress a1 @ gen_lists_rec_angle false a2
+                    | ReverseAngle(a1) => gen_lists_rec_angle supress a1
+                    | MoveAngle(a1,l2) => gen_lists_rec_angle supress a1 @ gen_lists_rec_line false l2
+                    | OppositeAngle(a1) => gen_lists_rec_angle supress a1
                     | RootAngle(_,_,_) => [] (*Case shouldn't occur*)
-                ) @ [angle_sequence]
-              and gen_lists_rec_rect (r as RootRect(_,_,_)) = (if seen (RectCon r) then [Seq.of_list [RectIso(fn cons => cons)]] else (see (RectCon r); [rect_sequence]))
-                | gen_lists_rec_rect rect = (case rect of
-                      ResolveRect(r1,r2) => gen_lists_rec_rect r1 @ gen_lists_rec_rect r2
-                    | MKRect(l1,l2) => gen_lists_rec_line l1 @ gen_lists_rec_line l2
-                    | JoinRect(r1,r2) => gen_lists_rec_rect r1 @ gen_lists_rec_rect r2
-                    | SubRect(r1,r2) => gen_lists_rec_rect r1 @ gen_lists_rec_rect r2
-                    | NextRect(r1) => gen_lists_rec_rect r1
-                    | MoveRect(r1,l2) => gen_lists_rec_rect r1 @ gen_lists_rec_line l2
-                    | Pythag(l1,l2) => gen_lists_rec_line l1 @ gen_lists_rec_line l2
+                ) @ (if supress then [Seq.of_list [AngleIso(fn x => x)]] else [angle_sequence])
+              and gen_lists_rec_rect supress (r as RootRect(_,_,_)) = (if seen (RectCon r) orelse supress then [Seq.of_list [RectIso(fn cons => cons)]] else (see (RectCon r); [rect_sequence]))
+                | gen_lists_rec_rect supress rect = (case rect of
+                      ResolveRect(r1,r2) => gen_lists_rec_rect supress r1 @ gen_lists_rec_rect false r2
+                    | MKRect(l1,l2) => gen_lists_rec_line supress l1 @ gen_lists_rec_line false l2
+                    | JoinRect(r1,r2) => gen_lists_rec_rect supress r1 @ gen_lists_rec_rect false r2
+                    | SubRect(r1,r2) => gen_lists_rec_rect supress r1 @ gen_lists_rec_rect false r2
+                    | NextRect(r1) => gen_lists_rec_rect supress r1
+                    | MoveRect(r1,l2) => gen_lists_rec_rect supress r1 @ gen_lists_rec_line false l2
+                    | Pythag(l1,l2) => gen_lists_rec_line supress l1 @ gen_lists_rec_line false l2
                     | RootRect(_,_,_) => [] (*Case shouldn't occur*)
-                ) @ [rect_sequence];
+                ) @ (if supress then [Seq.of_list [RectIso(fn x => x)]] else [rect_sequence]);
           in
               case con of
-                  LineCon(x) => gen_lists_rec_line x
-                | AngleCon(x) => gen_lists_rec_angle x
-                | RectCon(x) => gen_lists_rec_rect x
+                  LineCon(x) => gen_lists_rec_line true x
+                | AngleCon(x) => gen_lists_rec_angle true x
+                | RectCon(x) => gen_lists_rec_rect true x
           end;
     
     fun use_isos con isos =
@@ -264,6 +264,8 @@ struct
           val count = List.foldr (op *) 1 counts;
           val _ = print ((Int.toString count) ^ " variations available. \n");
           val multiplied = multiply_sequences seqs;
+          val count2 = (List.length o Seq.list_of) multiplied;
+          val _ = print ("That is, "^ (Int.toString count2) ^ " variations available. \n");
           val variations = Seq.map (use_isos ml_rep) multiplied;
       in
           variations
