@@ -220,41 +220,49 @@ struct
         end
 
     fun multiply_sequences (sequences: 'a Seq.seq list) : 'a list Seq.seq = 
-        let fun enumerate (n:int) (st:'a Seq.seq) (seq:'a Seq.seq) : ('a * 'a Seq.seq * int) Seq.seq = 
-                    Seq.make (fn () => case Seq.pull seq of NONE => NONE | SOME(hd,tl) => SOME((hd, st, n), enumerate (n + 1) st tl));
-            val enumerated : ('a * 'a Seq.seq * int) Seq.seq list = 
-                    List.map (fn seq => enumerate 0 seq seq) sequences;
-            fun increment ((hd,st,n),tl) max =
-                if n < max then
+        let type 'a enumerated_sequence = ('a * 'a Seq.seq * int) Seq.seq
+            fun to_enumerated (sq:'a Seq.seq) : 'a enumerated_sequence =
+                let fun enumerate_rec (n:int) (st:'a Seq.seq) (seq:'a Seq.seq) : ('a * 'a Seq.seq * int) Seq.seq = 
+                            Seq.make (fn () => case Seq.pull seq of NONE => NONE | SOME(hd,tl) => SOME((hd, st, n), enumerate_rec (n + 1) st tl));
+                in enumerate_rec 0 sq sq end
+            exception EndOfSequence;
+            exception MaxReached;
+            fun inc_enumerated_seq max ((hd,st,n),tl) =
+                    if n+1 = max then raise MaxReached else
                     case Seq.pull tl of
-                        SOME(x) => (x, false)
-                      | NONE => (Basics.the (Seq.pull (enumerate 0 st st)), true)
-                else
-                    (Basics.the(Seq.pull (enumerate 0 st st)), true);
-            fun increment_all [] max = ([], true)
-              | increment_all (x::xs) max = 
-                    case increment x max of
-                        (v, false) => (v::xs, false)
-                      | (v, true) => case increment_all xs max of
-                            (vs, false) => (v::vs, false)
-                          | (vs, true) => (x::xs, true);
-            fun any_left [] = false
-              | any_left (x::xs) =
-                    case Seq.pull (#2 x) of
-                        NONE => any_left xs
-                      | SOME(_) => true
-            fun next (xs, max) = case increment_all xs max of
-                (vs, false) => SOME(vs, max)
-              | (vs, true) => if any_left xs then next(xs, max + 1) else NONE;  (*could include a check here for finite product*)
+                        SOME(x) => x
+                      | NONE => raise EndOfSequence;
+            fun reset_enumerated_seq ((hd,st,n),tl) = (Basics.the o Seq.pull) (to_enumerated st);
+            exception MultiMaxReached
+            fun inc_multiple_enumerated_seqs max [] = raise MultiMaxReached
+              | inc_multiple_enumerated_seqs max (x::xs) = (
+                    inc_enumerated_seq max x :: xs 
+                    handle EndOfSequence => reset_enumerated_seq x :: inc_multiple_enumerated_seqs max xs
+                         | MaxReached => reset_enumerated_seq x :: inc_multiple_enumerated_seqs max xs
+                  );
+            val reset_multiple = List.map reset_enumerated_seq
+            fun has_value v [] = false
+              | has_value v (((_,_,x),_)::xs) = v = x orelse has_value v xs;
+            fun inc_until_has_value v xs =
+                let val next_xs = inc_multiple_enumerated_seqs v xs in
+                    if has_value (v - 1) next_xs then
+                        next_xs
+                    else
+                        inc_until_has_value v next_xs
+                end;
+            fun next (xs, v) = SOME(inc_until_has_value v xs, v) handle MultiMaxReached => (
+                        SOME(inc_until_has_value (v + 1) (reset_multiple xs), v+1) handle MultiMaxReached => NONE
+                    );
             fun nextSeq x = case next x of
                 NONE => Seq.make (fn () => SOME (x, Seq.empty))
               | SOME(v) => Seq.make (fn () => SOME (x, nextSeq (v)));
-            val annotated = nextSeq (List.map (Basics.the o Seq.pull) enumerated, 1);
+            val annotated = nextSeq (List.map (Basics.the o Seq.pull o to_enumerated) sequences, 1);
         in
             Seq.map
                 (fn s => List.map (#1 o #1) (#1 s)) 
                 (annotated)
         end;
+
 
     fun instantiate keep_tokens replacements construction = 
       let val ml_rep = rep2rep_to_ml keep_tokens replacements construction;
@@ -264,8 +272,6 @@ struct
           val count = List.foldr (op *) 1 counts;
           val _ = print ((Int.toString count) ^ " variations available. \n");
           val multiplied = multiply_sequences seqs;
-          val count2 = (List.length o Seq.list_of) multiplied;
-          val _ = print ("That is, "^ (Int.toString count2) ^ " variations available. \n");
           val variations = Seq.map (use_isos ml_rep) multiplied;
       in
           variations
