@@ -272,7 +272,16 @@ struct
           val count = List.foldr (op *) 1 counts;
           val _ = print ((Int.toString count) ^ " variations available. \n");
           val multiplied = multiply_sequences seqs;
-          val variations = Seq.map (use_isos ml_rep) multiplied;
+          fun replace_all geom = 
+                let val replace_map_point = ref [];
+                    val replace_map_direction = ref [];
+                    val replace_map_distance = ref [];
+                    fun get_replacement_for replace_map x = case List.find (fn (x1,_) => x = x1) (!replace_map) of (SOME (_,y)) => y | NONE => (let val n = ref NONE; val _ = (replace_map := (x, n) :: !replace_map); in n end);
+                    val replacers = (get_replacement_for replace_map_point, get_replacement_for replace_map_direction, get_replacement_for replace_map_distance);
+                in
+                  Geometry.map_points (Geometry.map_leaves_p replacers, Geometry.map_leaves_s replacers) geom
+                end;
+          val variations = Seq.map (replace_all o (use_isos ml_rep)) multiplied;
       in
           variations
       end
