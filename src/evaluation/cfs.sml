@@ -39,7 +39,7 @@ struct
                 let 
                     (* val _ = (print o get_idea_latex) x; *)
                     fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
-                    val pp_result = (Postprocessing.postprocess (50,9000) (fn x => ())) x;
+                    val pp_result = (Postprocessing.postprocess (700,0) (fn x => ())) x;
                     val _ = Postprocessing.print_summary pp_result;
                     val _ = Postprocessing.print_proven pp_result;
                     val _ = Postprocessing.print_probable pp_result;
