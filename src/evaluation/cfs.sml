@@ -28,7 +28,7 @@ struct
     fun get_idea_latex idea = (Latex.construction (0.0,0.0) (construction_of idea) ^ "\n\n");
 
 
-    fun summary_test (source_construction_name,_,_) = 
+    fun summary_test (source_construction_name,_,_,lims) = 
         let val _ = print ("TRANSFERRING "^ source_construction_name ^ ".\n");
             val source_construction = #construction (Document.findConstructionWithName document source_construction_name);
             fun output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
@@ -39,7 +39,7 @@ struct
                 let 
                     (* val _ = (print o get_idea_latex) x; *)
                     fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
-                    val pp_result = (Postprocessing.postprocess (700,0) (fn x => ())) x;
+                    val pp_result = (Postprocessing.postprocess lims (fn x => ())) x;
                     val _ = Postprocessing.print_summary pp_result;
                     val _ = Postprocessing.print_proven pp_result;
                     val _ = Postprocessing.print_probable pp_result;
@@ -55,13 +55,13 @@ struct
 
     fun summary_test_all () =
         let val inputs = [
-                ("additionCommutes","t12","t13:equality"),
-                ("additionAssociates","t25","t26:equality"),
-                ("additionDistributes","t60","t61:equality"),
-                ("cosSin","t93","t94:equality"),
-                ("trigonometry","t124","t125:equality")
+                ("additionCommutes","t12","t13:equality",(50,200)),
+                ("additionAssociates","t25","t26:equality",(50,200)),
+                ("additionDistributes","t60","t61:equality",(50,1000)),
+                ("cosSin","t93","t94:equality",(50,200)),
+                ("trigonometry","t124","t125:equality",(50,1000))
             ];
-            val _ = List.map summary_test inputs;
+            val _ = PolyML.Profiling.profile PolyML.Profiling.ProfileTime (List.map summary_test) inputs;
         in
             ()
         end;
@@ -98,7 +98,7 @@ struct
                     val _ = Postprocessing.print_summary pp_result;
                     val _ = Postprocessing.print_proven pp_result;
                     val _ = Postprocessing.print_probable pp_result;
-                    val _ = Postprocessing.print_possible pp_result;
+                    (* val _ = Postprocessing.print_possible pp_result; *)
                 in
                     ()
                 end;
@@ -106,6 +106,19 @@ struct
         in
             ()
         end
+
+    fun test_other_strings lims = 
+        let val other_strings = [
+                ("commutative multiplication", "A * B = B * A"),
+                ("associative multiplication", "A * open B * C close = open A * B close * C"),
+                ("definition of tan", "tan A = sin A / cos A"),
+                ("completing the square", "open A + B close * open A + B close = open A * A + A * B close + open B * A + B * B close"),
+                ("one with a tan is sexy", "1 + tan A * tan A = open 1 / cos A close / cos A")
+            ];
+            val _ = List.map (fn (x,y) => (PolyML.print x; test_string y lims)) other_strings;
+        in
+            ()
+        end;
 
     fun angel_5 () = 
         let val p1 = ref NONE;
@@ -187,7 +200,33 @@ struct
         in
             (Geometry.numeric_direction map lhs, Geometry.numeric_direction map rhs)
         end;
-
+    
+    fun test_split_distance () = 
+        let val _ = ();
+            val Direction = (ref o SOME o Geometry.Direction);
+            val Move = (ref o SOME o Geometry.Move);
+            val Right = (ref o SOME o Geometry.Right);
+            val RDir = (ref o SOME o Geometry.RDir);
+            val Divide = (ref o SOME o Geometry.Divide);
+            val Dot = (ref o SOME o Geometry.Dot);
+            val JoinRect = Geometry.JoinRect;
+            val ResolveRect = Geometry.ResolveRect;
+            val Value = (ref o SOME o Geometry.Value);
+            val Distance = (ref o SOME o Geometry.Distance);
+            val Times = (ref o SOME o Geometry.Times);
+            val Rect = Geometry.RootRect
+            val A = "A"; val B = "B"; val C = "C";
+            val p229 = ref NONE;
+            val p228 = ref NONE;
+            val p230 = ref NONE;
+            val d231 = ref NONE;
+            val p232 = ref NONE;
+            val d233 = ref NONE;
+            val input = ResolveRect(JoinRect(JoinRect(Rect(Move(Move(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Distance(p229, p228)), Distance(p230, Move(Move(p230, d231, Value(C)), d231, Value(B))))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Times(Value(B), Distance(p229, p228))), Times(Distance(p232, Move(Move(p232, d233, Value(C)), d233, Value(B))), Value(C)))), Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), Divide(Value(A), Distance(Move(Move(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Distance(p229, p228)), Distance(p230, Move(Move(p230, d231, Value(C)), d231, Value(B))))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Times(Value(B), Distance(p229, p228))), Times(Distance(p232, Move(Move(p232, d233, Value(C)), d233, Value(B))), Value(C)))), Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C)))))), Rect(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), p228, Divide(Value(B), Distance(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), p228)))), Rect(p228, p229, Divide(Value(C), Distance(p228, p229)))), JoinRect(Rect(Move(Move(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Distance(p229, p228)), Distance(p230, Move(Move(p230, d231, Value(C)), d231, Value(B))))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Times(Value(B), Distance(p229, p228))), Times(Distance(p232, Move(Move(p232, d233, Value(C)), d233, Value(B))), Value(C)))), Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), Divide(Value(A), Distance(Move(Move(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Distance(p229, p228)), Distance(p230, Move(Move(p230, d231, Value(C)), d231, Value(B))))), Right(Right(Direction(p228, p229))), Divide(Times(Value(A), Times(Value(B), Distance(p229, p228))), Times(Distance(p232, Move(Move(p232, d233, Value(C)), d233, Value(B))), Value(C)))), Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C)))))), JoinRect(Rect(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), p228, Divide(Value(B), Distance(Move(p228, Right(Right(Direction(p228, p229))), Divide(Times(Value(B), Distance(p229, p228)), Value(C))), p228))), Rect(p228, p229, Divide(Value(C), Distance(p228, p229))))))
+            val _ = (print o GeometryProver.print_proof_answer) (GeometryProver.attempt_proof (fn x => ()) (Geometry.RectCon(input)));
+        in 
+            ()
+        end;
     
     fun test_solver () =
         let open Geometry
