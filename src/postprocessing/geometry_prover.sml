@@ -22,6 +22,10 @@ struct
 
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
+    val debug = false;
+    fun debug_print x = if debug then PolyML.print x else x;
+    fun debug_print_lazy f = if debug then PolyML.print (f ()) else ();
+
     datatype proof_answer = Proven of Geometry.construction 
                           | Refuted 
                           | Possible of Geometry.construction * Geometry.pos_neg_constraint list list list 
@@ -74,7 +78,7 @@ struct
                 else
                     point
                 end; (*ZeroPath?*)
-            fun iter pos_c = (Geometry.map_points (shorten_point, fn x => x) construction; (List.mapPartial use_pos_con pos_c));
+            fun iter pos_c = (assignment_flag := false; Geometry.map_points (shorten_point, fn x => x) construction; (List.mapPartial (use_pos_con o debug_print) pos_c));
             val stop_count = ref 0;
             fun stopping _ = (stop_count := !stop_count + 1; 
                     (!stop_count > 2 andalso !assignment_flag = false) orelse !stop_count > 50
