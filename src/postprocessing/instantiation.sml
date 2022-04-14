@@ -22,7 +22,8 @@ struct
         | _ => raise InstantiationException "isomorphism / geometry type mismatch";
 
     val line_sequence = Seq.of_list [
-        LineIso(fn cons => cons),
+        LineIso(fn cons => cons)
+        ,
         LineIso(fn cons => Geometry.Reverse (cons)),
         LineIso(fn cons => Geometry.MoveLine (cons, Geometry.RootLine(ref NONE, ref NONE))),
         LineIso(fn cons => Geometry.Rotate (cons, Geometry.RootAngle(ref NONE, ref NONE, ref NONE))),
@@ -32,7 +33,8 @@ struct
     ];
 
     val angle_sequence = Seq.of_list [
-        AngleIso(fn cons => cons),
+        AngleIso(fn cons => cons)
+        ,
         AngleIso(fn cons => Geometry.ReverseAngle (cons)),
         AngleIso(fn cons => Geometry.OppositeAngle (cons)),
         AngleIso(fn cons => Geometry.MoveAngle (cons, Geometry.RootLine(ref NONE, ref NONE))),
@@ -43,7 +45,8 @@ struct
     ]
 
     val rect_sequence = Seq.of_list [
-        RectIso(fn cons => cons),
+        RectIso(fn cons => cons)
+        ,
         RectIso(fn cons => Geometry.NextRect (cons)),
         RectIso(fn cons => (Geometry.NextRect o Geometry.NextRect) (cons)),
         RectIso(fn cons => (Geometry.NextRect o Geometry.NextRect o Geometry.NextRect) (cons)),

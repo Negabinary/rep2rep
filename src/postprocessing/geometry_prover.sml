@@ -22,7 +22,7 @@ struct
 
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
-    val debug = false;
+    val debug = true;
     fun debug_print x = if debug then PolyML.print x else x;
     fun debug_print_lazy f = if debug then PolyML.print (f ()) else ();
 
@@ -34,7 +34,7 @@ struct
     
     exception DisjunctionException;
     exception RefutationException;
-    fun un_cdc [] = raise RefutationException 
+    fun un_cdc [] = (raise RefutationException)
       | un_cdc [[]] = NONE 
       | un_cdc [[X(x)]] = SOME (x) 
       | un_cdc _ = raise DisjunctionException;
@@ -78,7 +78,9 @@ struct
                 else
                     point
                 end; (*ZeroPath?*)
-            fun iter pos_c = (assignment_flag := false; Geometry.map_points (shorten_point, fn x => x) construction; (List.mapPartial (use_pos_con o debug_print) pos_c));
+            fun print_con x = (debug_print construction; x);
+            fun shorten x = (Geometry.map_points (shorten_point, fn x => x) construction; x)
+            fun iter pos_c = (assignment_flag := false; (List.mapPartial (shorten o print_con o use_pos_con o debug_print) pos_c));
             val stop_count = ref 0;
             fun stopping _ = (stop_count := !stop_count + 1; 
                     (!stop_count > 2 andalso !assignment_flag = false) orelse !stop_count > 50

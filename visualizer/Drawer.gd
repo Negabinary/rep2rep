@@ -546,6 +546,10 @@ func generate(tree:Dictionary):
 				generate(tree.children[0]),
 				generate(tree.children[1])
 			)
+		"Zero":
+			var z = Value.new()
+			z.value = 0
+			return z
 		var other:
 			if other in map:
 				return map[other]

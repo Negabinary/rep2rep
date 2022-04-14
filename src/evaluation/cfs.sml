@@ -268,7 +268,7 @@ struct
             val Ul9 = root_line "1";
             val Aa9 = root_angle "A";
             val tests = [
-                    ("Commutative-line-1",
+                    (*("Commutative-line-1",
                         LineCon(
                             ResolveLine(
                                 Concat(
@@ -283,7 +283,7 @@ struct
                                 )
                             )
                         )
-                    ),
+                    ),*)
                     ("Commutative-line-2",
                         LineCon(
                             ResolveLine(
@@ -300,7 +300,7 @@ struct
                                 )
                             )
                         )
-                    ),
+                    )(*,
                     ("Commutative-angle",
                         AngleCon(
                             ResolveAngle(
@@ -540,7 +540,7 @@ struct
                                 )
                             )
                         )
-                    )
+                    )*)
                 ]
             fun run_test (test_name, test) = 
                 let val _ = print (test_name ^ ":-------------------------------------------------------\n");
