@@ -151,9 +151,9 @@ struct
     exception Timeout
     val time = ref (Time.fromSeconds 0);
     fun reset_time () = time := Time.now ();
-    fun timeout () = if Time.now () > (!time + (Time.fromMilliseconds 1000000)) then raise Timeout else ();
+    fun timeout () = if Time.now () > (!time + (Time.fromMilliseconds 100)) then raise Timeout else ();
 
-    val debug = true;
+    val debug = false;
 
     val loop_root = ref NONE;
 
@@ -243,7 +243,8 @@ struct
       | same_distance_term (SRTermValue(v1)) (SRTermValue(v2)) = if v1 = v2 then YES else NO
       | same_distance_term _ _ = MAYBE
     and same_path_distance (Path(steps_1)) (Path(steps_2)) = 
-        let fun normalise_direction [] = []
+        let val _ = timeout ();
+            fun normalise_direction [] = []
               | normalise_direction (((nn, vv, dd), ss)::xs) =
                     let val (x1,y1) = Multiset.fold (fn (((x,y,z),w),(hx,hy)) => (Int.min (x, hx), Multiset.intersect (fn p => fn q => p = q) y hy)) (nn, vv) xs;
                     in 
@@ -273,6 +274,7 @@ struct
             end
     and same_path_direction path_1 path_2 = 
         let 
+            val _ = timeout ();
             val (cancelled_1, cancelled_2) = Multiset.cancel (definite same_step) (steps_of (normalise_distance path_1), steps_of (normalise_distance path_2));
         in
             (case (cancelled_1, cancelled_2) of
@@ -675,7 +677,7 @@ struct
     
     fun get_circle_constraints q = 
         let val (p as Path(xs)) = dedenom_loop q;
-            val _ = (if debug then PolyML.print else (fn x => x)) p
+            val _ = (*(if debug then PolyML.print else (fn x => x))*) p
             val otherwise = [[Geometry.X(Geometry.PC(loop_root, path_to_points (Path(xs)) loop_root))]] 
             val _ = if zero_length_path p = YES then raise Proven [[]] else ();
             val _ = if is_some (singular_direction (p)) andalso zero_length_path p = NO then raise Refuted else () handle ZeroPath => raise Proven [[]];
@@ -776,13 +778,32 @@ struct
                     if zero_length_path (Path others) = YES then
                         set_step_to_zero (step)
                     else
-                        ()
+                        ();
+            fun set_step_if_free (((n,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
+                if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso y1 = x2) then
+                    (try_set_point x1 (path_to_points (turn_path ((4 - n) mod 4) (Path other_steps)) y1);
+                    try_set_point y1 (path_to_points (turn_path ((6 - n) mod 4) (Path other_steps)) x1))
+                else
+                    ()
+              | set_step_if_free (((n,[],DRBetween(x1, y1)),([SRTermUnknown(z)],[])), other_steps) =
+                (
+                    try_set_point_and_distance
+                        x1 (* = *) (
+                            (ref o SOME o Geometry.Move) (y1, path_to_direction (turn_path ((4 - n) mod 4) (Path other_steps)), ref NONE)
+                        )
+                        z (* = *) (
+                            path_to_distance (Path other_steps)
+                        )
+                        handle ZeroPath => raise Refuted
+                )
+              | set_step_if_free _ = (); (*TODO: ADD MORE CASES*)
             val _ = Multiset.pick_map set_zero_if_other xs;
             val _ = Multiset.pick_map set_same_if_free xs;
+            val _ = Multiset.pick_map set_step_if_free xs;
+            val _ = Multiset.pick_map (fn (y, ys) => if same_path (reverse_path (Path [y])) (Path ys) = NO then (("RefPair"); raise Refuted) else ()) xs;
             val _ = Multiset.pick_map set_dir_if_free xs;
             val _ = Multiset.pick_map set_dist_if_free xs;
             val _ = Multiset.pick_map set_dist_if_bij xs;
-            val _ = Multiset.pick_map (fn (y, ys) => if same_path (reverse_path (Path [y])) (Path ys) = NO then (("RefPair"); raise Refuted) else ()) xs;
         in
             otherwise
         end handle (Proven x) => x | Refuted => [];

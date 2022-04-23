@@ -22,7 +22,7 @@ struct
 
     datatype 'a answer = YES | NO | MAYBE of 'a;
 
-    val debug = true;
+    val debug = false;
     fun debug_print x = if debug then PolyML.print x else x;
     fun debug_print_lazy f = if debug then PolyML.print (f ()) else ();
 

@@ -29,7 +29,8 @@ struct
 
 
     fun summary_test (source_construction_name,_,_,lims) = 
-        let val _ = print ("TRANSFERRING "^ source_construction_name ^ ".\n");
+        let val st = Time.now();
+            val _ = print ("TRANSFERRING "^ source_construction_name ^ ".\n");
             val source_construction = #construction (Document.findConstructionWithName document source_construction_name);
             fun output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
             val ideas = get_ideas output source_construction
@@ -48,6 +49,8 @@ struct
                     ()
                 end
             val _ = List.map loop ideas;
+            val et = Time.now();
+            val _ = PolyML.print (Time.toSeconds(et - st))
         in
             ()
         end;
@@ -55,11 +58,12 @@ struct
 
     fun summary_test_all () =
         let val inputs = [
-                ("additionCommutes","t12","t13:equality",(50,200)),
-                ("additionAssociates","t25","t26:equality",(50,200)),
-                ("additionDistributes","t60","t61:equality",(50,1000)),
-                ("cosSin","t93","t94:equality",(50,200)),
-                ("trigonometry","t124","t125:equality",(50,1000))
+                (*
+                ("additionCommutes","t12","t13:equality",(1000,0)),
+                ("additionAssociates","t25","t26:equality",(1000,0)),
+                ("additionDistributes","t60","t61:equality",(20000,0)),
+                ("cosSin","t93","t94:equality",(1000,0)),*)
+                ("trigonometry","t124","t125:equality",(60000,0))
             ];
             val _ = PolyML.Profiling.profile PolyML.Profiling.ProfileTime (List.map summary_test) inputs;
         in
@@ -231,7 +235,7 @@ struct
     fun test_solver () =
         let open Geometry
             fun root_line letter = let val s = ref NONE in RootLine(s, (ref o SOME o Move) (s, ref NONE, (ref o SOME o Value) letter)) end;
-            fun root_angle letter = let val s = ref NONE; val t = ref NONE in RootAngle(s, t, (ref o SOME o Move) (t, (ref o SOME o RDir) ((ref o SOME o Direction) (s,t), letter), (ref o SOME o Distance) (s,t))) end;
+            fun root_angle letter = let val s = ref NONE; val t = ref NONE in RootAngle(s, t, (ref o SOME o Move) (t, (ref o SOME o RDir) ((ref o SOME o Direction) (t,s), letter), ref NONE)) end;
             fun root_rect letter = let val s = ref NONE; val t = ref NONE in RootRect(s, t, (ref o SOME o Divide) ((ref o SOME o Value) letter, (ref o SOME o Distance) (s,t))) end;
             val Al1 = root_line "A";
             val Bl1 = root_line "B";
@@ -267,8 +271,8 @@ struct
             val Aa8 = root_angle "A";
             val Ul9 = root_line "1";
             val Aa9 = root_angle "A";
-            val tests = [
-                    (*("Commutative-line-1",
+            val tests = [(*
+                    ("Commutative-line-1",
                         LineCon(
                             ResolveLine(
                                 Concat(
@@ -283,7 +287,7 @@ struct
                                 )
                             )
                         )
-                    ),*)
+                    ),
                     ("Commutative-line-2",
                         LineCon(
                             ResolveLine(
@@ -300,7 +304,7 @@ struct
                                 )
                             )
                         )
-                    )(*,
+                    ),
                     ("Commutative-angle",
                         AngleCon(
                             ResolveAngle(
@@ -496,7 +500,7 @@ struct
                                 )
                             )
                         )
-                    ),
+                    ),*)
                     ("sin-sq-cos-sq",
                         RectCon(
                             ResolveRect(
@@ -526,21 +530,21 @@ struct
                             ResolveRect(
                                 Pythag(
                                     Cosine(
-                                        Ul8,
-                                        Aa8
+                                        Ul9,
+                                        Aa9
                                     ),
                                     Sine(
-                                        Ul8,
-                                        Aa8
+                                        Ul9,
+                                        Aa9
                                     )
                                 ),
                                 MKRect(
-                                    Reverse(Ul8),
-                                    Rotate(Reverse(Ul8), RootAngle(ref NONE, ref NONE, ref NONE))
+                                    Reverse(Ul9),
+                                    Rotate(Reverse(Ul9), RootAngle(ref NONE, ref NONE, ref NONE))
                                 )
                             )
                         )
-                    )*)
+                    )
                 ]
             fun run_test (test_name, test) = 
                 let val _ = print (test_name ^ ":-------------------------------------------------------\n");
