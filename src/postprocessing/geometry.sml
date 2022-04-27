@@ -20,7 +20,8 @@ struct
                        | Divide of distance_con option ref * distance_con option ref
                        | Value of string
                        | SCopy of distance_con option ref
-                       | Dot of direction_con option ref * direction_con option ref;
+                       | Dot of direction_con option ref * direction_con option ref
+                       | Zero;
     
     datatype relation = SamePoint of point_con option ref * point_con option ref
                       | SameDirection of direction_con option ref * direction_con option ref
@@ -71,7 +72,8 @@ struct
           | (SOME(Divide (s1,s2))) => (map_deep_state_s f s1; map_deep_state_s f s2; fs s)
           | (SOME(Value (x))) => fs s
           | (SOME(SCopy (s1))) => fs s
-          | (SOME(Dot (d1, d2))) => (map_deep_state_d f d1; map_deep_state_d f d2; fs s);
+          | (SOME(Dot (d1, d2))) => (map_deep_state_d f d1; map_deep_state_d f d2; fs s)
+          | (SOME(Zero)) => fs s;
 
     fun map_leaves_p (f as (fp,_,_)) p = case !p of
             NONE => fp p
@@ -90,7 +92,8 @@ struct
           | (SOME(Divide (s1,s2))) => (ref o SOME) (Divide (map_leaves_s f s1, map_leaves_s f s2))
           | (SOME(Value (x))) => (ref o SOME) (Value (x))
           | (SOME(SCopy (s1))) => (ref o SOME) (SCopy (map_leaves_s f s1))
-          | (SOME(Dot (d1, d2))) => (ref o SOME) (Dot (map_leaves_d f d1, map_leaves_d f d2));
+          | (SOME(Dot (d1, d2))) => (ref o SOME) (Dot (map_leaves_d f d1, map_leaves_d f d2))
+          | (SOME(Zero)) => (ref o SOME) Zero;
     
     fun map_points_l (fp,fs) (RootLine (x,y)) = RootLine(fp x, fp y)
       | map_points_l f (ResolveLine (x,y)) = ResolveLine(map_points_l f x, map_points_l f y)
@@ -538,7 +541,8 @@ struct
       | SOME(Divide(x,y)) => pcs check x orelse pcs check y
       | SOME(Value(x)) => false
       | SOME(SCopy(x)) => pcs check x
-      | SOME(Dot(a,b)) => pcd check a orelse pcd check b;
+      | SOME(Dot(a,b)) => pcd check a orelse pcd check b
+      | SOME(Zero) => false;
     
     fun dcp check const = case !const of
         NONE => false
@@ -557,7 +561,8 @@ struct
       | SOME(Divide(x,y)) => dcs check x orelse dcs check y
       | SOME(Value(x)) => false
       | SOME(SCopy(x)) => dcs check x
-      | SOME(Dot(a,b)) => direction_contains_check check a orelse direction_contains_check check b;
+      | SOME(Dot(a,b)) => direction_contains_check check a orelse direction_contains_check check b
+      | SOME(Zero) => false;
     
     fun scp check const = case !const of
         NONE => false
@@ -576,7 +581,8 @@ struct
       | SOME(Divide(x,y)) => distance_contains_check check x orelse distance_contains_check check y
       | SOME(Value(x)) => false
       | SOME(SCopy(x)) => distance_contains_check check x
-      | SOME(Dot(a,b)) => scd check a orelse scd check b;
+      | SOME(Dot(a,b)) => scd check a orelse scd check b
+      | SOME(Zero) => false;
 
     fun inc n = (n := !n + 1; !n);
 
@@ -603,7 +609,8 @@ struct
       | SOME(Divide(a,b)) => "Divide("^(print_distance a (pm,dm,sm,n))^", "^(print_distance b (pm,dm,sm,n))^")"
       | SOME(Value(v)) => "Value(" ^ v ^")"
       | SOME(SCopy(s)) => print_distance s (pm,dm,sm,n)
-      | SOME(Dot(a,b)) => "Dot(" ^ print_direction a (pm,dm,sm,n) ^ "," ^ print_direction b (pm,dm,sm,n) ^ ")";
+      | SOME(Dot(a,b)) => "Dot(" ^ print_direction a (pm,dm,sm,n) ^ "," ^ print_direction b (pm,dm,sm,n) ^ ")"
+      | SOME(Zero) => "Zero";
     
     fun print_constraint (PC(x,y)) z = (print_point x z) ^ " = " ^ (print_point y z)
       | print_constraint (DC(x,y)) z = (print_direction x z) ^ " = " ^ (print_direction y z)
@@ -693,7 +700,8 @@ struct
       | numeric_distance f (Divide (a,b)) = hs numeric_distance f (a) / hs numeric_distance f (b)
       | numeric_distance f (Value (v)) = f v
       | numeric_distance f (SCopy (a)) = hs numeric_distance f (a)
-      | numeric_distance f (Dot (a,b)) = cos (hd numeric_direction f (a) - hd numeric_direction f (b));
+      | numeric_distance f (Dot (a,b)) = cos (hd numeric_direction f (a) - hd numeric_direction f (b))
+      | numeric_distance f (Zero) = 0.0;
 
     fun create_map () =
         let val map = ref [];
@@ -732,13 +740,4 @@ struct
             Real.abs (v2 - v1) < 0.00000001
         end
 
-    (*
-      and distance_con = Distance of point_con option ref * point_con option ref
-                       | Times of distance_con option ref * distance_con option ref
-                       | Divide of distance_con option ref * distance_con option ref
-                       | Value of string
-                       | SCopy of distance_con option ref
-                       | Dot of direction_con option ref * direction_con option ref;
-    
-    *)
 end

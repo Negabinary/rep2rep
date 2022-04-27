@@ -29,7 +29,8 @@ struct
 
 
     fun summary_test (source_construction_name,_,_,lims) = 
-        let val _ = print ("TRANSFERRING "^ source_construction_name ^ ".\n");
+        let val st = Time.now();
+            val _ = print ("TRANSFERRING "^ source_construction_name ^ ".\n");
             val source_construction = #construction (Document.findConstructionWithName document source_construction_name);
             fun output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
             val ideas = get_ideas output source_construction
@@ -48,6 +49,8 @@ struct
                     ()
                 end
             val _ = List.map loop ideas;
+            val et = Time.now();
+            val _ = PolyML.print (Time.toSeconds(et - st))
         in
             ()
         end;
@@ -231,7 +234,7 @@ struct
     fun test_solver () =
         let open Geometry
             fun root_line letter = let val s = ref NONE in RootLine(s, (ref o SOME o Move) (s, ref NONE, (ref o SOME o Value) letter)) end;
-            fun root_angle letter = let val s = ref NONE; val t = ref NONE in RootAngle(s, t, (ref o SOME o Move) (t, (ref o SOME o RDir) ((ref o SOME o Direction) (s,t), letter), (ref o SOME o Distance) (s,t))) end;
+            fun root_angle letter = let val s = ref NONE; val t = ref NONE in RootAngle(s, t, (ref o SOME o Move) (t, (ref o SOME o RDir) ((ref o SOME o Direction) (t,s), letter), ref NONE)) end;
             fun root_rect letter = let val s = ref NONE; val t = ref NONE in RootRect(s, t, (ref o SOME o Divide) ((ref o SOME o Value) letter, (ref o SOME o Distance) (s,t))) end;
             val Al1 = root_line "A";
             val Bl1 = root_line "B";
@@ -267,7 +270,7 @@ struct
             val Aa8 = root_angle "A";
             val Ul9 = root_line "1";
             val Aa9 = root_angle "A";
-            val tests = [
+            val tests = [(*
                     ("Commutative-line-1",
                         LineCon(
                             ResolveLine(
@@ -496,7 +499,7 @@ struct
                                 )
                             )
                         )
-                    ),
+                    ),*)
                     ("sin-sq-cos-sq",
                         RectCon(
                             ResolveRect(
@@ -526,17 +529,17 @@ struct
                             ResolveRect(
                                 Pythag(
                                     Cosine(
-                                        Ul8,
-                                        Aa8
+                                        Ul9,
+                                        Aa9
                                     ),
                                     Sine(
-                                        Ul8,
-                                        Aa8
+                                        Ul9,
+                                        Aa9
                                     )
                                 ),
                                 MKRect(
-                                    Reverse(Ul8),
-                                    Rotate(Reverse(Ul8), RootAngle(ref NONE, ref NONE, ref NONE))
+                                    Reverse(Ul9),
+                                    Rotate(Reverse(Ul9), RootAngle(ref NONE, ref NONE, ref NONE))
                                 )
                             )
                         )

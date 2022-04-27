@@ -24,13 +24,13 @@ __meta__ = {
 }
 
 [node name="TextEdit" type="LineEdit" parent="VSplitContainer"]
-margin_right = 1004.0
+margin_right = 620.0
 margin_bottom = 24.0
 
 [node name="Control" type="ColorRect" parent="VSplitContainer"]
 margin_top = 36.0
-margin_right = 1004.0
-margin_bottom = 580.0
+margin_right = 620.0
+margin_bottom = 460.0
 size_flags_vertical = 3
 size_flags_stretch_ratio = 4.97
 color = Color( 0.0509804, 0.0745098, 0.129412, 1 )
@@ -47,8 +47,8 @@ __meta__ = {
 }
 
 [node name="ColorRect" type="ColorRect" parent="VSplitContainer/Control/HSplitContainer"]
-margin_right = 194.0
-margin_bottom = 544.0
+margin_right = 118.0
+margin_bottom = 424.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 color = Color( 0.215686, 0.215686, 0.215686, 1 )
@@ -65,30 +65,30 @@ __meta__ = {
 }
 
 [node name="Variables" type="VBoxContainer" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
-margin_right = 174.0
+margin_right = 98.0
 script = ExtResource( 3 )
 
 [node name="HSeparator" type="HSeparator" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
 margin_top = 4.0
-margin_right = 174.0
+margin_right = 98.0
 margin_bottom = 8.0
 
 [node name="Control" type="Control" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
 margin_top = 12.0
-margin_right = 174.0
-margin_bottom = 520.0
+margin_right = 98.0
+margin_bottom = 400.0
 size_flags_vertical = 3
 
 [node name="Parameters" type="VBoxContainer" parent="VSplitContainer/Control/HSplitContainer/ColorRect/VBoxContainer"]
-margin_top = 524.0
-margin_right = 174.0
-margin_bottom = 524.0
+margin_top = 404.0
+margin_right = 98.0
+margin_bottom = 404.0
 script = ExtResource( 3 )
 
 [node name="ColorRect2" type="ColorRect" parent="VSplitContainer/Control/HSplitContainer"]
-margin_left = 206.0
-margin_right = 1004.0
-margin_bottom = 544.0
+margin_left = 130.0
+margin_right = 620.0
+margin_bottom = 424.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 4.0

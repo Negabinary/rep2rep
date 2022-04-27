@@ -34,7 +34,7 @@ struct
     
     exception DisjunctionException;
     exception RefutationException;
-    fun un_cdc [] = raise RefutationException 
+    fun un_cdc [] = (raise RefutationException)
       | un_cdc [[]] = NONE 
       | un_cdc [[X(x)]] = SOME (x) 
       | un_cdc _ = raise DisjunctionException;
