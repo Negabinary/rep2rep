@@ -27,7 +27,7 @@ func add_direction_resolve(pr, d1, d2, neg=false):
 	resolvers.add_child(DirectionResolve.new(pr, d1, d2, not neg))
 
 func add_distance_resolve(p1, d1, s1, p2, d2, s2, neg=false):
-	pass
+	resolvers.add_child(DistanceResolve.new(p1,d1,s1,p2,d2,s2,not neg))
 
 func generate(tree:Dictionary):
 	match tree.kind:

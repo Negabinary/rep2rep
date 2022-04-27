@@ -39,6 +39,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://geometry/distance/distance.gd"
 }, {
+"base": "Control",
+"class": "DistanceResolve",
+"language": "GDScript",
+"path": "res://geometry/distance/distance_resolve.gd"
+}, {
 "base": "Distance",
 "class": "Divide",
 "language": "GDScript",
@@ -121,6 +126,7 @@ _global_script_class_icons={
 "Direction": "",
 "DirectionResolve": "",
 "Distance": "",
+"DistanceResolve": "",
 "Divide": "",
 "Dot": "",
 "Drawer": "",
@@ -143,6 +149,11 @@ _global_script_class_icons={
 config/name="Visualizer"
 run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
+
+[display]
+
+window/size/width=640
+window/size/height=480
 
 [input]
 
