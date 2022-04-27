@@ -681,9 +681,6 @@ struct
             val otherwise = [[Geometry.X(Geometry.PC(loop_root, path_to_points (Path(xs)) loop_root))]] 
             val _ = if zero_length_path p = YES then raise Proven [[]] else ();
             val _ = if is_some (singular_direction (p)) andalso zero_length_path p = NO then raise Refuted else () handle ZeroPath => raise Proven [[]];
-            fun set_same_if_free (((_,_,DRBetween(x1,y1)),_), other_steps) = 
-                    if zero_length_path (Path other_steps) = YES then try_set_point y1 x1 else ()
-              | set_same_if_free _ = ();
             fun set_dir_if_free (((n,[],DRBetween(x1,y1)),_), other_steps) = (
                     try_set_point y1 (* = *) (
                         let val other_path = (turn_path ((6 - n) mod 4) (Path other_steps));
@@ -798,7 +795,6 @@ struct
                 )
               | set_step_if_free _ = (); (*TODO: ADD MORE CASES*)
             val _ = Multiset.pick_map set_zero_if_other xs;
-            val _ = Multiset.pick_map set_same_if_free xs;
             val _ = Multiset.pick_map set_step_if_free xs;
             val _ = Multiset.pick_map (fn (y, ys) => if same_path (reverse_path (Path [y])) (Path ys) = NO then (("RefPair"); raise Refuted) else ()) xs;
             val _ = Multiset.pick_map set_dir_if_free xs;
