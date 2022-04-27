@@ -52,9 +52,10 @@ struct
 
     fun attempt_proof debug_output construction =
         let val _ = Path.reset_time ();
+            val _ = PolyML.print construction;
             val (pos_constraints, neg_constraints) = get_constraints construction;
             fun until (c:'a -> bool) (f:'a -> 'a) (v:'a) : 'a = if c v then v else until c f (f v);
-            fun use_pos_con (PC(p1,p2)) = un_cdc (Path.get_circle_constraints (Path.path_between p1 p2))
+            fun use_pos_con (PC(p1,p2)) = (debug_print (PC(p1,p2)); un_cdc (Path.get_circle_constraints (Path.path_between p1 p2)))
               | use_pos_con (DC(d1,d2)) = 
                     let val dist = ref NONE;
                     in
@@ -78,7 +79,9 @@ struct
                 else
                     point
                 end; (*ZeroPath?*)
-            fun iter pos_c = (assignment_flag := false; Geometry.map_points (shorten_point, fn x => x) construction; (List.mapPartial (use_pos_con o debug_print) pos_c));
+            fun print_con x = (debug_print construction; x);
+            fun shorten x = (Geometry.map_points (shorten_point, fn x => x) construction; x)
+            fun iter pos_c = (assignment_flag := false; (List.mapPartial (shorten o print_con o use_pos_con) pos_c));
             val stop_count = ref 0;
             fun stopping _ = (stop_count := !stop_count + 1; 
                     (!stop_count > 2 andalso !assignment_flag = false) orelse !stop_count > 50

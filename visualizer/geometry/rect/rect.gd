@@ -7,7 +7,8 @@ var start : Point
 var width : Distance
 var end : Point
 
-var color := Color(0,0,0,0.2)
+var line_color := Color(0,0,0,0.2)
+var color := Color(0,0,0,0.1)
 
 func _init(start, end, width):
 	self.start = start
@@ -34,3 +35,14 @@ func _draw():
 		end.get_point_pos() + perpendicular,
 		start.get_point_pos() + perpendicular
 	]),color)
+	draw_polyline(
+		PoolVector2Array([
+			start.get_point_pos(),
+			end.get_point_pos(),
+			end.get_point_pos() + perpendicular,
+			start.get_point_pos() + perpendicular,
+			start.get_point_pos()
+		]),
+		line_color,
+		3
+	)

@@ -12,5 +12,5 @@ func _init(a:Distance, b:Distance):
 	recalculate()
 
 func recalculate():
-	value = a.get_value() * b.get_value()
+	value = a.get_value() * b.get_value() / 30
 	emit_signal("changed")

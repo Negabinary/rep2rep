@@ -41,9 +41,9 @@ struct
                     fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
                     val pp_result = (Postprocessing.postprocess lims (fn x => ())) x;
                     val _ = Postprocessing.print_summary pp_result;
-                    val _ = Postprocessing.print_proven pp_result;
-                    val _ = Postprocessing.print_probable pp_result;
-                    (* val _ = Postprocessing.print_possible pp_result; *)
+                    (* val _ = Postprocessing.print_proven pp_result; *)
+                    (* val _ = Postprocessing.print_probable pp_result; *)
+                    val _ = Postprocessing.print_possible pp_result;
                 in
                     ()
                 end
@@ -54,12 +54,12 @@ struct
 
 
     fun summary_test_all () =
-        let val inputs = [
-                ("additionCommutes","t12","t13:equality",(50,200)),
-                ("additionAssociates","t25","t26:equality",(50,200)),
-                ("additionDistributes","t60","t61:equality",(50,1000)),
-                ("cosSin","t93","t94:equality",(50,200)),
-                ("trigonometry","t124","t125:equality",(50,1000))
+        let val inputs = [                
+                ("additionCommutes","t12","t13:equality",(1000,0))(*,
+                ("additionAssociates","t25","t26:equality",(1000,0)),
+                ("additionDistributes","t60","t61:equality",(20000,0)),
+                ("cosSin","t93","t94:equality",(1000,0)),
+                ("trigonometry","t124","t125:equality",(60000,0))*)
             ];
             val _ = PolyML.Profiling.profile PolyML.Profiling.ProfileTime (List.map summary_test) inputs;
         in

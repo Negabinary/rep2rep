@@ -613,8 +613,107 @@ struct
     
     fun get_circle_constraints q = 
         let val (p as Path(xs)) = dedenom_loop q;
+            val _ = (if debug then PolyML.print else (fn x => x)) p
+            val otherwise = [[Geometry.X(Geometry.PC(loop_root, path_to_points (Path(xs)) loop_root))]] 
             val _ = if zero_length_path p = YES then raise Proven [[]] else ();
-            val _ = if is_some (singular_direction p) andalso zero_length_path p = NO then raise Refuted else () handle ZeroPath => raise Proven [[]];
+            val _ = if is_some (singular_direction (p)) andalso zero_length_path p = NO then raise Refuted else () handle ZeroPath => raise Proven [[]];
+            fun set_dir_if_free (((n,[],DRBetween(x1,y1)),_), other_steps) = (
+                    PolyML.print "HERE!";
+                    try_set_point y1 (* = *) (
+                        let val other_path = (turn_path ((6 - n) mod 4) (Path other_steps));
+                        in
+                            if zero_length_path other_path = NO then
+                                (ref o SOME o Geometry.Move) (x1, path_to_direction other_path, ref NONE)
+                            else
+                                (ref o SOME o Geometry.Move) (x1, path_to_direction other_path, (ref o SOME o Geometry.Distance) (x1, ref NONE))
+                        end
+                    ) handle Proven [[]] => raise (Proven otherwise);
+                    PolyML.print "HEREE!";
+                    try_set_point x1 (* = *) (
+                        let val other_path = (turn_path ((4 - n) mod 4) (Path other_steps));
+                        in
+                            if zero_length_path other_path = NO then
+                                (ref o SOME o Geometry.Move) (y1, path_to_direction other_path, ref NONE)
+                            else
+                                (ref o SOME o Geometry.Move) (y1, path_to_direction other_path, (ref o SOME o Geometry.Distance) (y1, ref NONE))
+                        end
+                    ) handle Proven [[]] => raise (Proven otherwise)
+                )
+              | set_dir_if_free (((n,[],DRUnknown(d)),_), other_steps) = (
+                    try_set_direction d (* = *) (
+                        path_to_direction (turn_path ((6 - n) mod 4) (Path other_steps))
+                    )
+                )
+              | set_dir_if_free _ = ()
+
+            fun set_dist_term_if_free p (SRTermBetween(x1,y1), other) = (
+                    try_set_point y1 (* = *) ((ref o SOME o Geometry.Move) (x1, ref NONE, path_to_distance (divide_path p (other, []))))
+                )
+              | set_dist_term_if_free p (SRTermUnknown(x), other) = (
+                    try_set_distance x (* = *) (path_to_distance (divide_path p (other, [])))
+                )
+              | set_dist_term_if_free p _ = ();
+            fun set_dist_if_free ((step_dir, (numerator, denominator)), other_steps) = 
+                    if same_path_direction (Path [turn_step 2 (step_dir, (numerator, denominator))]) (Path other_steps) = YES then
+                        (Multiset.pick_map (set_dist_term_if_free (divide_path (Path other_steps) ([], denominator))) numerator; ())
+                    else
+                        ()
+            fun set_dist_if_bij (step as (step_dir, (numerator, denominator)), other_steps) = 
+                    let val turned_step = turn_step 2 step;
+                        val opp_steps = Multiset.filter (fn x => same_step_direction x turned_step = YES) other_steps;
+                        fun for_each_opp_step (opp_dir, (opp_num, opp_denom)) = 
+                            let fun set_dist_term_if_bij (SRTermUnknown x, other) = (
+                                        try_set_distance_if_q x (path_to_distance (reverse_path (divide_path (Path [(opp_dir, (opp_num, opp_denom))]) (other, denominator)))) otherwise)
+                                | set_dist_term_if_bij (SRTermBetween (x,y), other) = (
+                                        try_set_point_if_q y (* = *) ((ref o SOME o Geometry.Move) (
+                                            x,
+                                            ref NONE,
+                                            path_to_distance (reverse_path (divide_path (Path [(opp_dir, (opp_num, opp_denom))]) (other, denominator)))
+                                        )) otherwise;
+                                        try_set_point_if_q x (* = *) ((ref o SOME o Geometry.Move) (
+                                            y,
+                                            ref NONE,
+                                            path_to_distance (reverse_path (divide_path (Path [(opp_dir, (opp_num, opp_denom))]) (other, denominator)))
+                                        )) otherwise
+                                    )
+                                | set_dist_term_if_bij _ = ()
+                            in
+                                Multiset.pick_map set_dist_term_if_bij numerator
+                            end
+                        val _ = Multiset.map for_each_opp_step opp_steps;
+                    in
+                        ()
+                    end
+            fun set_step_to_zero (step_dir, (num,denom)) = 
+                let fun can_set_to_zero (SRTermBetween(x1,x2)) = SOME (fn () => (
+                            try_set_point x1 x2;
+                            try_set_point x2 x1;
+                            raise (Proven otherwise)
+                        )) 
+                      | can_set_to_zero (SRTermUnknown x) = SOME  (fn () => (
+                            try_set_distance x ((ref o SOME) Geometry.Zero);
+                            raise (Proven otherwise)
+                      ))
+                      | can_set_to_zero (SRTermValue _) = NONE
+                      | can_set_to_zero (SRTermPath p) = (case zero_length_path p of 
+                            YES => raise (Proven [[]])
+                          | MAYBE => SOME (fn () => raise (Proven otherwise))
+                          | NO => NONE
+                        )
+                      | can_set_to_zero (SRTermDot (p1, p2)) = NONE
+                      | can_set_to_zero (SRTermSDot x) = NONE;
+                    val zeroable_nums = Multiset.mapPartial can_set_to_zero num;
+                in
+                    case zeroable_nums of
+                        [] => raise Refuted
+                      | [x] => x ()
+                      | _ => raise (Proven otherwise)
+                end
+            fun set_zero_if_other (step,others) =
+                    if zero_length_path (Path others) = YES then
+                        set_step_to_zero (step)
+                    else
+                        ();
             fun set_step_if_free (((n,[],DRBetween(x1,y1)),([SRTermBetween(x2,y2)],[])), other_steps) = 
                 if (x1 = x2 andalso y1 = y2) orelse (x1 = y2 andalso y1 = x2) then
                     (try_set_point x1 (path_to_points (turn_path ((4 - n) mod 4) (Path other_steps)) y1);
@@ -667,10 +766,14 @@ struct
             val direction = ref NONE;
             
         in 
-            [[Geometry.X(Geometry.PC(
+            [[Geometry.X(Geometry.SC(
+                path_to_distance path_1,
+                path_to_distance path_2
+            ))]]
+            (* [[Geometry.X(Geometry.PC(
                 (ref o SOME o Geometry.Move) (start, direction, path_to_distance path_1),
                 (ref o SOME o Geometry.Move) (start, direction, path_to_distance path_2)
-            ))]]
+            ))]] *)
         end handle (Proven x) => x | Refuted => [];
 
     fun get_direction_constraints ((path_1 as Path(steps_1 as (s1::_))),(path_2 as Path(steps_2 as (s2::_)))) = (
@@ -689,6 +792,10 @@ struct
             val start = ref NONE;
             val distance = ref NONE;
         in
+            (* [[Geometry.X(Geometry.DC(
+                path_to_direction path_1,
+                path_to_direction path_2
+            ))]] *)
             [[Geometry.X(Geometry.PC(
                 (ref o SOME o Geometry.Move) (start, path_to_direction path_1, distance),
                 (ref o SOME o Geometry.Move) (start, path_to_direction path_2, distance)
