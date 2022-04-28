@@ -13,6 +13,7 @@ struct
                        | PCopy of point_con option ref
      and direction_con = Direction of point_con option ref * point_con option ref
                        | RDir of direction_con option ref * string
+                       | LDir of direction_con option ref * string
                        | Right of direction_con option ref
                        | DCopy of direction_con option ref
       and distance_con = Distance of point_con option ref * point_con option ref
@@ -63,6 +64,7 @@ struct
             NONE => fd d
           | (SOME(Direction (p1,p2))) => (map_deep_state_p f p1; map_deep_state_p f p2; fd d)
           | (SOME(RDir (d1,v1))) => (map_deep_state_d f d1; fd d)
+          | (SOME(LDir (d1,v1))) => (map_deep_state_d f d1; fd d)
           | (SOME(Right (d1))) => (map_deep_state_d f d1; fd d)
           | (SOME(DCopy (d1))) => (map_deep_state_d f d1; fd d)
     and map_deep_state_s (f as (_,_,fs)) s = case !s of
@@ -83,6 +85,7 @@ struct
             NONE => fd d
           | (SOME(Direction (p1,p2))) => (ref o SOME) (Direction (map_leaves_p f p1, map_leaves_p f p2))
           | (SOME(RDir (d1,v1))) => (ref o SOME) (RDir (map_leaves_d f d1,v1))
+          | (SOME(LDir (d1,v1))) => (ref o SOME) (LDir (map_leaves_d f d1,v1))
           | (SOME(Right (d1))) => (ref o SOME) (Right (map_leaves_d f d1))
           | (SOME(DCopy (d1))) => (ref o SOME) (DCopy (map_leaves_d f d1))
     and map_leaves_s (f as (_,_,fs)) s = case !s of
@@ -532,6 +535,7 @@ struct
         NONE => false
       | SOME(Direction(x,y)) => point_contains_check check x orelse point_contains_check check y
       | SOME(RDir(x,s)) => pcd check x
+      | SOME(LDir(x,s)) => pcd check x
       | SOME(Right(x)) => pcd check x
       | SOME(DCopy(x)) => pcd check x
     and pcs check const = case !const of
@@ -552,6 +556,7 @@ struct
         NONE => const = check
       | SOME(Direction(x,y)) => dcp check x orelse dcp check y
       | SOME(RDir(x,s)) => direction_contains_check check x
+      | SOME(LDir(x,s)) => direction_contains_check check x
       | SOME(Right(x)) => direction_contains_check check x
       | SOME(DCopy(x)) => direction_contains_check check x
     and dcs check const = case !const of
@@ -572,6 +577,7 @@ struct
         NONE => false
       | SOME(Direction(x,y)) => scp check x orelse scp check y
       | SOME(RDir(x,s)) => scd check x
+      | SOME(LDir(x,s)) => scd check x
       | SOME(Right(x)) => scd check x
       | SOME(DCopy(x)) => scd check x
     and distance_contains_check check const = case !const of
@@ -598,6 +604,7 @@ struct
           | SOME(x,y) => "d" ^ (PolyML.makestring y))
       | SOME(Direction(a,b)) => "Direction("^(print_point a (pm,dm,sm,n))^", "^(print_point b (pm,dm,sm,n))^")" 
       | SOME(RDir(d,v)) => "RDir(" ^ (print_direction d (pm,dm,sm,n)) ^ ", " ^ v ^ ")"
+      | SOME(LDir(d,v)) => "LDir(" ^ (print_direction d (pm,dm,sm,n)) ^ ", " ^ v ^ ")"
       | SOME(Right(d)) => "Right(" ^ (print_direction d (pm,dm,sm,n)) ^ ")"
       | SOME(DCopy(d)) => print_direction d (pm,dm,sm,n)
     and print_distance distance (pm,dm,sm,n) = case !distance of
@@ -688,6 +695,7 @@ struct
                 atan2 (nby - nay, nbx - nax)
             end
       | numeric_direction f (RDir(a,v)) = cadd (hd numeric_direction f (a) - (f v))
+      | numeric_direction f (LDir(a,v)) = cadd (hd numeric_direction f (a) + (f v))
       | numeric_direction f (Right(a)) = cadd (hd numeric_direction f (a) - pi / 2.0)
       | numeric_direction f (DCopy(a)) = hd numeric_direction f (a)
     and numeric_distance f (Distance(a,b)) = 
