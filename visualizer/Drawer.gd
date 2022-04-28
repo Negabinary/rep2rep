@@ -518,6 +518,11 @@ func generate(tree:Dictionary):
 				generate(tree.children[0]),
 				generate(tree.children[1])
 			)
+		"LDir":
+			return LDir.new(
+				generate(tree.children[0]),
+				generate(tree.children[1])
+			)
 		"Right":
 			return Right.new(
 				generate(tree.children[0])

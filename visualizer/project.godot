@@ -59,6 +59,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Drawer.gd"
 }, {
+"base": "Direction",
+"class": "LDir",
+"language": "GDScript",
+"path": "res://geometry/direction/ldir.gd"
+}, {
 "base": "Control",
 "class": "Line",
 "language": "GDScript",
@@ -130,6 +135,7 @@ _global_script_class_icons={
 "Divide": "",
 "Dot": "",
 "Drawer": "",
+"LDir": "",
 "Line": "",
 "MovablePoint": "",
 "Move": "",
