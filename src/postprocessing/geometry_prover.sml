@@ -52,7 +52,6 @@ struct
 
     fun attempt_proof debug_output construction =
         let val _ = Path.reset_time ();
-            val _ = PolyML.print construction;
             val (pos_constraints, neg_constraints) = get_constraints construction;
             fun until (c:'a -> bool) (f:'a -> 'a) (v:'a) : 'a = if c v then v else until c f (f v);
             fun use_pos_con (PC(p1,p2)) = (debug_print (PC(p1,p2)); un_cdc (Path.get_circle_constraints (Path.path_between p1 p2)))

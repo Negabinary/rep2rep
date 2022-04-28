@@ -42,9 +42,9 @@ struct
                     fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
                     val pp_result = (Postprocessing.postprocess lims (fn x => ())) x;
                     val _ = Postprocessing.print_summary pp_result;
-                    (* val _ = Postprocessing.print_proven pp_result; *)
-                    (* val _ = Postprocessing.print_probable pp_result; *)
-                    val _ = Postprocessing.print_possible pp_result;
+                    val _ = Postprocessing.print_proven pp_result;
+                    val _ = Postprocessing.print_probable pp_result;
+                    (* val _ = Postprocessing.print_possible pp_result; *)
                 in
                     ()
                 end
@@ -270,7 +270,7 @@ struct
             val Aa8 = root_angle "A";
             val Ul9 = root_line "1";
             val Aa9 = root_angle "A";
-            val tests = [(*
+            val tests = [
                     ("Commutative-line-1",
                         LineCon(
                             ResolveLine(
@@ -499,7 +499,7 @@ struct
                                 )
                             )
                         )
-                    ),*)
+                    ),
                     ("sin-sq-cos-sq",
                         RectCon(
                             ResolveRect(

@@ -737,7 +737,6 @@ struct
             val _ = if zero_length_path p = YES then raise Proven [[]] else ();
             val _ = if is_some (singular_direction (p)) andalso zero_length_path p = NO then raise Refuted else () handle ZeroPath => raise Proven [[]];
             fun set_dir_if_free (((n,m,DRBetween(x1,y1)),_), other_steps) = (
-                    PolyML.print "HERE!";
                     try_set_point y1 (* = *) (
                         let val other_path = turn_path ((6 - n) mod 4) (Path other_steps);
                         in
@@ -747,7 +746,6 @@ struct
                                 (ref o SOME o Geometry.Move) (x1, turn_through (path_to_direction other_path) (MultisetPair.invert m), (ref o SOME o Geometry.Distance) (x1, ref NONE))
                         end
                     ) handle Proven [[]] => raise (Proven otherwise);
-                    PolyML.print "HEREE!";
                     try_set_point x1 (* = *) (
                         let val other_path = (turn_path ((4 - n) mod 4) (Path other_steps));
                         in
