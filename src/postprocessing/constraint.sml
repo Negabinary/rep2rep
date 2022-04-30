@@ -771,7 +771,6 @@ struct
                         turn_through (path_to_direction (turn_path ((6 - n) mod 4) (Path other_steps)))  (MultisetPair.invert m)
                     )
                 )
-              | set_dir_if_free _ = ()
 
             fun set_dist_term_if_free p (SRTermBetween(x1,y1), other) = (
                     try_set_point y1 (* = *) ((ref o SOME o Geometry.Move) (x1, ref NONE, path_to_distance (divide_path p (other, []))))

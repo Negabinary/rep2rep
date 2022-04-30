@@ -342,7 +342,16 @@ struct
                         (ref o SOME o Direction) (get_line_start b, get_line_end b),
                         (ref o SOME o Direction) (get_line_start c, get_line_end c)
                     )
-                ], []
+                ], [
+                  DC(
+                    dirof a,
+                    dirof b
+                  ),
+                  DC(
+                    (ref o SOME o Right o ref o SOME o Right) (dirof a),
+                    dirof b
+                  )
+                ]
             )
       | DivRect(r,l) => mc
             (mc (get_rect_constraints r) (get_line_constraints l))

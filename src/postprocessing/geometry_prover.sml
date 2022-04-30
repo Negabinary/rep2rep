@@ -71,6 +71,7 @@ struct
                             Path.distance_direction_to_path (s2, dir)
                         ) (ref NONE))
                     end
+              | use_pos_con (rc) = 
                     if Path.does_hold rc then
                         NONE
                     else if Path.does_not_hold rc then
