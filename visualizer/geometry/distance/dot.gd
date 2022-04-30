@@ -12,5 +12,5 @@ func _init(a:Direction,b:Direction):
 	recalculate()
 
 func recalculate():
-	value = b.get_unit().dot(a.get_unit())
+	value = b.get_unit().dot(a.get_unit()) * 30
 	emit_signal("changed")
