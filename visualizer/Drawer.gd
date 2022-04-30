@@ -78,7 +78,7 @@ func generate(tree:Dictionary):
 			)
 			add_child(Line.new(c.get_line_start(), missing_point))
 			add_point_resolve(a.get_line_start(), b.get_line_end())
-			add_point_resolve(b.get_line_start(), c.get_line_end())
+			add_point_resolve(b.get_line_start(), c.get_line_start())
 			add_direction_resolve(c.get_line_start(), b.get_line_direction(), c.get_line_direction())
 			add_child(line)
 			return line
@@ -248,7 +248,7 @@ func generate(tree:Dictionary):
 			var a = generate(tree.children[0])
 			var b = generate(tree.children[1])
 			var c = generate(tree.children[2])
-			var angle = Angle.new(a,b,c)
+			var angle = Angle.new(a,b,c,true)
 			add_child(angle)
 			add_point_resolve(a,b,true)
 			add_point_resolve(b,c,true)
@@ -264,7 +264,7 @@ func generate(tree:Dictionary):
 		"AngleBetween":
 			var line_1 = generate(tree.children[0])
 			var line_2 = generate(tree.children[1])
-			var angle = Angle.new(line_1.get_line_end(), line_1.get_line_start(), line_2.get_line_end())
+			var angle = Angle.new(line_1.get_line_end(), line_1.get_line_start(), line_2.get_line_end(),false)
 			add_point_resolve(line_1.get_line_start(), line_2.get_line_start())
 			add_point_resolve(line_1.get_line_end(), line_2.get_line_end(), true)
 			add_child(angle)
