@@ -637,7 +637,17 @@ struct
             val path_2 = distance_direction_to_path (s2, d);
         in
             same_path_distance path_1 path_2
-        end;
+        end
+  | holds (Geometry.RC(r1,r2)) = case (!r1, !r2) of
+            (SOME(Geometry.Clockwise),SOME(Geometry.Clockwise)) => YES
+          | (SOME(Geometry.Clockwise),SOME(Geometry.Opposite(a))) => (case !a of
+                SOME(Geometry.Clockwise) => NO
+              | SOME(Geometry.Opposite(b)) => holds (Geometry.RC(r1,b))
+              | NONE => MAYBE
+            )
+          | (SOME(Geometry.Opposite(a)),SOME(Geometry.Clockwise)) => holds (Geometry.RC(r2,r1))
+          | (SOME(Geometry.Opposite(a)),SOME(Geometry.Opposite(b))) => holds (Geometry.RC(a,b))
+          | _ => MAYBE;
     
     fun does_hold x = holds x = YES;
     fun does_not_hold x = holds x = NO;

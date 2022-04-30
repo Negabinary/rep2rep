@@ -71,6 +71,12 @@ struct
                             Path.distance_direction_to_path (s2, dir)
                         ) (ref NONE))
                     end
+                    if Path.does_hold rc then
+                        NONE
+                    else if Path.does_not_hold rc then
+                        raise RefutationException
+                    else
+                        SOME(rc)
             fun shorten_point point = 
                 let val (start, path) = Path.point_to_path point in 
                 if is_some (!point) then

@@ -22,11 +22,9 @@ struct
                        | Value of string
                        | SCopy of distance_con option ref
                        | Dot of direction_con option ref * direction_con option ref
-                       | Zero;
-    
-    datatype relation = SamePoint of point_con option ref * point_con option ref
-                      | SameDirection of direction_con option ref * direction_con option ref
-                      | sameDistance of distance_con option ref * distance_con option ref
+                       | Zero
+           and rot_con = Clockwise
+                       | Opposite of rot_con option ref;
 
     datatype line_con = RootLine of point_con option ref * point_con option ref
                       | ResolveLine of line_con * line_con
@@ -268,6 +266,15 @@ struct
             (ref o SOME o Distance) (get_angle_middle a, get_angle_start a)
         )
     
+    and get_angle_rot (RootAngle(a,b,c)) = ref (SOME (Clockwise))
+      | get_angle_rot (ResolveAngle(a, b)) = get_angle_rot a
+      | get_angle_rot (AngleBetween(a, b)) = ref (SOME (Clockwise))
+      | get_angle_rot (JoinAngle(a, b)) = get_angle_rot a
+      | get_angle_rot (SubAngle(a, b)) = get_angle_rot a
+      | get_angle_rot (ReverseAngle(a)) = (ref o SOME o Opposite) (get_angle_rot a)
+      | get_angle_rot (MoveAngle(a,l)) = get_angle_rot a
+      | get_angle_rot (OppositeAngle(a)) = get_angle_rot a
+    
     and get_rect_start (RootRect(a, b, c)) = a
       | get_rect_start (ResolveRect(a, b)) = get_rect_start a
       | get_rect_start (MKRect(a, b)) = get_line_start a
@@ -302,7 +309,8 @@ struct
 
     datatype constraint = PC of point_con option ref * point_con option ref
                         | DC of direction_con option ref * direction_con option ref
-                        | SC of distance_con option ref * distance_con option ref;
+                        | SC of distance_con option ref * distance_con option ref
+                        | RC of rot_con option ref * rot_con option ref;
     
     datatype pos_neg_constraint = Y of constraint | N of constraint | X of constraint;
       (*Y = Yes, N = No, X = Extra condition that can't be proven*)
@@ -403,7 +411,8 @@ struct
                 [
                     PC(get_angle_start a, get_angle_start b),
                     PC(get_angle_middle a, get_angle_middle b),
-                    PC(get_angle_end a, get_angle_end b)
+                    PC(get_angle_end a, get_angle_end b),
+                    RC(get_angle_rot a, get_angle_rot b)
                 ], []
             )
       | AngleBetween(a,b) => mc
@@ -415,7 +424,7 @@ struct
       | JoinAngle(a,b) => mc
             (mc (get_angle_constraints a) (get_angle_constraints b))
             (
-                [PC(get_angle_middle a, get_angle_middle b),PC(get_angle_end a, get_angle_start b)],
+                [PC(get_angle_middle a, get_angle_middle b),PC(get_angle_end a, get_angle_start b),RC(get_angle_rot a, get_angle_rot b)],
                 [PC(get_angle_start a, get_angle_end b)]
             )
       | SubAngle(a,b) => mc
@@ -423,7 +432,8 @@ struct
             (
                 [
                     PC(get_angle_middle a, get_angle_middle b), 
-                    PC(get_angle_end a, get_angle_end b)
+                    PC(get_angle_end a, get_angle_end b),
+                    RC(get_angle_rot a, get_angle_rot b)
                 ], [PC(get_angle_start a, get_angle_start b)]
             )
       | ReverseAngle(a) => get_angle_constraints a
@@ -617,11 +627,16 @@ struct
       | SOME(Value(v)) => "Value(" ^ v ^")"
       | SOME(SCopy(s)) => print_distance s (pm,dm,sm,n)
       | SOME(Dot(a,b)) => "Dot(" ^ print_direction a (pm,dm,sm,n) ^ "," ^ print_direction b (pm,dm,sm,n) ^ ")"
-      | SOME(Zero) => "Zero";
+      | SOME(Zero) => "Zero"
+    and print_rot rot z = case !rot of
+        SOME(Clockwise) => "Clockwise"
+      | SOME(Opposite(r)) => "Opposite" ^ print_rot r z
+      | NONE => "Error";
     
     fun print_constraint (PC(x,y)) z = (print_point x z) ^ " = " ^ (print_point y z)
       | print_constraint (DC(x,y)) z = (print_direction x z) ^ " = " ^ (print_direction y z)
-      | print_constraint (SC(x,y)) z = (print_distance x z) ^ " = " ^ (print_distance y z);
+      | print_constraint (SC(x,y)) z = (print_distance x z) ^ " = " ^ (print_distance y z)
+      | print_constraint (RC(x,y)) z = (print_rot x z) ^ " = " ^ (print_rot y z);
     
     fun print_line (RootLine(a,b)) z = "Line(" ^ (print_point a z) ^ ", " ^ (print_point b z) ^ ")"
       | print_line (ResolveLine(a,b)) z = "ResolveLine(" ^ (print_line a z) ^ ", " ^ (print_line b z) ^ ")"
@@ -709,7 +724,8 @@ struct
       | numeric_distance f (Value (v)) = f v
       | numeric_distance f (SCopy (a)) = hs numeric_distance f (a)
       | numeric_distance f (Dot (a,b)) = cos (hd numeric_direction f (a) - hd numeric_direction f (b))
-      | numeric_distance f (Zero) = 0.0;
+      | numeric_distance f (Zero) = 0.0
+    and numeric_rot rot = case !rot of SOME(Clockwise) => false | SOME(Opposite(a)) => not (numeric_rot a) | NONE => false;
 
     fun create_map () =
         let val map = ref [];
@@ -747,5 +763,6 @@ struct
         in
             Real.abs (v2 - v1) < 0.00000001
         end
+      | check_constraint map (RC(a,b)) = (numeric_rot a = numeric_rot b);
 
 end

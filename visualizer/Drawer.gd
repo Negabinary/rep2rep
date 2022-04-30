@@ -272,7 +272,7 @@ func generate(tree:Dictionary):
 		"JoinAngle":
 			var a1 = generate(tree.children[0])
 			var a2 = generate(tree.children[1])
-			var a = Angle.new(a1.get_angle_start(), a1.get_angle_middle(), a2.get_angle_end())
+			var a = Angle.new(a1.get_angle_start(), a1.get_angle_middle(), a2.get_angle_end(),a1.direction)
 			add_point_resolve(a1.get_angle_middle(), a2.get_angle_middle())
 			add_point_resolve(a1.get_angle_end(), a2.get_angle_start())
 			add_point_resolve(a1.get_angle_start(), a2.get_angle_end(), true)
@@ -281,7 +281,7 @@ func generate(tree:Dictionary):
 		"SubAngle":
 			var a1 = generate(tree.children[0])
 			var a2 = generate(tree.children[1])
-			var a = Angle.new(a1.get_angle_start(), a1.get_angle_middle(), a2.get_angle_start())
+			var a = Angle.new(a1.get_angle_start(), a1.get_angle_middle(), a2.get_angle_start(),a1.direction)
 			add_point_resolve(a1.get_angle_middle(), a2.get_angle_middle())
 			add_point_resolve(a1.get_angle_end(), a2.get_angle_end())
 			add_point_resolve(a1.get_angle_start(), a2.get_angle_start(), true)
@@ -289,7 +289,7 @@ func generate(tree:Dictionary):
 			return a
 		"ReverseAngle":
 			var a1 = generate(tree.children[0])
-			var a = Angle.new(a1.get_angle_end(), a1.get_angle_middle(), a1.get_angle_start())
+			var a = Angle.new(a1.get_angle_end(), a1.get_angle_middle(), a1.get_angle_start(),not a1.direction)
 			add_child(a)
 			return a
 		"MoveAngle":
@@ -310,7 +310,7 @@ func generate(tree:Dictionary):
 				DBetween.new(line_2.get_line_start(), line_2.get_line_end()),
 				SBetween.new(line_2.get_line_start(), line_2.get_line_end())
 			)
-			var angle = Angle.new(np1, np2, np3)
+			var angle = Angle.new(np1, np2, np3, angle_1.direction)
 			add_point_resolve(angle_1.get_angle_middle(), line_2.get_line_start())
 			add_child(Line.new(angle_1.get_angle_start(), np1))
 			add_child(Line.new(angle_1.get_angle_middle(), np2))
@@ -329,7 +329,7 @@ func generate(tree:Dictionary):
 				DBetween.new(angle.get_angle_end(), angle.get_angle_middle()),
 				SBetween.new(angle.get_angle_middle(), angle.get_angle_end())
 			)
-			var new_angle = Angle.new(new_start, angle.get_angle_middle(), new_end)
+			var new_angle = Angle.new(new_start, angle.get_angle_middle(), new_end, angle.direction)
 			add_child(new_angle)
 			return new_angle
 		"Rect":
