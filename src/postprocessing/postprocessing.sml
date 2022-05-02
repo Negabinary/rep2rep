@@ -15,6 +15,7 @@ sig
 
     val is_fully_transfered : State.T -> bool;
     val postprocess : int * int -> (GeometryProver.proof_answer -> unit) -> State.T -> postprocessing_result;
+    val count_variants : State.T -> LargeInt.int;
     val postprocess_silent : int * int -> State.T -> postprocessing_result;
 
     val refuted_count : postprocessing_result -> int;
@@ -123,6 +124,17 @@ struct
         in
             proof_answers
         end
+    fun count_variants state =
+        let val result_construction = 
+                case Composition.resultingConstructions (State.patternCompOf state) of
+                    [x] => x
+                    | _ => raise PostProcessingException "Multiple constructions in structure transfer result";
+            val (keep_tokens, replacements, hints, fully_transfered) = parse_relations (State.goalsOf state);
+            val _ = if not fully_transfered then raise NotFullyTransfered else ();
+            val count = Instantiation.count_variants keep_tokens replacements result_construction;
+        in
+            count
+        end;
     fun postprocess_silent limit = postprocess limit (fn x => ());
     fun refuted_count diagrams = count (fn x => x = GeometryProver.Refuted) diagrams;
     fun timeout_count diagrams = count (fn x => x = GeometryProver.Timeout) diagrams;

@@ -87,6 +87,38 @@ struct
             ()
         end;
     
+    fun count_variants str =
+        let val grammar = Document.findGrammarWithName document "equationM";
+            val tokens = String.tokens (fn x => x = #"\n" orelse x = #" ") str;
+            val source_constructions = Grammar.parse grammar "equality" tokens;
+            val source_construction = case source_constructions of (x::_) => x | _ => raise (TestingException "Could not parse expression.");
+            fun output x = ();
+            val ideas = get_ideas output source_construction;
+            val counts = List.map (Postprocessing.count_variants) ideas;
+        in
+            counts
+        end
+    
+    fun test_variant_counts () =
+        let val test_strings = [
+                "A + B = B + A",
+                "open A + B close + C = A + open B + C close",
+                "open A + B close * C = A * C + B * C",
+                "cos A * cos A + sin A * sin A = 1 * 1",
+                "sin A = cos open 90 - A close",
+                "A * B = B * A",
+                "A * open B * C close = open A * B close * C",
+                "tan A = sin A / cos A",
+                "open A + B close * open A + B close = open A * A + A * B close + open B * A + B * B close",
+                "1 + tan A * tan A = open 1 / cos A close / cos A"
+            ];
+            fun iter input = PolyML.print ((List.length o (List.filter (fn x => x = #" ")) o String.explode) input, count_variants input);
+            val res = List.map iter test_strings;
+            val _ = List.map (fn (x,y) => PolyML.print (x,y));
+        in
+            ()
+        end
+    
     fun test_string str lims = 
         let val grammar = Document.findGrammarWithName document "equationM";
             val tokens = String.tokens (fn x => x = #"\n" orelse x = #" ") str;

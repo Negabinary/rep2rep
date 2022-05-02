@@ -4,7 +4,8 @@ import "postprocessing.geometry";
 signature INSTANTIATION = 
 sig
     val instantiate : (string * CSpace.token) list -> (CSpace.token * CSpace.token) list -> Construction.construction -> Geometry.construction Seq.seq;
-    val multiply_sequences : 'a Seq.seq list -> 'a list Seq.seq
+    val multiply_sequences : 'a Seq.seq list -> 'a list Seq.seq;
+    val count_variants : (string * CSpace.token) list -> (CSpace.token * CSpace.token) list -> Construction.construction -> LargeInt.int;
 end
 
 structure Instantiation : INSTANTIATION =
@@ -286,4 +287,13 @@ struct
       in
           variations
       end
+    
+    fun count_variants keep_tokens replacements construction = 
+        let val ml_rep = rep2rep_to_ml keep_tokens replacements construction;
+            val seqs = gen_lists ml_rep;
+            val counts = (List.map (Int.toLarge o List.length o Seq.list_of) seqs);
+            val count = List.foldr (op *) (Int.toLarge 1) counts;
+        in
+            count
+        end
 end
