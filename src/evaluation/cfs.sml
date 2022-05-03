@@ -40,10 +40,12 @@ struct
                 let 
                     (* val _ = (print o get_idea_latex) x; *)
                     fun pp_output x = (print (GeometryProver.print_proof_answer x); PolyML.print "----------------------------------------------------------------"; ());
+                    val stl = Time.now();
                     val pp_result = (Postprocessing.postprocess lims (fn x => ())) x;
+                    val _ = PolyML.print ("Time taken for idea > ",Time.toMilliseconds(Time.now() - stl));
                     val _ = Postprocessing.print_summary pp_result;
-                    val _ = Postprocessing.print_proven pp_result;
-                    val _ = Postprocessing.print_probable pp_result;
+                    (* val _ = Postprocessing.print_proven pp_result; *)
+                    (* val _ = Postprocessing.print_probable pp_result; *)
                     (* val _ = Postprocessing.print_possible pp_result; *)
                 in
                     ()
@@ -58,11 +60,11 @@ struct
 
     fun summary_test_all () =
         let val inputs = [                
-                ("additionCommutes","t12","t13:equality",(1000,0))(*,
+                ("additionCommutes","t12","t13:equality",(1000,0)),
                 ("additionAssociates","t25","t26:equality",(1000,0)),
-                ("additionDistributes","t60","t61:equality",(20000,0)),
+                ("additionDistributes","t60","t61:equality",(1000,0)),
                 ("cosSin","t93","t94:equality",(1000,0)),
-                ("trigonometry","t124","t125:equality",(60000,0))*)
+                ("trigonometry","t124","t125:equality",(1000,0))
             ];
             val _ = PolyML.Profiling.profile PolyML.Profiling.ProfileTime (List.map summary_test) inputs;
         in
@@ -302,7 +304,10 @@ struct
             val Aa8 = root_angle "A";
             val Ul9 = root_line "1";
             val Aa9 = root_angle "A";
-            val tests = [
+            val Aa10 = root_angle "A";
+            val Ul10 = root_line "1";
+            val Bl10 = root_angle "B";
+            val tests = [(*
                     ("Commutative-line-1",
                         LineCon(
                             ResolveLine(
@@ -435,24 +440,27 @@ struct
                     ("distribution-rect",
                         RectCon(
                             ResolveRect(
-                                JoinRect(
-                                    MKRect(
-                                        Al4,
-                                        Cl4
-                                    ),
-                                    MKRect(
-                                        Bl4,
-                                        MoveLine(
-                                            Cl4,
-                                            RootLine(ref NONE, ref NONE)
-                                        )
-                                    )
-                                ),
                                 MKRect(
                                     Concat(
                                         Al4, Bl4
                                     ),
-                                    Cl4
+                                    MoveLine(
+                                            Cl4,
+                                            RootLine(ref NONE, ref NONE)
+                                        )
+                                ),
+                                JoinRect(
+                                    MKRect(
+                                        Al4,
+                                        MoveLine(
+                                            Cl4,
+                                            RootLine(ref NONE, ref NONE)
+                                        )
+                                    ),
+                                    MKRect(
+                                        Bl4,
+                                        Cl4
+                                    )
                                 )
                             )
                         )
@@ -473,16 +481,26 @@ struct
                                         Ul5,
                                         Cl5
                                     ),
-                                    SimilarTriangle(
+                                    MoveLine(
                                         MoveLine(
-                                            MoveLine(
-                                                Bl5,
-                                                RootLine(ref NONE, ref NONE)
+                                            Reverse(
+                                                SimilarTriangle(
+                                                    MoveLine(
+                                                        MoveLine(
+                                                            Reverse(
+                                                                Bl5
+                                                            ),
+                                                            RootLine(ref NONE, ref NONE)
+                                                        ),
+                                                        RootLine(ref NONE, ref NONE)
+                                                    ),
+                                                    Ul5,
+                                                    Cl5
+                                                )
                                             ),
-                                            RootLine(ref NONE, ref NONE)
+                                    RootLine(ref NONE, ref NONE)
                                         ),
-                                        MoveLine(Ul5,RootLine(ref NONE, ref NONE)),
-                                        MoveLine(Cl5,RootLine(ref NONE, ref NONE))
+                                        RootLine(ref NONE, ref NONE)
                                     )
                                 )
                             )
@@ -555,7 +573,7 @@ struct
                                 )
                             )
                         )
-                    ),
+                    ),*)
                     ("cos-sq-sin-sq",
                         RectCon(
                             ResolveRect(
@@ -572,6 +590,33 @@ struct
                                 MKRect(
                                     Reverse(Ul9),
                                     Rotate(Reverse(Ul9), RootAngle(ref NONE, ref NONE, ref NONE))
+                                )
+                            )
+                        )
+                    ),(**)
+                    ("def-tan",
+                        LineCon(
+                            ResolveLine(
+                                Tangent(
+                                    Ul10,
+                                    Aa10
+                                ),
+                                SimilarTriangle(
+                                    Sine(
+                                        Rotate(
+                                            Ul10,
+                                            ReverseAngle(Aa10)
+                                        ),
+                                        Aa10
+                                    ),
+                                    Cosine(
+                                        Rotate(
+                                            Ul10,
+                                            ReverseAngle(Aa10)
+                                        ),
+                                        Aa10
+                                    ),
+                                    Ul10
                                 )
                             )
                         )
