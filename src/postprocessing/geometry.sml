@@ -222,7 +222,7 @@ struct
       | get_line_end (Cosine(l, a)) = get_line_start (Sine(l, a))
       | get_line_end (Tangent(l, a)) = (ref o SOME o Move) (
             get_angle_middle a,
-            (ref o SOME o Direction) (get_angle_middle a, get_angle_end a),
+            (ref o SOME o Direction) (get_angle_middle a, get_angle_start a),
             (ref o SOME o Divide) (disof l, (ref o SOME o Dot) (
                     (ref o SOME o Direction) (get_angle_middle a, get_angle_start a), 
                     (ref o SOME o Direction) (get_angle_middle a, get_angle_end a)
@@ -367,7 +367,7 @@ struct
             (
                 [
                     PC(get_angle_middle a, get_line_start l),
-                    PC(get_angle_start a, get_line_end l)
+                    DC((ref o SOME o Direction) (get_angle_middle a, get_angle_start a), dirof l)
                 ], []
             )
       | Sine(l, a) => mc
@@ -392,7 +392,7 @@ struct
             (
                 [
                     PC(get_line_start l, get_angle_middle a),
-                    DC(dirof l, (ref o SOME o Direction) (get_angle_middle a, get_angle_start a))
+                    DC(dirof l, (ref o SOME o Direction) (get_angle_middle a, get_angle_end a))
                 ], []
             )
       | MoveLine(l, lm) => mc

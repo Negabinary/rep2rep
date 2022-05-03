@@ -5,7 +5,7 @@ signal changed
 
 var start : Point
 var end : Point
-
+var color := Color(0,0,0,1)
 
 func _init(start, end):
 	self.start = start
@@ -26,4 +26,4 @@ func get_line_distance() -> Distance:
 	return SBetween.new(get_line_start(), get_line_end())
 
 func _draw():
-	draw_line(start.get_point_pos(), end.get_point_pos(), Color(0,0,0,1), 2, true)
+	draw_line(start.get_point_pos(), end.get_point_pos(), color, 2, true)

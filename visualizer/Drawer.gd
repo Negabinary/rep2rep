@@ -117,7 +117,14 @@ func generate(tree:Dictionary):
 				)
 			)
 			add_point_resolve(angle.get_angle_middle(), child.get_line_start())
-			add_point_resolve(angle.get_angle_start(), child.get_line_end())
+			add_direction_resolve(
+				child.get_line_start(),
+				DBetween.new(
+					angle.get_angle_middle(),
+					angle.get_angle_start()
+				),
+				child.get_line_direction()
+			)
 			add_child(line)
 			return line
 		"Sine":
@@ -207,7 +214,7 @@ func generate(tree:Dictionary):
 			add_direction_resolve(
 				angle.get_angle_middle(), 
 				one.get_line_direction(), 
-				DBetween.new(angle.get_angle_middle(), angle.get_angle_start())
+				DBetween.new(angle.get_angle_middle(), angle.get_angle_end())
 			)
 			add_child(line)
 			return line
