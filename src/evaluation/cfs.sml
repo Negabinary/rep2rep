@@ -143,6 +143,15 @@ struct
         in
             ()
         end
+    
+    fun numeric_string str =
+        let val grammar = Document.findGrammarWithName document "equationM";
+            val tokens = String.tokens (fn x => x = #"\n" orelse x = #" ") str;
+            val source_constructions = Grammar.parse grammar "equality" tokens;
+            val source_construction = case source_constructions of (x::_) => x | _ => raise (TestingException "Could not parse expression.");
+        in
+            Generator.check_equality source_construction
+        end
 
     fun test_other_strings lims = 
         let val other_strings = [
