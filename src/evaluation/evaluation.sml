@@ -60,6 +60,63 @@ struct
             val _ = Seq.chop 100000 (Seq.map evaluate_problem correct_equations);
         in () end;
     
+    fun variation_distribution n = 
+        let val document = Document.read "correspondences/eqgeom";
+            val KB = Document.knowledgeOf document;
+            val sourceTypeSystem = Document.findTypeSystemWithName document "equation";
+            val targetTypeSystem = Document.findTypeSystemWithName document "geometry";
+            val equations = Generator.equations_2 n;
+            val correct_equations = Seq.filter Generator.check_equality equations;
+
+            fun make_ideas construction = 
+                let val _ = print "====================================================================\n";
+                    val _ = print (Generator.print_equation construction ^ "\n");
+                    val goal = ([Construction.constructOf construction], [CSpace.makeToken "t'" (Type.typeOfString "value")], "repeq");
+                    val transfers = Transfer.masterTransfer false false NONE KB sourceTypeSystem targetTypeSystem construction goal;
+                    val full_transfers = Seq.filter (fn x => Postprocessing.is_fully_transfered x handle Postprocessing.UnresolvableGeometryTypes => false) transfers;
+                    val (ideas, _) = Seq.chop idea_limit full_transfers;
+                in
+                    ideas
+                end
+            
+            val ideas = List.flatmap make_ideas (Seq.list_of correct_equations);
+            
+            val N = 2000;
+
+            val refuted_array = Array.array (N,0);
+            val timeout_array = Array.array (N,0);
+            val proven_array = Array.array (N,0);
+            val probable_array = Array.array (N,0);
+            val possible_array = Array.array (N,0);
+
+            val _ = PolyML.print "BEGIN EVALUATION";
+
+            fun evaluate_idea idea = 
+                let val _ = print "--------------------------------------------------------------------\n"
+                    val pp_result = List.enumerate (Postprocessing.postprocess_silent (N, 0) idea);
+                    fun inc_arr arr i = Array.update (arr, i, (Array.sub (arr, i)) + 1);
+                    fun use_res (i,GeometryProver.Proven _) = (inc_arr proven_array i; true)
+                      | use_res (i,GeometryProver.Refuted) = (inc_arr refuted_array i; false)
+                      | use_res (i,GeometryProver.Possible _) = (inc_arr possible_array i; false)
+                      | use_res (i,GeometryProver.Probable _) = (inc_arr probable_array i; true)
+                      | use_res (i,GeometryProver.Timeout) = (inc_arr timeout_array i;false);
+                    val _ = List.exists use_res pp_result;
+                    val _ = PolyML.print (List.length pp_result);
+                in
+                    ()
+                end
+        
+            val _ = List.map evaluate_idea ideas;
+            val _ = PolyML.line_length 100000000000000;
+            val _ = PolyML.print_depth 100000000000000;
+            val _ = PolyML.print refuted_array;
+            val _ = PolyML.print timeout_array;
+            val _ = PolyML.print proven_array;
+            val _ = PolyML.print probable_array;
+            val _ = PolyML.print possible_array;
+
+        in () end;
+    
     fun variations_per_idea n =
         let val document = Document.read "correspondences/eqgeom";
             val KB = Document.knowledgeOf document;
@@ -80,4 +137,6 @@ struct
                 end
             val _ = Seq.chop 100000 (Seq.map evaluate_problem correct_equations);
         in () end;
+    
+
 end
