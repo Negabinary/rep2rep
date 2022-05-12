@@ -1,4 +1,4 @@
-import "postprocessing.constraint";
+import "postprocessing.path";
 
 
 signature GEOMETRY_PROVER =
